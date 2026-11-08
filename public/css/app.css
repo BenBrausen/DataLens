@@ -164,3 +164,41 @@ details summary { cursor: pointer; font-weight: 600; font-size: 13px; padding: 8
   .brand span { display: none; }
   .freshness { display: none; }
 }
+
+/* ---------- sources & states ---------- */
+.state-pick { display: flex; align-items: center; gap: 10px; background: var(--surface-2); border-radius: var(--radius); padding: 8px 10px; margin-bottom: 6px; }
+.state-pick label { font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.state-pick select { flex: 1; min-width: 0; }
+.state-note { margin: 0 0 10px; }
+.topic-chips, .scope-chips { margin: 0 0 12px; }
+.tier-desc { margin: -4px 0 8px; }
+.badge.tier-federal { background: rgba(42,120,214,.14); color: var(--accent); }
+.badge.tier-state { background: rgba(27,175,122,.15); color: var(--good); }
+.badge.tier-local { background: rgba(27,175,122,.10); color: var(--good); }
+.badge.tier-academic { background: rgba(98,80,214,.14); color: #6250d6; }
+.badge.tier-nonprofit { background: rgba(98,80,214,.10); color: #6250d6; }
+.badge.tier-industry { background: rgba(235,104,52,.15); color: var(--warn); }
+.badge.tier-international { background: var(--surface-2); color: var(--muted); }
+:root[data-theme="dark"] .badge.tier-academic, :root[data-theme="dark"] .badge.tier-nonprofit { color: #9085e9; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge.tier-academic, :root:not([data-theme="light"]) .badge.tier-nonprofit { color: #9085e9; } }
+.ds .local { display: inline-block; margin-top: 4px; font-size: 11.5px; font-weight: 600; color: var(--good); }
+.portal-list { display: grid; gap: 6px; margin-bottom: 8px; }
+.portal { display: block; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; text-decoration: none; color: inherit; }
+.portal:hover { border-color: var(--faint); }
+.portal b { display: block; font-size: 13px; }
+.portal span { font-size: 11.5px; color: var(--muted); }
+.src { border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 6px; overflow: hidden; }
+.src.open { border-color: var(--faint); }
+.src-head { display: flex; align-items: center; gap: 6px; width: 100%; border: 0; background: var(--surface); padding: 10px 12px; text-align: left; }
+.src-head b { flex: 1; font-size: 13px; }
+.src-head span:last-child { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.src-body { padding: 0 12px 12px; font-size: 12.5px; }
+.src-body p { margin: 0 0 8px; }
+.src-body .disclose { background: rgba(235,104,52,.10); border-radius: 6px; padding: 8px 10px; }
+.state-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 4px; margin-bottom: 6px; }
+.state-cell { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 5px 2px; text-align: center; }
+.state-cell b { display: block; font-size: 12.5px; }
+.state-cell span { display: block; font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.state-cell.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+.linkbtn { border: 0; background: none; color: var(--accent); padding: 0; text-decoration: underline; font-size: inherit; }
+.result .meta .badge { margin-left: 0; margin-right: 4px; }

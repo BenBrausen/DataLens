@@ -12,6 +12,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const isoCountries = require('i18n-iso-countries');
 
+import { DATASET_TAGS, THIRD_PARTY, FEDERAL, TIERS } from './sources/catalog.mjs';
 const OUT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../public/data');
 const NOW = new Date().toISOString();
 
@@ -69,9 +70,11 @@ async function fred(ids) {
   const out = {};
   for (let i = 0; i < ids.length; i += 12) {
     const chunk = ids.slice(i, i + 12);
-    const text = await get(`https://fred.stlouisfed.org/graph/fredgraph.csv?id=${chunk.join(',')}`, 'text');
+    let text = '';
+    try { text = await get(`https://fred.stlouisfed.org/graph/fredgraph.csv?id=${chunk.join(',')}`, 'text', chunk.length > 1 ? 1 : 3); }
+    catch (e) { if (chunk.length === 1) { console.warn(`  (FRED has no series ${chunk[0]}; skipped)`); out[chunk[0]] = []; continue; } }
     if (text.startsWith('PK') || !text.startsWith('observation_date')) {
-      if (chunk.length === 1) throw new Error(`FRED returned no CSV for ${chunk[0]}`);
+      if (chunk.length === 1) { console.warn(`  (FRED returned no CSV for ${chunk[0]}; skipped)`); out[chunk[0]] = []; continue; }
       for (const id of chunk) Object.assign(out, await fred([id]));
       continue;
     }
@@ -256,8 +259,9 @@ builders['federal-debt'] = async () => {
 };
 
 builders['state-unemployment'] = async () => {
-  const d = await fred(STATES.map(s => s[0] + 'UR'));
+  const d = await fred([...STATES.map(s => s[0] + 'UR'), 'UNRATE']);
   const times = d.CAUR.map(p => p[0]);
+  const us = new Map(d.UNRATE.map(p => [p[0], p[1]]));
   const entities = STATES.map(([ab, fips, name]) => {
     const m = new Map(d[ab + 'UR'].map(p => [p[0], p[1]]));
     return { id: fips, code: ab, name, values: times.map(t => m.get(t) ?? null) };
@@ -268,7 +272,7 @@ builders['state-unemployment'] = async () => {
     source: { publisher: 'U.S. Bureau of Labor Statistics', dataset: 'Local Area Unemployment Statistics (LAUS)', url: 'https://www.bls.gov/lau/', via: 'FRED, Federal Reserve Bank of St. Louis' },
     howToRead: ['State rates are modeled estimates and are revised every year in March.'],
     caveats: ['Small states have larger margins of error; month-to-month moves of a few tenths of a point are often noise.'],
-    isRate: true }, times, entities);
+    isRate: true, national: { name: 'United States', values: times.map(t => us.get(t) ?? null) } }, times, entities);
 };
 
 let popCache;
@@ -290,7 +294,8 @@ builders['state-population'] = async () => {
     description: 'Resident population of each state and D.C., annual estimates (decennial counts in census years).',
     source: { publisher: 'U.S. Census Bureau', dataset: 'Annual Resident Population Estimates', url: 'https://www.census.gov/programs-surveys/popest.html', via: 'FRED, Federal Reserve Bank of St. Louis' },
     howToRead: ['Between censuses these are estimates built from births, deaths and migration records.'],
-    caveats: ['Estimates are revised after each decennial census, so older numbers may change.'] }, times, entities);
+    caveats: ['Estimates are revised after each decennial census, so older numbers may change.'],
+    national: { name: 'United States (50 states + DC)', values: times.map((_, i) => entities.reduce((a, e) => a + (e.values[i] ?? 0), 0)) } }, times, entities);
 };
 
 builders['overdose-deaths'] = async () => {
@@ -383,6 +388,115 @@ builders['life-expectancy'] = async () => {
     caveats: ['It is a snapshot of death rates in a given year, so shocks like COVID-19 dip it temporarily.'], isRate: true }, times, entities);
 };
 
+
+// Generic builder for a FRED series published for every state.
+async function fredStatePanel(meta, idFor, nationalId, transform = v => v) {
+  const ids = STATES.map(s => idFor(s[0]));
+  const d = await fred(nationalId ? [...ids, nationalId] : ids);
+  const times = [...new Set(ids.flatMap(id => (d[id] || []).map(p => p[0])))].sort();
+  const entities = STATES.map(([ab, fips, name]) => {
+    const m = new Map((d[idFor(ab)] || []).map(p => [p[0], transform(p[1])]));
+    return { id: fips, code: ab, name, values: times.map(t => m.get(t) ?? null) };
+  });
+  const out = { ...meta, geo: 'us-states' };
+  if (nationalId) { const m = new Map(d[nationalId].map(p => [p[0], transform(p[1])])); out.national = { name: 'United States', values: times.map(t => m.get(t) ?? null) }; }
+  return panel(out, times, entities);
+}
+
+builders['state-income'] = () => fredStatePanel({
+  id: 'state-income', title: 'Median household income by state', category: 'Economy', frequency: 'annual',
+  unit: { label: 'Median household income (inflation-adjusted)', format: 'usd', decimals: 0 },
+  description: 'Income of the household in the middle of each state\'s distribution, adjusted for inflation by the Census Bureau.',
+  source: { publisher: 'U.S. Census Bureau', dataset: 'Current Population Survey, Annual Social and Economic Supplement', url: 'https://www.census.gov/topics/income-poverty/income.html', via: 'FRED, Federal Reserve Bank of St. Louis' },
+  howToRead: ['Median means half of households earn more and half earn less, so a few very high earners do not skew it.'],
+  caveats: ['State estimates come from a survey sample and have wide margins of error; differences of a few thousand dollars between states are often not meaningful.', 'Not adjusted for cost of living, which varies a lot between states.'],
+}, ab => `MEHOINUS${ab}A672N`, 'MEHOINUSA672N');
+
+builders['state-income-pc'] = () => fredStatePanel({
+  id: 'state-income-pc', title: 'Personal income per person by state', category: 'Economy', frequency: 'annual',
+  unit: { label: 'Per capita personal income', format: 'usd', decimals: 0 },
+  description: 'All income received by a state\'s residents (wages, benefits, investment income) divided by its population.',
+  source: { publisher: 'U.S. Bureau of Economic Analysis', dataset: 'State Annual Personal Income (SAINC)', url: 'https://www.bea.gov/data/income-saving/personal-income-by-state', via: 'FRED, Federal Reserve Bank of St. Louis' },
+  howToRead: ['An average, so high earners pull it up. Median household income better describes a typical family.'],
+  caveats: ['In current dollars, not adjusted for inflation or cost of living.'],
+}, ab => `${ab}PCPI`, 'A792RC0A052NBEA');
+
+builders['state-hpi'] = () => fredStatePanel({
+  id: 'state-hpi', title: 'Home price growth by state', category: 'Housing', frequency: 'quarterly',
+  unit: { label: 'House price index (1980 = 100)', format: 'number', decimals: 0 },
+  description: 'How much home prices have grown in each state since 1980, from repeat sales of the same houses.',
+  source: { publisher: 'Federal Housing Finance Agency', dataset: 'All-Transactions House Price Index', url: 'https://www.fhfa.gov/data/hpi', via: 'FRED, Federal Reserve Bank of St. Louis' },
+  howToRead: ['Each state starts at 100 in 1980, so 500 means prices are five times their 1980 level. It compares growth, not price levels: a state at 400 is not more expensive than one at 300.'],
+  caveats: ['Not adjusted for inflation.'],
+}, ab => `${ab}STHPI`, 'USSTHPI');
+
+builders['state-min-wage'] = () => fredStatePanel({
+  id: 'state-min-wage', title: 'Minimum wage by state', category: 'Economy', frequency: 'annual',
+  unit: { label: 'State minimum hourly wage', format: 'usd', decimals: 2 },
+  description: 'The minimum hourly wage set by each state\'s law.',
+  source: { publisher: 'U.S. Department of Labor', dataset: 'State Minimum Wage Rates', url: 'https://www.dol.gov/agencies/whd/minimum-wage/state', via: 'FRED, Federal Reserve Bank of St. Louis' },
+  howToRead: ['Where a state\'s minimum is below $7.25 or it has none, the federal minimum of $7.25 applies to most workers.', 'Many cities and counties set higher local minimums.'],
+  caveats: ['States with no minimum wage law of their own show as no data.', 'Nominal dollars, not adjusted for inflation.'],
+}, ab => `STTMINWG${ab}`, 'FEDMINNFRWG');
+
+builders['state-home-values'] = async () => {
+  const text = await get('https://files.zillowstatic.com/research/public_csvs/zhvi/State_zhvi_uc_sfrcondo_tier_0.33_0.67_sm_sa_month.csv', 'text');
+  const rows = parseCSV(text), head = rows[0];
+  const dateCols = head.map((h, i) => [h, i]).filter(([h]) => /^\d{4}-\d{2}-\d{2}$/.test(h));
+  const byName = new Map(rows.slice(1).map(r => [r[head.indexOf('RegionName')], r]));
+  const entities = STATES.map(([ab, fips, name]) => {
+    const r = byName.get(name);
+    return { id: fips, code: ab, name, values: dateCols.map(([, i]) => (r && r[i] !== '' ? round(parseFloat(r[i]), 0) : null)) };
+  });
+  return panel({ id: 'state-home-values', title: 'Typical home value by state', category: 'Housing', frequency: 'monthly', geo: 'us-states',
+    unit: { label: 'Typical home value (ZHVI)', format: 'usd', decimals: 0 },
+    description: 'Zillow\'s estimate of the typical value of homes in each state (the middle third of the market), seasonally adjusted.',
+    source: { publisher: 'Zillow Research', dataset: 'Zillow Home Value Index (ZHVI), all homes, mid-tier', url: 'https://www.zillow.com/research/data/' },
+    howToRead: ['This is a model estimate of what homes are worth, including homes that did not sell, not a record of sale prices.'],
+    caveats: ['Not adjusted for inflation.'] }, dateCols.map(([h]) => h), entities);
+};
+
+builders['consumer-sentiment'] = async () => {
+  const d = await fred(['UMCSENT']);
+  return ts({ id: 'consumer-sentiment', title: 'U.S. consumer sentiment', category: 'Economy', frequency: 'monthly',
+    unit: { label: 'Index of Consumer Sentiment (1966 = 100)', format: 'number', decimals: 1 },
+    description: 'How Americans feel about their finances and the economy, from a monthly survey.',
+    source: { publisher: 'University of Michigan', dataset: 'Surveys of Consumers, Index of Consumer Sentiment', url: 'https://www.sca.isr.umich.edu/', via: 'FRED, Federal Reserve Bank of St. Louis' },
+    howToRead: ['Measures feelings, not spending. Sentiment and actual spending often move apart.'],
+    caveats: ['Survey of roughly 600-1,000 people a month; moves of 2-3 points can be noise.', 'The survey changed from phone to online interviews in 2024, which may affect comparisons with earlier years.'] },
+    [{ id: 'UMCSENT', name: 'Consumer sentiment', points: d.UMCSENT }]);
+};
+
+builders['job-postings'] = async () => {
+  const text = await get('https://raw.githubusercontent.com/hiring-lab/job_postings_tracker/master/US/aggregate_job_postings_US.csv', 'text');
+  const rows = parseCSV(text), head = rows[0];
+  const iv = head.indexOf('indeed_job_postings_index_SA'), ivar = head.indexOf('variable');
+  const pts = rows.slice(1).filter(r => r[ivar] === 'total postings').map(r => [r[0], parseFloat(r[iv])]).filter(p => Number.isFinite(p[1]));
+  const weekly = pts.filter((_, i) => i % 7 === 0 || i === pts.length - 1);
+  return ts({ id: 'job-postings', title: 'Job postings on Indeed', category: 'Economy', frequency: 'weekly',
+    unit: { label: 'Job postings index (Feb 1, 2020 = 100)', format: 'number', decimals: 1 },
+    description: 'Daily count of U.S. job postings on Indeed relative to before the pandemic, seasonally adjusted.',
+    source: { publisher: 'Indeed Hiring Lab', dataset: 'Job Postings Tracker (aggregate, U.S.)', url: 'https://github.com/hiring-lab/job_postings_tracker' },
+    howToRead: ['Above 100 means more postings than just before the pandemic; below 100 means fewer.'],
+    caveats: ['Postings on one website, not total U.S. job openings. The official measure is the BLS Job Openings and Labor Turnover Survey (JOLTS).'] },
+    [{ id: 'POSTINGS', name: 'Job postings', points: weekly }]);
+};
+
+builders['world-co2'] = async () => {
+  const text = await get('https://ourworldindata.org/grapher/co-emissions-per-capita.csv?v=1&csvType=full&useColumnShortNames=true', 'text');
+  const rows = parseCSV(text).slice(1).filter(r => /^[A-Z]{3}$/.test(r[1]) && +r[2] >= 1950);
+  const years = [...new Set(rows.map(r => +r[2]))].sort((a, b) => a - b);
+  const by = new Map();
+  for (const [name, code, y, v] of rows) { if (!by.has(code)) by.set(code, { name, m: new Map() }); by.get(code).m.set(+y, parseFloat(v)); }
+  const entities = [...by.entries()].map(([code, { name, m }]) => ({ id: isoCountries.alpha3ToNumeric(code) || code, code, name, values: years.map(y => (m.has(y) ? round(m.get(y), 2) : null)) }));
+  return panel({ id: 'world-co2', title: 'CO₂ emissions per person by country', category: 'World', frequency: 'annual', geo: 'world',
+    unit: { label: 'Tonnes of CO₂ per person', format: 'number', decimals: 1 },
+    description: 'Carbon dioxide emitted from fossil fuels and industry in each country, divided by its population.',
+    source: { publisher: 'Our World in Data', dataset: 'CO₂ emissions per capita, based on the Global Carbon Budget', url: 'https://ourworldindata.org/co2-emissions' },
+    howToRead: ['Counts emissions where goods are produced, not where they are consumed. Countries that import many goods look cleaner than their consumption implies.'],
+    caveats: ['Excludes emissions from land-use change such as deforestation.'], isRate: true }, years.map(y => `${y}-12-31`), entities);
+};
+
 // ---------- run ----------
 await fs.mkdir(OUT, { recursive: true });
 const only = process.argv.slice(2);
@@ -403,8 +517,10 @@ for (const [key, build] of Object.entries(builders)) {
 // Rebuild the catalog from whatever snapshots exist on disk.
 for (const f of (await fs.readdir(OUT)).filter(f => f.endsWith('.json') && f !== 'catalog.json')) {
   const ds = JSON.parse(await fs.readFile(path.join(OUT, f), 'utf8'));
-  const { series, entities, events, times, ...meta } = ds;
-  catalog.push({ ...meta, nSeries: series?.length, nEntities: entities?.length, nEvents: events?.length,
+  const { series, entities, events, times, national, ...meta } = ds;
+  const tag = DATASET_TAGS[meta.id] || {};
+  const src = [...FEDERAL.map(f => ({ ...f, tier: 'federal' })), ...THIRD_PARTY].find(x => x.id === tag.source);
+  catalog.push({ ...meta, hasNational: !!national, topic: tag.topic || 'economy', sourceId: tag.source || null, tier: tag.tier || src?.tier || 'federal', nSeries: series?.length, nEntities: entities?.length, nEvents: events?.length,
     firstObservation: times?.[0] ?? series?.[0]?.points?.[0]?.[0] ?? events?.[0]?.t });
 }
 catalog.sort((a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title));

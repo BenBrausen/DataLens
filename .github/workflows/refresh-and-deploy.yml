@@ -4,7 +4,8 @@
 name: Refresh data and deploy
 on:
   schedule:
-    - cron: '17 */6 * * *'   # every 6 hours
+    - cron: '17 */6 * * *'   # data, every 6 hours
+    - cron: '17 6 * * 1'     # data + portal re-verification, Mondays
   workflow_dispatch:
   push:
     branches: [main]
@@ -27,12 +28,16 @@ jobs:
           # Optional free keys raise rate limits / unlock sources. Add as repo secrets.
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      - name: Re-verify state portals (platform, dataset counts, moved domains)
+        if: github.event_name != 'schedule' || github.event.schedule == '17 6 * * 1'
+        continue-on-error: true
+        run: node scripts/build-sources.mjs
       - run: node scripts/build-artifact.mjs
       - name: Commit changed snapshots (gives every dataset a version history)
         run: |
           git config user.name "plainsight-bot"
           git config user.email "plainsight-bot@users.noreply.github.com"
-          git add public/data
+          git add public/data public/sources
           git diff --cached --quiet || git commit -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
           git pull --rebase origin main && git push
       # Publishing is opt-in: enable Pages (Settings > Pages > Source: GitHub Actions),

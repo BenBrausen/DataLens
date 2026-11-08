@@ -19,8 +19,14 @@ const CACHE_MS = 60 * 60 * 1000;
 
 // Public-data hosts only. Government domains, plus well-known open-data portals and
 // statistical agencies. Keeps the proxy from becoming an open relay.
-const ALLOW = [/\.gov$/i, /\.mil$/i, /\.us$/i, /^data\.[a-z0-9-]+\.(org|com|net)$/i, /^fred\.stlouisfed\.org$/i, /^api\.worldbank\.org$/i, /^opendata\.[a-z0-9.-]+$/i];
-const allowed = host => ALLOW.some(r => r.test(host));
+const ALLOW = [/\.gov$/i, /\.mil$/i, /\.us$/i, /^data\.[a-z0-9-]+\.(org|com|net)$/i, /^fred\.stlouisfed\.org$/i, /^api\.worldbank\.org$/i, /^opendata\.[a-z0-9.-]+$/i,
+  /\.edu$/i, /(^|\.)arcgis\.com$/i, /^api\.us\.socrata\.com$/i, /^data\.geospatialhub\.org$/i, /^ourworldindata\.org$/i];
+// Every portal host in the source registry is allowed too.
+let registryHosts = new Set();
+fs.readFile(path.join(PUB, 'sources/registry.json'), 'utf8').then(t => {
+  registryHosts = new Set(JSON.parse(t).states.flatMap(s => s.portals.map(p => p.host || new URL(p.url).hostname)));
+}).catch(() => {});
+const allowed = host => registryHosts.has(host) || ALLOW.some(r => r.test(host));
 
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon' };
 const cache = new Map();

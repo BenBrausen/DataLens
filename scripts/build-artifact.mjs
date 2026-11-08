@@ -14,7 +14,7 @@ html = html
   .replace('<script src="vendor/d3.min.js"></script>', '<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>')
   .replace('<script src="vendor/topojson-client.min.js"></script>', js('public/vendor/topojson-client.min.js'))
   .replace('<script src="js/geo-data.js"></script>', js('public/js/geo-data.js'))
-  .replace('<!--INLINE_DATA-->', `<script>window.PS_EMBED=${safe(JSON.stringify({ catalog, datasets }))};</script>`)
+  .replace('<!--INLINE_DATA-->', `<script>window.PS_EMBED=${safe(JSON.stringify({ catalog, datasets, registry: JSON.parse(read('public/sources/registry.json')) }))};</script>`)
   .replace(/<script src="(js\/[a-z]+\.js)"><\/script>/g, (_, f) => js('public/' + f))
   .replace('<!--INLINE_HEAD-->', '')
   .replace(/<\/head>\s*<body>/, '')

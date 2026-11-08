@@ -6,8 +6,9 @@
   const renderer = new PS.Renderer(canvas);
 
   const S = {
-    catalog: [], ds: null, step: 'data', dataTab: 'featured', playing: false, p: 1, t0: 0,
-    analysis: null, audio: null, imported: null, search: { q: '', results: [], busy: false, err: '' }, exporting: false, custom: [],
+    catalog: [], ds: null, step: 'data', dataTab: 'topics', topic: 'all', sourceOpen: null,
+    state: (() => { try { return localStorage.getItem('ps-state') || ''; } catch { return ''; } })(), playing: false, p: 1, t0: 0,
+    analysis: null, audio: null, imported: null, search: { q: '', scope: 'all', org: null, orgName: '', results: [], busy: false, err: '', info: '' }, exporting: false, custom: [],
   };
   const DEFAULTS = {
     chart: 'line', platform: 'vertical', format: 'video', duration: 20, theme: 'newsroom', palette: 'plainsight',
@@ -15,7 +16,7 @@
     accent: '', bg: '', bgGradient: false, radius: 6, lineWidth: 5, grid: 'light', textScale: 1, annotate: true, zeroBase: true,
     series: [], entities: [], topN: 10, highlight: '', sortAsc: false, rangeStart: null, rangeEnd: null, handle: '', brand: true,
     motion: 'steady', takeaway: true, takeawayText: '', captions: true, script: '', scriptEdited: false, voice: '', speakPreview: false,
-    kicker: '', title: '', subtitle: '', note: '', colorZero: false,
+    kicker: '', title: '', subtitle: '', note: '', colorZero: false, focus: '', compareNational: true, titleEdited: false,
   };
   let o = { ...DEFAULTS };
 
@@ -33,6 +34,12 @@
     if (ds.kind === 'events') return `${ds.unit.label} 2.5 and above, ${PS.fmtDate(a, 'daily')} to ${PS.fmtDate(b, 'daily')}`;
     const range = ds.singleTime ? '' : yearOf(a) === yearOf(b) ? `, ${yearOf(a)}` : `, ${yearOf(o.rangeStart ?? a)}–${yearOf(o.rangeEnd ?? b)}`;
     return `${ds.unit.label}${range}`;
+  }
+  const stateInfo = () => { const r = PS.STATE_LIST.find(x => x[0] === S.state); return r ? { code: r[0], fips: r[1], name: r[2] } : null; };
+  function autoTitle(ds) {
+    const st = stateInfo();
+    if (o.focus && st && o.chart === 'line') return `${ds.title.replace(/ by state$/i, '')} in ${st.name}`;
+    return ds.title;
   }
   function palette() {
     const T = PS.THEMES[o.theme];
@@ -116,8 +123,14 @@
     S.ds = ds;
     const charts = PS.chartsFor(ds).map(c => c.id);
     o.chart = charts.includes(o.chart) && keepStory ? o.chart : PS.defaultChart(ds);
-    Object.assign(o, { series: [], entities: [], highlight: '', rangeStart: null, rangeEnd: null, takeawayText: '', scriptEdited: false });
-    o.title = ds.title; o.subtitle = autoSubtitle(ds); o.kicker = '';
+    Object.assign(o, { series: [], entities: [], highlight: '', rangeStart: null, rangeEnd: null, takeawayText: '', scriptEdited: false, titleEdited: false });
+    // A chosen state localizes every state-level dataset: highlighted on maps and
+    // bars, and compared with the U.S. on line charts.
+    const st = stateInfo();
+    o.focus = st && ds.geo === 'us-states' && ds.entities.some(e => e.id === st.fips) ? st.fips : '';
+    o.highlight = o.focus;
+    if (o.focus && ds.national && !keepStory) o.chart = 'line';
+    o.title = autoTitle(ds); o.subtitle = autoSubtitle(ds); o.kicker = '';
     o.zeroBase = !(ds.kind === 'timeseries' && ds.unit.format === 'usd' && false);
     if (ds.zeroLine) o.zeroBase = false;
     S.p = o.format === 'image' ? 1 : 1;
@@ -145,52 +158,126 @@
   const STEPS = {};
   const AFTER = {};
 
+  const TIER_BADGE = { federal: 'Federal', state: 'State', local: 'Local', academic: 'Academic', nonprofit: 'Nonprofit', industry: 'Company', international: 'Intl.' };
+  const tierBadge = t => `<span class="badge tier-${t || 'federal'}">${TIER_BADGE[t] || 'Federal'}</span>`;
+  const PLATFORM_NAME = { socrata: 'Socrata', ckan: 'CKAN', arcgis: 'ArcGIS Hub', website: 'Website', unknown: 'Not yet checked' };
+  const fmtThrough = c => PS.fmtDate(c.lastObservation, c.frequency === 'real-time' ? 'daily' : c.frequency);
+
+  function dsCard(c) {
+    const st = stateInfo();
+    const active = S.ds && (S.ds.id === c.id || c.reframes?.includes(S.ds.id));
+    const kind = c.kind === 'events' ? '<span class="badge live">Live</span>' : c.geo ? '<span class="badge">Map</span>' : c.kind === 'panel' ? '<span class="badge">Compare</span>' : '';
+    const local = st && c.geo === "us-states" ? `<span class="local">Shows ${esc(st.name)}${c.hasNational ? ' vs. U.S.' : ''}</span>` : '';
+    return `<button class="ds ${active ? 'active' : ''}" data-ds="${c.id}"><b>${esc(c.title)}${kind}${tierBadge(c.tier)}</b><span>${esc(c.source.publisher)} · through ${esc(fmtThrough(c))}</span>${local}</button>`;
+  }
+  const heads = list => list.filter(c => !c.reframes || c.reframes[0] === c.id);
+  function lensHTML() {
+    if (!S.ds?.reframes) return '';
+    return `<div class="lens"><p><b>Same data, different lens.</b> The lens changes the story; pick the one that answers the question honestly.</p><div class="chips">${S.ds.reframes.map(id => { const c = S.catalog.find(x => x.id === id); return c ? `<button class="chip ${S.ds.id === id ? 'active' : ''}" data-ds="${id}">${esc(c.lens || c.title)}</button>` : ''; }).join('')}</div></div>`;
+  }
+  function portalChips(code) {
+    const ps = PS.statePortals(code);
+    if (!ps.length) return '<p class="muted">No portals registered yet.</p>';
+    return `<div class="portal-list">${ps.map(p => `<a class="portal" href="${esc(p.url)}" target="_blank" rel="noopener"><b>${esc(p.name)}</b><span>${esc(p.host || new URL(p.url).hostname)} · ${PLATFORM_NAME[p.platform] || 'Not yet checked'}${p.datasets ? ` · ${p.datasets.toLocaleString()} datasets` : ''}${p.scope === 'specialized' ? ' · GIS/agency' : ''}</span></a>`).join('')}</div>`;
+  }
+
   STEPS.data = () => {
-    const tabs = `<div class="tabs">${[['featured', 'Featured'], ['search', 'Search data.gov'], ['upload', 'Upload']].map(([k, l]) => `<button data-tab="${k}" class="${S.dataTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>`;
+    const st = stateInfo();
+    const stateSel = `<div class="state-pick"><label for="statePick">Your state</label><select id="statePick"><option value="">All states (national view)</option>${PS.STATE_LIST.map(([c, , n]) => `<option value="${c}" ${S.state === c ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
+      ${st ? `<p class="muted state-note">State-level charts now highlight ${esc(st.name)} and compare it with the U.S.</p>` : ''}`;
+    const tabs = `<div class="tabs">${[['topics', 'Topics'], ['sources', 'Sources'], ['search', 'Search'], ['upload', 'Upload']].map(([k, l]) => `<button data-tab="${k}" class="${S.dataTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>`;
     let body = '';
-    if (S.dataTab === 'featured') {
-      const lens = S.ds?.reframes ? `<div class="lens"><p><b>Same data, different lens.</b> The lens changes the story; pick the one that answers the question honestly.</p><div class="chips">${S.ds.reframes.map(id => { const c = S.catalog.find(x => x.id === id); return c ? `<button class="chip ${S.ds.id === id ? 'active' : ''}" data-ds="${id}">${esc(c.lens || c.title)}</button>` : ''; }).join('')}</div></div>` : '';
+    const reg = PS.REGISTRY;
+
+    if (S.dataTab === 'topics') {
+      const topics = (reg?.topics || []).map(t => ({ ...t, n: heads(S.catalog).filter(c => c.topic === t.id).length })).filter(t => t.n);
+      body += `<div class="chips topic-chips"><button class="chip ${S.topic === 'all' ? 'active' : ''}" data-topic="all">All</button>${topics.map(t => `<button class="chip ${S.topic === t.id ? 'active' : ''}" data-topic="${t.id}">${esc(t.name)} <small>${t.n}</small></button>`).join('')}</div>`;
+      body += lensHTML();
+      let list = heads(S.catalog).filter(c => S.topic === 'all' || c.topic === S.topic);
+      if (st) list = [...list.filter(c => c.geo === 'us-states'), ...list.filter(c => c.geo !== 'us-states')];
       const groups = {};
-      S.catalog.filter(c => !c.reframes || c.reframes[0] === c.id).forEach(c => (groups[c.category] ||= []).push(c));
-      if (S.custom.length) groups['Your data'] = S.custom;
-      body = lens + Object.entries(groups).map(([g, list]) => `<div class="ds-group"><h3>${esc(g)}</h3>${list.map(c => {
-        const active = S.ds && (S.ds.id === c.id || c.reframes?.includes(S.ds.id));
-        const kind = c.kind === 'events' ? '<span class="badge live">Live</span>' : c.geo ? '<span class="badge">Map</span>' : c.kind === 'panel' ? '<span class="badge">Compare</span>' : '';
-        return `<button class="ds ${active ? 'active' : ''}" data-ds="${c.id}"><b>${esc(c.title)}${kind}</b><span>${esc(c.source.publisher)} · through ${esc(PS.fmtDate(c.lastObservation, c.frequency === 'real-time' ? 'daily' : c.frequency))}</span></button>`;
-      }).join('')}</div>`).join('');
+      list.forEach(c => { const g = st && c.geo === 'us-states' ? `${st.name} & the U.S.` : (reg?.topics.find(t => t.id === c.topic)?.name || c.category); (groups[g] ||= []).push(c); });
+      if (S.custom.length && S.topic === 'all') groups['Your data'] = S.custom;
+      body += Object.entries(groups).map(([g, l]) => `<div class="ds-group"><h3>${esc(g)}</h3>${l.map(dsCard).join('')}</div>`).join('');
+      if (st) {
+        const t = reg?.topics.find(x => x.id === S.topic);
+        body += `<div class="ds-group"><h3>From ${esc(st.name)}'s government</h3>${portalChips(st.code)}
+          <button class="btn block" data-act="portalBrowse" data-q="${esc(t ? t.kw[0] : '')}">Browse ${esc(st.name)} datasets${t ? ' about ' + esc(t.name.toLowerCase()) : ''}</button></div>`;
+      }
       if (S.ds?.id === 'earthquakes') body = `<button class="btn block" data-act="live">Refresh live from USGS</button>` + body;
-    } else if (S.dataTab === 'search') {
-      body = `<p class="muted">Search ${'300,000+'} federal, state and city datasets in the official data.gov catalog. Plainsight loads the CSV and suggests a chart.</p>
-        <form id="searchForm" class="row"><input type="search" id="q" placeholder="e.g. electric vehicles, crime, school enrollment" value="${esc(S.search.q)}"><button class="btn primary" style="flex:none">Search</button></form>
-        <div class="results">${S.search.busy ? '<p class="muted">Searching…</p>' : ''}${S.search.err ? `<p class="err">${esc(S.search.err)}</p>` : ''}
-        ${S.search.results.map((r, i) => `<div class="result"><b>${esc(r.title)}</b><div class="meta">${esc(r.publisher)}${r.orgType ? ' · ' + esc(r.orgType) : ''}${r.modified ? ' · updated ' + esc(String(r.modified).slice(0, 10)) : ''}</div><p>${esc(r.description)}</p><div class="row"><button class="btn" data-load="${i}">Load data</button><a class="muted" href="${esc(r.landing)}" target="_blank" rel="noopener" style="flex:none">Source page ↗</a></div></div>`).join('')}</div>` + mapperHTML();
-    } else {
+    }
+
+    else if (S.dataTab === 'sources') {
+      const curated = id => heads(S.catalog).filter(c => c.sourceId === id);
+      const card = (src, tier) => {
+        const open = S.sourceOpen === src.id, ds = curated(src.id);
+        return `<div class="src ${open ? 'open' : ''}"><button class="src-head" data-src="${src.id}"><b>${esc(src.name)}</b>${tierBadge(tier)}<span>${ds.length ? `${ds.length} ready-made` : src.catalogSlug ? 'Search on data.gov' : ''}</span></button>
+          ${open ? `<div class="src-body">${src.org ? `<p><b>Who:</b> ${esc(src.org)}</p>` : ''}${src.why ? `<p><b>Why it's trusted:</b> ${esc(src.why)}</p>` : ''}${src.disclosure ? `<p class="${tier === 'industry' ? 'disclose' : ''}"><b>${tier === 'industry' ? 'Disclosure' : 'Keep in mind'}:</b> ${esc(src.disclosure)}</p>` : ''}${src.note ? `<p class="muted">${esc(src.note)}</p>` : ''}
+            ${ds.map(dsCard).join('')}
+            ${src.catalogSlug ? `<button class="btn block" data-act="orgSearch" data-org="${esc(src.catalogSlug)}" data-name="${esc(src.name)}">Search all ${esc(src.name)} datasets on data.gov</button>` : ''}
+            <a class="muted" href="${esc(src.url)}" target="_blank" rel="noopener">${esc(new URL(src.url).hostname)} ↗</a></div>` : ''}</div>`;
+      };
+      const tiers = reg?.tiers || [];
+      body += lensHTML();
+      for (const tier of tiers) {
+        body += `<div class="ds-group"><h3>${esc(tier.name)}</h3><p class="muted tier-desc">${esc(tier.desc)}</p>`;
+        if (tier.id === 'federal') body += (reg.federal || []).map(f => card(f, 'federal')).join('');
+        else if (tier.id === 'state') {
+          body += `<div class="state-grid">${reg.states.map(s => {
+            const ps = s.portals.filter(p => PS.SEARCHABLE.includes(p.platform)), n = ps.reduce((a, p) => a + (p.datasets || 0), 0);
+            return `<button class="state-cell ${S.state === s.code ? 'active' : ''}" data-statebrowse="${s.code}" title="${esc(s.name)}"><b>${s.code}</b><span>${ps.length ? (n ? n.toLocaleString() : 'Searchable') : s.portals.length ? 'Link' : '—'}</span></button>`;
+          }).join('')}</div><p class="muted">Numbers are searchable datasets. "Link" means the portal has no search API yet and opens in a new tab.</p>`;
+        }
+        else body += (reg.thirdParty || []).filter(x => x.tier === tier.id).map(x => card(x, tier.id)).join('') || '<p class="muted">None yet.</p>';
+        body += '</div>';
+      }
+    }
+
+    else if (S.dataTab === 'search') {
+      const sc = S.search;
+      const scopes = [['all', st ? `Everything + ${st.name}` : 'Everything'], ['datagov', 'Federal (data.gov)'], ...(st ? [['state', `${st.name} portals`]] : []), ['states', 'All state portals']];
+      body += `<form id="searchForm" class="row"><input type="search" id="q" placeholder="e.g. broadband, crashes, school enrollment" value="${esc(sc.q)}"><button class="btn primary" style="flex:none">Search</button></form>
+        <div class="chips scope-chips">${scopes.map(([k, l]) => `<button class="chip ${sc.scope === k ? 'active' : ''}" data-scope="${k}">${esc(l)}</button>`).join('')}</div>
+        ${sc.org ? `<p class="muted">Limited to ${esc(sc.orgName)} <button class="linkbtn" data-act="clearOrg">clear</button></p>` : ''}
+        ${st && sc.scope === 'state' ? portalChips(st.code) : ''}
+        <div class="results">${sc.busy ? '<p class="muted">Searching…</p>' : ''}${sc.err ? `<p class="err">${esc(sc.err)}</p>` : ''}${sc.info ? `<p class="muted">${esc(sc.info)}</p>` : ''}
+        ${sc.results.map((r, i) => `<div class="result"><b>${esc(r.title)}</b><div class="meta">${tierBadge(r.tier)} ${esc(r.publisher)}${r.state && !r.publisher.includes(r.state) ? ' · ' + esc(r.state) : ''}${r.modified ? ' · updated ' + esc(String(r.modified).slice(0, 10)) : ''} · ${esc(r.platform === 'data.gov' ? 'data.gov' : r.host)}</div>${r.description ? `<p>${esc(r.description)}</p>` : ''}<div class="row"><button class="btn" data-load="${i}">Load data</button><a class="muted" href="${esc(r.landing)}" target="_blank" rel="noopener" style="flex:none">Source page ↗</a></div></div>`).join('')}</div>` + mapperHTML();
+    }
+
+    else {
       body = `<p class="muted">Upload a CSV. Plainsight detects dates, numbers, states and countries automatically. Uploaded files are labeled as unverified in the citation.</p>
         <input type="file" id="file" accept=".csv,.tsv,.txt,text/csv"><p class="muted">Tip: one row per date (and place), one column per measure.</p>` + mapperHTML();
     }
-    return tabs + body;
+    return stateSel + tabs + body;
   };
 
-  function mapperHTML() {
-    const im = S.imported; if (!im) return '';
-    const opt = (k, types, none) => `<select data-map="${k}">${none ? `<option value="-1">${none}</option>` : ''}${im.cols.filter(c => types.includes(c.type)).map(c => `<option value="${c.i}" ${im.map[k] === c.i ? 'selected' : ''}>${esc(c.name)} (${c.type})</option>`).join('')}</select>`;
-    return `<div class="mapper"><b>${esc(im.meta.title)}</b><p class="muted">${im.table.rows.length.toLocaleString()} rows · ${im.cols.length} columns</p>
-      ${field('Time', opt('time', ['date'], 'None (one moment)'))}
-      ${field('Place or category', opt('category', ['state', 'country', 'text'], 'None (single series)'))}
-      ${field('Value', opt('value', ['number'], ''))}
-      ${field('Combine duplicate rows by', `<select data-map="agg">${['sum', 'mean', 'max', 'min', 'count'].map(a => `<option ${im.map.agg === a ? 'selected' : ''}>${a}</option>`).join('')}</select>`)}
-      <button class="btn primary block" data-act="build">Build chart</button>
-      <table><tr>${im.table.header.slice(0, 5).map(h => `<th>${esc(h)}</th>`).join('')}</tr>${im.table.rows.slice(0, 4).map(r => `<tr>${r.slice(0, 5).map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
+  async function runSearch() {
+    const sc = S.search, st = stateInfo();
+    Object.assign(sc, { busy: true, err: '', info: '', results: [] }); renderStep();
+    const jobs = [];
+    if (sc.scope === 'all' || sc.scope === 'datagov') jobs.push(PS.searchCatalog(sc.q, null, sc.org).then(r => ({ results: r.results })).catch(e => ({ results: [], err: sc.scope === 'datagov' ? e.message : 'data.gov search needs the Plainsight server or proxy; showing state portals only.' })));
+    if (!sc.org && (sc.scope === 'state' || (sc.scope === 'all' && st))) jobs.push(PS.searchPortals(st.code, sc.q).then(r => ({ results: r.results, errs: r.errors, portals: r.portals })));
+    if (!sc.org && (sc.scope === 'states' || (sc.scope === 'all' && !st))) jobs.push(PS.searchPortals(null, sc.q).then(r => ({ results: r.results, errs: r.errors, portals: r.portals })));
+    const out = await Promise.all(jobs);
+    // State results first when a state is chosen, otherwise interleave.
+    const lists = out.map(x => x.results), merged = [];
+    while (lists.some(l => l.length)) lists.forEach(l => l.length && merged.push(l.shift()));
+    const mine = st ? merged.filter(r => r.tier !== 'state' || r.state === st.name) : merged;
+    sc.results = st && sc.scope === 'all' ? [...mine.filter(r => r.tier === 'state'), ...mine.filter(r => r.tier !== 'state')] : mine;
+    const errs = out.flatMap(x => (x.err ? [x.err] : []).concat(x.errs || []));
+    if (errs.length) sc.info = errs[0];
+    if (!sc.results.length) sc.err = sc.scope === 'state' && !out.some(x => x.portals) ? `${st.name}'s portals don't have a search API yet. Open them from the links above, or search Federal (data.gov) for ${st.name} data.` : 'No downloadable datasets matched. Try broader words.';
+    sc.busy = false; renderStep();
   }
 
   AFTER.data = () => {
-    $('#searchForm')?.addEventListener('submit', async e => {
-      e.preventDefault();
-      S.search = { q: $('#q').value.trim(), results: [], busy: true, err: '' }; renderStep();
-      try { const r = await PS.searchCatalog(S.search.q); S.search.results = r.results; if (!r.results.length) S.search.err = 'No downloadable datasets matched. Try broader words.'; }
-      catch (err) { S.search.err = err.message; }
-      S.search.busy = false; renderStep();
+    $('#statePick')?.addEventListener('change', e => {
+      S.state = e.target.value;
+      try { localStorage.setItem('ps-state', S.state); } catch { }
+      if (S.search.scope === 'state' && !S.state) S.search.scope = 'all';
+      if (S.ds && !S.ds.id.startsWith('custom-')) selectDataset(S.ds.id); else renderStep();
     });
+    $('#searchForm')?.addEventListener('submit', e => { e.preventDefault(); S.search.q = $('#q').value.trim(); runSearch(); });
     $('#file')?.addEventListener('change', async e => {
       const f = e.target.files[0]; if (!f) return;
       if (f.size > 40e6) { toast('That file is over 40 MB. Filter it first.'); return; }
@@ -198,12 +285,26 @@
     });
   };
 
+  function mapperHTML() {
+    const im = S.imported; if (!im) return '';
+    const opt = (k, types, none) => `<select data-map="${k}">${none ? `<option value="-1">${none}</option>` : ''}${im.cols.filter(c => types.includes(c.type)).map(c => `<option value="${c.i}" ${im.map[k] === c.i ? 'selected' : ''}>${esc(c.name)} (${c.type})</option>`).join('')}</select>`;
+    return `<div class="mapper"><b>${esc(im.meta.title)}</b><p class="muted">${im.table.rows.length.toLocaleString()} rows · ${im.cols.length} columns</p>
+      ${field('Time', opt('time', ['date'], 'None (one moment)'))}
+      ${im.cols.some(c => c.type === 'month') ? field('Month column (combined with year)', opt('month', ['month'], 'None')) : ''}
+      ${im.cols.some(c => c.values && c.values.length >= 2) ? field('Only rows where', `<div class="row"><select data-map="filterCol"><option value="-1">No filter</option>${im.cols.filter(c => c.values && c.values.length >= 2).map(c => `<option value="${c.i}" ${im.map.filterCol === c.i ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>${im.map.filterCol >= 0 ? `<select data-map="filterVal">${im.cols[im.map.filterCol].values.map(v => `<option ${im.map.filterVal === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>` : ''}</div><p class="muted">Use this when a file mixes totals and their parts, like a state total plus its counties.</p>`) : ''}
+      ${field('Place or category', opt('category', ['state', 'country', 'text'], 'None (single series)'))}
+      ${field('Value', opt('value', ['number'], ''))}
+      ${field('Combine duplicate rows by', `<select data-map="agg">${['sum', 'mean', 'max', 'min', 'count'].map(a => `<option ${im.map.agg === a ? 'selected' : ''}>${a}</option>`).join('')}</select>`)}
+      <button class="btn primary block" data-act="build">Build chart</button>
+      <table><tr>${im.table.header.slice(0, 5).map(h => `<th>${esc(h)}</th>`).join('')}</tr>${im.table.rows.slice(0, 4).map(r => `<tr>${r.slice(0, 5).map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
+  }
+
   function importTable(text, meta) {
     try {
       const table = PS.parseCSV(text);
       if (!table.rows.length) throw new Error('No rows found.');
       const cols = PS.profile(table);
-      S.imported = { table, cols, map: PS.guessMapping(cols), meta };
+      S.imported = { table, cols, map: PS.guessMapping(cols, table), meta };
       renderStep();
     } catch (e) { toast('Could not read that file: ' + e.message); }
   }
@@ -211,17 +312,32 @@
   $('#stepBody').addEventListener('click', async e => {
     const t = e.target.closest('button, [data-ds]'); if (!t) return;
     if (t.dataset.tab) { S.dataTab = t.dataset.tab; renderStep(); return; }
+    if (t.dataset.topic) { S.topic = t.dataset.topic; renderStep(); return; }
+    if (t.dataset.src) { S.sourceOpen = S.sourceOpen === t.dataset.src ? null : t.dataset.src; renderStep(); return; }
+    if (t.dataset.scope) { S.search.scope = t.dataset.scope; if (S.search.q || t.dataset.scope !== 'datagov') runSearch(); else renderStep(); return; }
+    if (t.dataset.statebrowse) {
+      S.state = t.dataset.statebrowse; try { localStorage.setItem('ps-state', S.state); } catch { }
+      Object.assign(S.search, { scope: 'state', q: '', org: null }); S.dataTab = 'search';
+      if (S.ds && !S.ds.id.startsWith('custom-')) selectDataset(S.ds.id);
+      runSearch(); return;
+    }
     if (t.dataset.ds) { selectDataset(t.dataset.ds); return; }
     if (t.dataset.load != null) {
       const r = S.search.results[+t.dataset.load];
       t.disabled = true; t.textContent = 'Loading…';
       try {
-        const text = await PS.fetchRemoteText(r.files[0].url);
-        importTable(text, { title: r.title, category: 'data.gov', description: r.description, source: { publisher: r.publisher, dataset: r.title, url: r.landing }, howToRead: [r.description.slice(0, 220)] });
+        const { text, truncated } = await PS.fetchRemote(r.files[0].url);
+        importTable(text, {
+          title: r.title, category: r.state || 'data.gov', description: r.description, tier: r.tier,
+          source: { publisher: r.publisher + (r.state && !r.publisher.includes(r.state) ? `, ${r.state}` : ''), dataset: r.title, url: r.landing, portal: r.host },
+          howToRead: r.description ? [r.description.slice(0, 220)] : [],
+          caveats: truncated ? ['This file is very large, so Plainsight loaded only its first rows. Check that the chart covers the period you mean to show.'] : [],
+        });
+        if (truncated) toast('Large file: loaded the first 30 MB of rows.');
       } catch (err) { toast(err.message); t.disabled = false; t.textContent = 'Load data'; }
       return;
     }
-    if (t.dataset.chart) { o.chart = t.dataset.chart; Object.assign(o, { takeawayText: '' }); update(); renderStep(); return; }
+    if (t.dataset.chart) { o.chart = t.dataset.chart; Object.assign(o, { takeawayText: '' }); if (!o.titleEdited) o.title = autoTitle(S.ds); update(); renderStep(); return; }
     if (t.dataset.theme) { o.theme = t.dataset.theme; o.bg = ''; update(); renderStep(); return; }
     if (t.dataset.pal) { o.palette = t.dataset.pal; update(); renderStep(); return; }
     if (t.dataset.ramp) { o.ramp = t.dataset.ramp; update(); renderStep(); return; }
@@ -231,6 +347,9 @@
   });
 
   const ACTIONS = {
+    portalBrowse: t => { Object.assign(S.search, { scope: 'state', q: t.dataset.q || '', org: null }); S.dataTab = 'search'; runSearch(); },
+    orgSearch: t => { Object.assign(S.search, { scope: 'datagov', q: S.search.q || '', org: t.dataset.org, orgName: t.dataset.name }); S.dataTab = 'search'; runSearch(); },
+    clearOrg: () => { Object.assign(S.search, { org: null, orgName: '' }); runSearch(); },
     live: async t => {
       t.disabled = true; t.textContent = 'Fetching…';
       try { S.ds = await PS.LIVE.earthquakes(); o.subtitle = autoSubtitle(S.ds); update(); toast('Updated with the latest USGS feed.'); }
@@ -242,12 +361,12 @@
       try {
         const { ds, skipped } = PS.buildFromTable(im.table, im.cols, im.map, { ...im.meta, id: 'custom-' + (S.custom.length + 1) });
         S.custom = S.custom.filter(d => d.title !== ds.title).concat(ds);
-        S.imported = null; S.dataTab = 'featured';
+        S.imported = null; S.dataTab = 'topics';
         selectDataset(ds.id);
         if (skipped) toast(`${skipped.toLocaleString()} rows skipped (missing or unreadable values).`);
       } catch (e) { toast(e.message); }
     },
-    resetStory: () => { o.title = S.ds.title; o.subtitle = autoSubtitle(S.ds); o.kicker = ''; o.takeawayText = ''; o.scriptEdited = false; update(); renderStep(); },
+    resetStory: () => { o.titleEdited = false; o.title = autoTitle(S.ds); o.subtitle = autoSubtitle(S.ds); o.kicker = ''; o.takeawayText = ''; o.scriptEdited = false; update(); renderStep(); },
     regenScript: () => { o.scriptEdited = false; update(); renderStep(); },
     speak: () => PS.speak(o.script, { voice: o.voice, duration: o.duration }),
     record: async t => {
@@ -290,11 +409,17 @@
   // generic inputs: data-k binds to o[key]
   $('#stepBody').addEventListener('input', e => {
     const el = e.target;
-    if (el.dataset.map) { S.imported.map[el.dataset.map] = el.dataset.map === 'agg' ? el.value : +el.value; return; }
+    if (el.dataset.map) {
+      const k = el.dataset.map;
+      S.imported.map[k] = ['agg', 'filterVal'].includes(k) ? el.value : +el.value;
+      if (k === 'filterCol') { S.imported.map.filterVal = S.imported.cols[+el.value]?.values?.[0] ?? ''; renderStep(); }
+      return;
+    }
     if (el.dataset.color != null) { o.customColors[+el.dataset.color] = el.value; o.palette = 'custom'; update(); return; }
     const k = el.dataset.k; if (!k) return;
     let v = el.type === 'checkbox' ? el.checked : el.dataset.num != null ? +el.value : el.value;
     if (k === 'script') o.scriptEdited = true;
+    if (k === 'title') o.titleEdited = true;
     if (k === 'rangeStart' || k === 'rangeEnd') v = v === '' ? null : +v;
     o[k] = v;
     const out = el.closest('.field')?.querySelector('output');

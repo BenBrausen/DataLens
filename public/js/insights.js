@@ -53,6 +53,7 @@
     return { headline, facts, trend: Math.sign(last.v - first.v), stats: { first, last, peak, trough, avg } };
   }
 
+  const vals0 = now => { const a = now.map(x => x.v).sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
   function panelFacts(ds, view, o) {
     const u = ds.unit, f = ds.frequency, idx = view.idx;
     const li = idx[idx.length - 1], fi = idx[0];
@@ -68,6 +69,18 @@
     if (race && then.length && then[0].e.id !== top.e.id && fi !== li)
       headline = `${top.e.name} now ranks first in ${lbl} at ${v(top.v)}. In ${PS.fmtDate(ds._tms[fi], f)}, ${then[0].e.name} led.`;
     else headline = `${top.e.name} has the highest ${lbl} (${v(top.v)}) and ${bot.e.name} the lowest (${v(bot.v)}) as of ${d(li)}.`;
+    // A chosen state leads the story.
+    const fe = o.focus && ds.entities.find(e => e.id === o.focus);
+    if (fe && fe.values[li] != null) {
+      const val = fe.values[li], rank = now.findIndex(x => x.e.id === fe.id) + 1, n = now.length;
+      const us = ds.national?.values[li];
+      const ord = k => k + (['th', 'st', 'nd', 'rd'][(k % 100 > 10 && k % 100 < 14) ? 0 : Math.min(k % 10, 4) % 4] || 'th');
+      const pos = rank === 1 ? `the highest of ${n}` : rank === n ? `the lowest of ${n}` : rank <= n / 2 ? `${ord(rank)} highest of ${n}` : `${ord(n - rank + 1)} lowest of ${n}`;
+      const cmp = us != null ? `${val > us ? 'above' : val < us ? 'below' : 'equal to'} the U.S. (${v(us)})` : `compared with a typical ${ds.geo === 'world' ? 'country' : 'state'} at ${v(vals0(now))}`;
+      headline = `${fe.name}'s ${lbl} was ${v(val)} in ${d(li)}, ${cmp}. It ranks ${pos}.`;
+      const fa = fe.values[fi];
+      if (fi !== li && fa != null) facts.push({ k: 'focus', text: `${fe.name} since ${PS.fmtDate(ds._tms[fi], f)}: ${PS.fmtChange(fa, val, u)}${us != null && ds.national.values[fi] != null ? ` (U.S.: ${PS.fmtChange(ds.national.values[fi], us, u)})` : ''}.` });
+    }
     facts.push({ k: 'top', text: `Highest: ${now.slice(0, 3).map(x => `${x.e.name} (${v(x.v)})`).join(', ')}.` });
     facts.push({ k: 'bottom', text: `Lowest: ${now.slice(-3).reverse().map(x => `${x.e.name} (${v(x.v)})`).join(', ')}.` });
     const vals = now.map(x => x.v).sort((a, b) => a - b), med = vals[Math.floor(vals.length / 2)];
@@ -122,6 +135,13 @@
     if (ds.source.unverified) add('warn', 'Unverified source', 'This data was uploaded, so Plainsight cannot confirm where it came from. Name the original publisher in the note before sharing.');
     else add('pass', 'Source cited on every frame',`${ds.source.publisher}${ds.source.via ? ', via ' + ds.source.via : ''}. Retrieved ${PS.fmtRetrieved(ds.retrieved)}. Citations can be restyled but not removed.`);
 
+    if (ds.aggWarning) add('warn', `Rows were ${ds.aggWarning.agg === 'sum' ? 'added together' : 'averaged'}`, `${ds.aggWarning.rows.toLocaleString()} rows shared a date or place and were combined. If the file mixes totals with their parts (a state total plus its counties), the result double counts. Check the "Only rows where" filter.`);
+    // Source tier
+    const TP = (PS.REGISTRY?.thirdParty || []).find(x => x.id === ds.sourceId);
+    if (ds.tier === 'industry') add('warn', 'Company data', `${TP?.disclosure || 'This comes from a company with a business interest in the topic.'} The citation labels it as company data.`);
+    else if (ds.tier === 'academic' || ds.tier === 'nonprofit') add('info', ds.tier === 'academic' ? 'Academic source' : 'Nonprofit research source', `${TP?.org ? TP.org + '. ' : ''}${TP?.why || ''} ${TP?.disclosure || ''}`.trim());
+    else if (ds.tier === 'state') add('pass', 'Official state source', `Published by ${ds.source.publisher} on ${ds.source.portal || 'its open-data portal'}.`);
+
     // Freshness
     if (ds.lastObservation) {
       const age = (Date.now() - +PS.parseDate(ds.lastObservation)) / DAY;
@@ -163,7 +183,10 @@
     }
 
     (ds.caveats || []).forEach(c => add('info', 'Context', c));
-    if (o.paletteCheck) o.paletteCheck.issues.forEach(i => add(i.level === 'fail' ? 'warn' : 'info', 'Color accessibility', i.msg));
+    if (o.paletteCheck?.issues.length) {
+      const iss = o.paletteCheck.issues, fail = iss.some(i => i.level === 'fail');
+      add(fail ? 'warn' : 'info', 'Color accessibility', iss.length === 1 ? iss[0].msg : `${iss.length} color pairs are hard to tell apart${fail ? ', some for everyone' : ' for color-blind viewers'}. Direct labels carry identity here; the "Color-blind safe" palette avoids it.`);
+    }
 
     // Voiceover script, short enough to read in the chosen duration.
     const src = ds.source.publisher;

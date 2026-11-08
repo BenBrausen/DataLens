@@ -1,0 +1,51 @@
+State,Portal URL,Category
+Alabama,https://open.alabama.gov/,Specialized
+Alaska,https://data-soa-dnr.opendata.arcgis.com/,Specialized
+Arizona,https://azgeo.az.gov/,Specialized
+Arkansas,https://gis.arkansas.gov/,Specialized
+California,https://data.ca.gov/,General
+Colorado,https://data.colorado.gov/,General
+Connecticut,https://data.ct.gov/,General
+Delaware,https://data.delaware.gov/,General
+Florida,https://geodata.florida.gov/,Specialized
+Georgia,https://open.georgia.gov/,Specialized
+Hawaii,https://opendata.hawaii.gov/,General
+Idaho,https://data.gis.idaho.gov/,Specialized
+Illinois,https://data.illinois.gov/,General
+Indiana,https://www.indianamap.org/,Specialized
+Iowa,https://data.iowa.gov/,General
+Kansas,https://hub.kansasgis.org/,Specialized
+Kentucky,https://kygeonet.ky.gov/,Specialized
+Louisiana,https://data-ladotd.opendata.arcgis.com/,Specialized
+Maine,https://www.maine.gov/geolib/,Specialized
+Maryland,https://opendata.maryland.gov/,General
+Massachusetts,https://www.mass.gov/orgs/massgis-bureau-of-geographic-information,Specialized
+Michigan,https://data.michigan.gov/,General
+Minnesota,https://gisdata.mn.gov/,Specialized
+Mississippi,https://www.gis.ms.gov/,Specialized
+Missouri,https://data.mo.gov/,General
+Montana,https://data.mt.gov/,General
+Nebraska,https://www.ne.gov/government/open-data/,Specialized
+Nevada,https://goed.nv.gov/,Specialized
+New Hampshire,https://www.granit.unh.edu/,Specialized
+New Jersey,https://data.nj.gov/,General
+New Mexico,https://www.sunshineportalnm.com/,Specialized
+New York,https://data.ny.gov/,General
+North Carolina,https://www.nconemap.gov/,Specialized
+North Dakota,https://www.gis.nd.gov/,Specialized
+Ohio,https://data.ohio.gov/,General
+Oklahoma,https://data.ok.gov/,General
+Oregon,https://data.oregon.gov/,General
+Pennsylvania,https://data.pa.gov/,General
+Rhode Island,https://www.ri.gov/data/,Specialized
+South Carolina,https://www.sc.gov/data-and-transparency,Specialized
+South Dakota,https://open.sd.gov/,Specialized
+Tennessee,https://geodata.tn.gov/,Specialized
+Texas,https://data.texas.gov/,General
+Utah,https://gis.utah.gov/,Specialized
+Vermont,https://data.vermont.gov/,General
+Virginia,https://data.virginia.gov/,General
+Washington,https://data.wa.gov/,General
+West Virginia,https://dep.wv.gov/Data/Pages/default.aspx,Specialized
+Wisconsin,https://sagic.wi.gov/Pages/WIsconsin_GIS_Data.aspx,Specialized
+Wyoming,https://data.geospatialhub.org/,Specialized

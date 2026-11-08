@@ -53,10 +53,47 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 | Population by state, 1900 to now | Census via FRED | panel, US map | annual |
 | Overdose deaths by state: totals and per 100k | CDC NCHS | panel, US map | monthly |
 | Earthquakes, past 30 days | USGS | events, world map | real time |
+| Median household income by state (vs U.S.) | Census via FRED | panel, US map | annual |
+| Personal income per person by state (vs U.S.) | BEA via FRED | panel, US map | annual |
+| Home price growth by state (vs U.S.) | FHFA via FRED | panel, US map | quarterly |
+| Minimum wage by state (vs federal) | Dept. of Labor via FRED | panel, US map | annual |
+| Typical home value by state | Zillow Research (company) | panel, US map | monthly |
+| Consumer sentiment | University of Michigan (academic) | time series | monthly |
+| Job postings index | Indeed Hiring Lab (company) | time series | weekly |
+| CO2 emissions per person by country | Our World in Data (academic) | panel, world map | annual |
 | GDP by country, 1960 to now | World Bank | panel, world map | annual |
 | Life expectancy by country | World Bank / UN | panel, world map | annual |
 
 To add a source, write one builder function in `scripts/refresh-data.mjs` that returns one of the three shapes. Charts, explanations and trust checks work automatically.
+
+## Sources: federal, state and vetted third parties
+
+Every dataset and search result carries a **source tier**, shown as a badge, in the trust check and in the citation line on the chart:
+
+| Tier | Examples | How it's labeled on the chart |
+|---|---|---|
+| Federal | BLS, Census, BEA, Treasury, CDC, USGS, EIA, FHFA | agency name |
+| State | 50 state portals plus state agencies | agency + state |
+| Academic | University of Michigan, Our World in Data (Oxford) | "(academic research)" |
+| Nonprofit | Urban Institute | "(nonprofit research)" |
+| Industry | Zillow Research, Indeed Hiring Lab | "(company data)" + disclosure warning |
+| International | World Bank | organization name |
+
+Browse three ways in the Data step: **Topics** (jobs, prices, housing, health and so on), **Sources** (by tier, with each source's trust profile) and **Search** (data.gov and state portals together). Pick **Your state** and every state-level chart highlights that state, compares it with the U.S., and leads the takeaway with it ("California's unemployment rate was 5.1%, above the U.S. (4.2%). It ranks 2nd highest of 51.").
+
+**State portals** (`scripts/sources/state-portals.csv`, plus reviewed extras in `scripts/sources/catalog.mjs`). `scripts/build-sources.mjs` detects each portal's platform, follows moved domains and counts datasets. It runs weekly in CI and never overwrites a good result because a portal was unreachable.
+
+| Platform | Search | Download | Verified with |
+|---|---|---|---|
+| Socrata | one call covers every state portal | `/resource/<id>.csv` | NY, WA, TX, CO, CT, MD and 9 more |
+| CKAN | `/api/3/action/package_search` | resource CSV URL | California (4,696 datasets) |
+| ArcGIS Hub | `/api/search/v1` (OGC Records) | Hub download API | Minnesota (moved from gisdata.mn.gov) |
+
+All three allow direct browser requests, so state search works on a static site with no proxy. Downloads are capped at 30 MB (some GIS exports are 160 MB+); a capped load is flagged on the chart.
+
+**Adding a third-party source** (`THIRD_PARTY` in `scripts/sources/catalog.mjs`): it must publish its methodology, offer a stable public download or API, and state who funds it. Industry sources always ship with a disclosure. Candidates not yet added (no open bulk download or still to be reviewed): Pew Research Center, KFF, Brookings, Federal Reserve Bank of New York, Redfin Data Center, Realtor.com Research.
+
+**Importing safely.** The CSV mapper samples the whole file, combines `year` + `month` columns into dates, and offers an "Only rows where…" filter that defaults to the most detailed level (counties, not the state total), so files that mix totals with their parts are not double counted. Whenever rows get summed or averaged, a trust check says so.
 
 ## Being the central data source
 

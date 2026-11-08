@@ -1,7 +1,8 @@
 // Cloudflare Worker: gives the static (GitHub Pages) build data.gov search and CSV loading.
 // Deploy: `npx wrangler deploy worker/proxy.js --name plainsight-proxy`, then set
 // window.PS_API_BASE = 'https://plainsight-proxy.<you>.workers.dev/' in public/index.html.
-const ALLOW = [/\.gov$/i, /\.mil$/i, /\.us$/i, /^data\.[a-z0-9-]+\.(org|com|net)$/i, /^fred\.stlouisfed\.org$/i, /^api\.worldbank\.org$/i, /^opendata\.[a-z0-9.-]+$/i];
+const ALLOW = [/\.gov$/i, /\.mil$/i, /\.us$/i, /^data\.[a-z0-9-]+\.(org|com|net)$/i, /^fred\.stlouisfed\.org$/i, /^api\.worldbank\.org$/i, /^opendata\.[a-z0-9.-]+$/i,
+  /\.edu$/i, /(^|\.)arcgis\.com$/i, /^api\.us\.socrata\.com$/i, /^data\.geospatialhub\.org$/i, /^ourworldindata\.org$/i];
 const cors = { 'Access-Control-Allow-Origin': '*' };
 
 export default {

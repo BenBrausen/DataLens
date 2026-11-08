@@ -109,7 +109,7 @@
       L.footSize = 21 * S * ts;
       ctx.font = font(st, 400, L.footSize);
       const brandW = (o.handle || o.brand) ? Math.min(R.w * 0.32, 340 * S) : 0;
-      L.footLines = wrap(ctx, this.sourceLine(), R.w - brandW - (brandW ? 24 * S : 0), 3);
+      L.footLines = wrap(ctx, this.sourceLine(), R.w - brandW - (brandW ? 24 * S : 0), 4);
       L.footH = L.footLines.length * L.footSize * 1.35;
       L.footY = R.y + R.h - L.footH;
       L.brandW = brandW;
@@ -134,7 +134,8 @@
     sourceLine() {
       const { ds, o } = this.scene;
       const s = ds.source;
-      let txt = `Source: ${s.publisher}${s.dataset ? ', ' + s.dataset : ''}${s.via ? ' (via ' + s.via + ')' : ''}. Retrieved ${PS.fmtRetrieved(ds.retrieved)}.`;
+      const tierLbl = { academic: ' (academic research)', nonprofit: ' (nonprofit research)', industry: ' (company data)' }[ds.tier] || '';
+      let txt = `Source: ${s.publisher}${tierLbl}${s.dataset ? ', ' + s.dataset : ''}${s.via ? ' (via ' + s.via + ')' : ''}. Retrieved ${PS.fmtRetrieved(ds.retrieved)}.`;
       if (ds.lens && ds.lens !== 'Nominal dollars' && /computed by Plainsight/.test((ds.caveats || []).join(' '))) txt += ' Adjusted by Plainsight.';
       if (o.note) txt += ' ' + o.note;
       if (this._axisNote) txt += ' Note: y-axis does not start at zero.';
@@ -322,7 +323,8 @@
     if (ds.kind === 'panel') series = panelToSeries(ds, st.view, o);
     const multi = series.length > 1;
     let top = C.y;
-    if (multi) top = legendRow(ctx, st, series.map((s, i) => ({ name: s.name, color: st.pal[i % st.pal.length] })), C.x, C.y + 12 * S, C.w) + 6 * S;
+    const colorOf = (s, i) => (s.ref ? T.muted : st.pal[i % st.pal.length]);
+    if (multi) top = legendRow(ctx, st, series.map((s, i) => ({ name: s.name, color: colorOf(s, i) })), C.x, C.y + 12 * S, C.w) + 6 * S;
     const all = series.flatMap(s => s.pts);
     const t0 = d3.min(all, p => p.t), t1 = d3.max(all, p => p.t);
     let lo = d3.min(all, p => p.v), hi = d3.max(all, p => p.v);
@@ -352,7 +354,7 @@
     const base = y(Math.max(y.domain()[0], Math.min(0, y.domain()[1])));
     const ends = [];
     series.forEach((s, si) => {
-      const color = st.pal[si % st.pal.length];
+      const color = colorOf(s, si);
       const pts = s.pts.filter(p => p.t <= tq);
       if (!pts.length) return;
       const endV = interpAt(s.pts, tq);
@@ -365,8 +367,9 @@
         g.addColorStop(0, rgba(color, multi ? 0.22 : 0.42)); g.addColorStop(1, rgba(color, 0.03));
         ctx.fillStyle = g; ctx.fill(a);
       }
-      ctx.strokeStyle = color; ctx.lineWidth = st.lw * (multi && si > 0 ? 0.8 : 1); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-      ctx.stroke(path);
+      ctx.strokeStyle = color; ctx.lineWidth = st.lw * (s.ref ? 0.6 : multi && si > 0 ? 0.8 : 1); ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+      if (s.ref) ctx.setLineDash([st.lw * 2.2, st.lw * 1.6]);
+      ctx.stroke(path); ctx.setLineDash([]);
       ends.push({ s, si, color, x: x(tq), y: y(endV), v: endV });
     });
     // peak annotation for the primary series
@@ -401,13 +404,15 @@
   };
 
   function panelToSeries(ds, view, o) {
-    const ids = o.entities?.length ? o.entities : (() => {
+    const ids = o.entities?.length ? o.entities : o.focus ? [o.focus] : (() => {
       const li = view.idx.at(-1);
       return ds.entities.filter(e => e.values[li] != null).sort((a, b) => b.values[li] - a.values[li]).slice(0, 3).map(e => e.id);
     })();
     return ids.map(id => ds.entities.find(e => e.id === id)).filter(Boolean).map(e => ({
       id: e.id, name: e.name, pts: view.idx.map(i => ({ t: ds._tms[i], v: e.values[i] })).filter(p => p.v != null),
-    })).filter(s => s.pts.length);
+    })).filter(s => s.pts.length).concat(ds.national && o.compareNational !== false ? [{
+      id: '__national', name: ds.national.name, ref: true, pts: view.idx.map(i => ({ t: ds._tms[i], v: ds.national.values[i] })).filter(p => p.v != null),
+    }] : []).filter(s => s.pts.length);
   }
 
   CHART_DRAW.bignumber = function (ctx, C, st) {
