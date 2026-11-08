@@ -36,6 +36,7 @@ async function get(url, type = 'json', tries = 3) {
     try {
       const r = await fetch(url, { headers: { 'User-Agent': 'plainsight-data-refresh/1.0' } });
       if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
+      if (type === 'latin1') return new TextDecoder('latin1').decode(await r.arrayBuffer());
       return type === 'json' ? await r.json() : await r.text();
     } catch (e) {
       if (i === tries - 1) throw e;
@@ -497,6 +498,126 @@ builders['world-co2'] = async () => {
     caveats: ['Excludes emissions from land-use change such as deforestation.'], isRate: true }, years.map(y => `${y}-12-31`), entities);
 };
 
+// ---------- county level ----------
+const ABBR = Object.fromEntries(STATES.map(([ab, fips]) => [fips, ab]));
+const COUNTY_CAVEAT = 'Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map.';
+
+let censusCounties;
+async function censusCountyFile() {
+  if (censusCounties) return censusCounties;
+  // Newest vintage first: the Census Bureau publishes a new one each spring.
+  for (let v = new Date().getUTCFullYear(); v >= 2024; v--) {
+    try {
+      const text = await get(`https://www2.census.gov/programs-surveys/popest/datasets/2020-${v}/counties/totals/co-est${v}-alldata.csv`, 'latin1', 1);
+      // The server answers a missing file with HTTP 200 and an HTML error page, so
+      // check the content, not just the status.
+      if (!text.startsWith('SUMLEV')) continue;
+      const rows = parseCSV(text), head = rows[0];
+      const recs = rows.slice(1).map(r => Object.fromEntries(head.map((h, i) => [h, r[i]]))).filter(r => r.SUMLEV === '050');
+      if (recs.length < 3000 || !head.includes(`POPESTIMATE${v}`)) continue;
+      return (censusCounties = { vintage: v, recs });
+    } catch { /* try the previous vintage */ }
+  }
+  throw new Error('No Census county estimates file found');
+}
+
+function countyPanel(meta, recs, years, valueOf) {
+  const last = Math.max(...Object.keys(recs[0]).filter(k => /^POPESTIMATE\d{4}$/.test(k)).map(k => +k.slice(-4)));
+  const entities = recs.map(r => ({ id: r.STATE + r.COUNTY, code: ABBR[r.STATE], name: `${r.CTYNAME}, ${ABBR[r.STATE]}`, short: r.CTYNAME, pop: +r[`POPESTIMATE${last}`],
+    values: years.map(y => { const v = valueOf(r, y); return Number.isFinite(v) ? v : null; }) }));
+  return panel({ ...meta, geo: 'us-counties' }, years.map(y => `${y}-07-01`), entities);
+}
+
+builders['county-population'] = async () => {
+  const { vintage, recs } = await censusCountyFile();
+  const years = []; for (let y = 2020; y <= vintage; y++) years.push(y);
+  const src = { publisher: 'U.S. Census Bureau', dataset: `County Population Totals, Vintage ${vintage}`, url: 'https://www.census.gov/programs-surveys/popest.html' };
+  const base = { category: 'People', frequency: 'annual', source: src, reframes: ['county-population', 'county-growth', 'county-migration'] };
+  return [
+    countyPanel({ ...base, id: 'county-population', title: 'Population by county', lens: 'People',
+      unit: { label: 'Resident population (July 1)', format: 'number', decimals: 0 },
+      description: 'Estimated number of people living in each county on July 1 of each year.',
+      howToRead: ['Annual estimates built from births, deaths and migration since the 2020 Census.'],
+      caveats: [COUNTY_CAVEAT], isCount: true }, recs, years, (r, y) => +r[`POPESTIMATE${y}`]),
+    countyPanel({ ...base, id: 'county-growth', title: 'Population growth by county since 2020', lens: 'Growth since 2020',
+      unit: { label: 'Population change since April 2020', format: 'pct', decimals: 1 },
+      description: 'How much each county\'s population has grown or shrunk since the 2020 Census.',
+      howToRead: ['Percent change from the April 2020 Census base, so small counties can swing a lot from a few hundred people.'],
+      caveats: [COUNTY_CAVEAT, 'Percent change computed by Plainsight from Census estimates.'], isRate: true, zeroLine: true },
+      recs, years, (r, y) => round((+r[`POPESTIMATE${y}`] / +r.ESTIMATESBASE2020 - 1) * 100, 2)),
+    countyPanel({ ...base, id: 'county-migration', title: 'Where Americans are moving, by county', lens: 'Moves within the U.S.',
+      unit: { label: 'Net domestic migration per 1,000 residents', format: 'number', decimals: 1 },
+      description: 'People moving into a county from elsewhere in the U.S., minus people moving out, per 1,000 residents.',
+      howToRead: ['Positive means more people arrived from other parts of the U.S. than left. Immigration from abroad is counted separately and is not included.'],
+      caveats: [COUNTY_CAVEAT, 'The first year (2020) covers only April to July.'], isRate: true, zeroLine: true },
+      recs, years.filter(y => y > 2020), (r, y) => round(+r[`RDOMESTICMIG${y}`], 1)),
+  ];
+};
+
+// CDC PLACES: model-based county estimates for health measures (age-adjusted).
+const PLACES = [
+  ['OBESITY', 'county-obesity', 'Adult obesity by county', 'Adults with obesity (BMI 30+)'],
+  ['DIABETES', 'county-diabetes', 'Diagnosed diabetes by county', 'Adults ever told they have diabetes'],
+  ['DEPRESSION', 'county-depression', 'Depression by county', 'Adults ever told they have depression'],
+  ['CSMOKING', 'county-smoking', 'Adult smoking by county', 'Adults who currently smoke cigarettes'],
+  ['ACCESS2', 'county-uninsured', 'Uninsured adults by county', 'Adults 18-64 without health insurance'],
+];
+builders['county-health'] = async () => {
+  const ids = PLACES.map(p => `'${p[0]}'`).join(',');
+  const rows = await get(`https://data.cdc.gov/resource/swc5-untb.json?$select=locationid,locationname,stateabbr,measureid,data_value,year&$where=datavaluetypeid='AgeAdjPrv' AND measureid in(${ids})&$limit=50000`);
+  // County names come from the Census file: the CDC feed has encoding damage in some
+  // names (e.g. "DoÃ±a Ana").
+  let names = new Map(), pops = new Map();
+  try {
+    const { vintage, recs } = await censusCountyFile();
+    names = new Map(recs.map(r => [r.STATE + r.COUNTY, r.CTYNAME]));
+    pops = new Map(recs.map(r => [r.STATE + r.COUNTY, +r[`POPESTIMATE${vintage}`]]));
+  } catch { }
+  return PLACES.map(([mid, id, title, label]) => {
+    const rs = rows.filter(r => r.measureid === mid && /^\d{5}$/.test(r.locationid));
+    const year = rs.reduce((m, r) => Math.max(m, +r.year), 0);
+    const entities = rs.filter(r => +r.year === year).map(r => {
+      const short = names.get(r.locationid) || `${r.locationname} County`;
+      return { id: r.locationid, code: r.stateabbr, name: `${short}, ${r.stateabbr}`, short, pop: pops.get(r.locationid) ?? null, values: [round(+r.data_value, 1)] };
+    });
+    return panel({ id, title, category: 'Health', frequency: 'annual', geo: 'us-counties', singleTime: true,
+      unit: { label: `${label} (age-adjusted %)`, format: 'pct', decimals: 1 },
+      description: `${label}, age-adjusted, as estimated by the CDC for every county.`,
+      source: { publisher: 'CDC, Division of Population Health', dataset: 'PLACES: Local Data for Better Health, County Data', url: 'https://www.cdc.gov/places/' },
+      howToRead: ['Age-adjusted, so counties with older or younger populations can be compared fairly.'],
+      caveats: ['These are model-based estimates from a national survey (BRFSS) combined with Census data, not direct counts for each county. Small differences between neighboring counties are not meaningful.', COUNTY_CAVEAT],
+      isRate: true }, [`${year}-12-31`], entities);
+  });
+};
+
+// Census ACS 5-year county income and poverty. Runs only when a free Census API key
+// is available (repo secret CENSUS_API_KEY). Not exercised until the key exists.
+builders['county-income'] = async () => {
+  const key = process.env.CENSUS_API_KEY;
+  if (!key) { console.log('  (skipped county-income: add a CENSUS_API_KEY secret to enable)'); return []; }
+  const years = [];
+  for (let y = new Date().getUTCFullYear() - 1; y >= 2015 && years.length < 10; y--) {
+    try {
+      const j = await get(`https://api.census.gov/data/${y}/acs/acs5?get=NAME,B19013_001E,B17001_001E,B17001_002E&for=county:*&key=${key}`, 'json', 1);
+      years.unshift({ y, rows: j.slice(1) });
+    } catch { /* that year is not released yet */ }
+  }
+  if (!years.length) throw new Error('Census ACS returned no county data');
+  const ids = [...new Set(years.flatMap(({ rows }) => rows.map(r => r[4] + r[5])))];
+  const names = new Map(years.at(-1).rows.map(r => [r[4] + r[5], r[0]]));
+  const val = (yr, id, f) => { const r = yr.rows.find(x => x[4] + x[5] === id); if (!r) return null; const v = f(r); return Number.isFinite(v) && v >= 0 ? v : null; };
+  const src = { publisher: 'U.S. Census Bureau', dataset: 'American Community Survey 5-year estimates', url: 'https://www.census.gov/programs-surveys/acs' };
+  const mk = (id, title, unit, f, extra) => panel({ id, title, category: 'Economy', frequency: 'annual', geo: 'us-counties', source: src, unit,
+    howToRead: ['Each year is a 5-year average (e.g. 2019-2023), which keeps small-county estimates stable but makes recent changes show up slowly.'],
+    caveats: ['Survey estimates with margins of error that can be large for small counties.', COUNTY_CAVEAT], ...extra },
+    years.map(({ y }) => `${y}-12-31`),
+    ids.map(cid => ({ id: cid, code: ABBR[cid.slice(0, 2)], name: (names.get(cid) || cid).replace(/, ([A-Za-z ]+)$/, (m, st) => `, ${STATES.find(s => s[2] === st)?.[0] || st}`), short: (names.get(cid) || '').split(',')[0], values: years.map(yr => val(yr, cid, f)) })));
+  return [
+    mk('county-income', 'Median household income by county', { label: 'Median household income', format: 'usd', decimals: 0 }, r => +r[1], { description: 'Income of the household in the middle of each county.', caveats: ['Not adjusted for inflation between years.', COUNTY_CAVEAT] }),
+    mk('county-poverty', 'Poverty rate by county', { label: 'People below the poverty line', format: 'pct', decimals: 1 }, r => round(+r[3] / +r[2] * 100, 1), { description: 'Share of people whose family income is below the federal poverty threshold.', isRate: true }),
+  ];
+};
+
 // ---------- run ----------
 await fs.mkdir(OUT, { recursive: true });
 const only = process.argv.slice(2);
@@ -507,6 +628,8 @@ for (const [key, build] of Object.entries(builders)) {
     const t0 = Date.now();
     const result = [].concat(await build());
     for (const ds of result) {
+      const n = ds.kind === 'panel' ? ds.entities.filter(e => e.values.some(v => v != null)).length : ds.kind === 'events' ? ds.events.length : ds.series.reduce((a, x) => a + x.points.length, 0);
+      if (!n) { console.error(`FAIL ${ds.id}: built with no data (keeping previous snapshot)`); continue; }
       await fs.writeFile(path.join(OUT, ds.id + '.json'), JSON.stringify(ds));
       console.log(`ok   ${ds.id.padEnd(22)} ${ds.kind.padEnd(10)} last=${ds.lastObservation} ${Date.now() - t0}ms`);
     }

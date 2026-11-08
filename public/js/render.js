@@ -8,11 +8,29 @@
 
   // ---------- geometry caches ----------
   const geoCache = {};
-  function geo(kind) {
-    if (geoCache[kind]) return geoCache[kind];
+  function geo(kind, scope) {
+    const key = kind + '|' + (scope || '');
+    if (geoCache[key]) return geoCache[key];
     const G = window.PS_GEO;
     let out;
-    if (kind === 'us-states') {
+    if (kind === 'us-counties') {
+      const C = window.PS_GEO_COUNTIES;
+      if (!C) throw new Error('County map is still loading.');
+      if (!geoCache.countiesAll) {
+        const path = d3.geoPath();
+        geoCache.countiesAll = {
+          features: topojson.feature(C, C.objects.counties).features.map(f => ({ id: String(f.id), name: f.properties.name, p: new Path2D(path(f)), b: path.bounds(f) })),
+          states: topojson.feature(C, C.objects.states).features.map(f => ({ id: String(f.id), p: new Path2D(path(f)), b: path.bounds(f) })),
+          stateMesh: new Path2D(path(topojson.mesh(C, C.objects.states, (a, b) => a !== b))),
+        };
+      }
+      const A = geoCache.countiesAll;
+      // A chosen state zooms the map to that state's counties.
+      const feats = scope ? A.features.filter(f => f.id.startsWith(scope)) : A.features;
+      const st = scope && A.states.find(s => s.id === scope);
+      const bb = st ? st.b : [[0, 0], [975, 610]];
+      out = { w: bb[1][0] - bb[0][0], h: bb[1][1] - bb[0][1], x0: bb[0][0], y0: bb[0][1], features: feats, borders: scope ? (st && st.p) : A.stateMesh, outline: !!scope };
+    } else if (kind === 'us-states') {
       const fc = topojson.feature(G.states, G.states.objects.states);
       const path = d3.geoPath();
       out = { w: 975, h: 610, features: fc.features.map(f => ({ id: f.id, name: f.properties.name, p: new Path2D(path(f)), c: path.centroid(f) })) };
@@ -25,8 +43,9 @@
       const [[, by0], [, by1]] = path.bounds(fc);
       out = { w: 1000, h: by1 - by0 + 8, y0: by0 - 4, proj, features: fc.features.map(f => ({ id: String(f.id), name: f.properties.name, p: new Path2D(path(f)) })) };
     }
-    return (geoCache[kind] = out);
+    return (geoCache[key] = out);
   }
+  PS.geoReady = kind => kind !== 'us-counties' || !!window.PS_GEO_COUNTIES;
 
   // ---------- style resolution ----------
   PS.resolveStyle = function (o, platform) {
@@ -46,12 +65,16 @@
       if (dark && (o.ramp === 'viridis' || o.ramp === 'magma')) stops.reverse();
     }
     const ramp = d3.scaleLinear().domain(stops.map((_, i) => i / (stops.length - 1))).range(stops).interpolate(d3.interpolateLab).clamp(true);
+    // Diverging scale for data with a meaningful zero: red for losses, blue for gains, gray at zero.
+    const div = d3.scaleLinear().domain([-1, -0.5, 0, 0.5, 1])
+      .range(dark ? ['#e66767', '#8f4c4a', '#383835', '#2f5a8f', '#5598e7'] : ['#b02a2a', '#ef8a7a', '#f0efec', '#86b6ef', '#1c5cab'])
+      .interpolate(d3.interpolateLab).clamp(true);
     const S = Math.min(platform.w, platform.h) / 1080;
     const ts = (o.textScale || 1) * (platform.h / platform.w > 1.6 ? 1.12 : 1);
     const head = o.headFont === 'theme' ? T.head : o.headFont;
     const body = o.bodyFont === 'theme' ? T.body : o.bodyFont;
     const accent = o.accent || pal[0];
-    return { T, pal, ramp, S, ts, head, body, accent, dark, r: (o.radius ?? 6) * S, lw: (o.lineWidth ?? 5) * S, upper: T.upper };
+    return { T, pal, ramp, div, S, ts, head, body, accent, dark, r: (o.radius ?? 6) * S, lw: (o.lineWidth ?? 5) * S, upper: T.upper };
   };
 
   const font = (st, weight, size, fam) => `${weight} ${Math.round(size)}px "${fam || st.body}", "Inter", system-ui, -apple-system, sans-serif`;
@@ -518,9 +541,9 @@
     const N = Math.min(o.topN || 10, ds.entities.length);
     const tau = st.q * (idx.length - 1);
     const i0 = Math.floor(tau), i1 = Math.min(idx.length - 1, i0 + 1), f = ease.inOut(tau - i0);
-    const rankAt = i => { const m = new Map(); ds.entities.filter(e => e.values[idx[i]] != null).sort((a, b) => b.values[idx[i]] - a.values[idx[i]]).forEach((e, r) => m.set(e.id, r)); return m; };
+    const rankAt = i => { const m = new Map(); ds.entities.filter(PS.rankable(o)).filter(e => e.values[idx[i]] != null).sort((a, b) => b.values[idx[i]] - a.values[idx[i]]).forEach((e, r) => m.set(e.id, r)); return m; };
     const r0 = rankAt(i0), r1 = rankAt(i1);
-    const rows = ds.entities.map((e, ei) => {
+    const rows = ds.entities.filter(PS.rankable(o)).map((e, ei) => {
       const ra = r0.get(e.id) ?? N + 1, rb = r1.get(e.id) ?? N + 1;
       return { e, ei, v: valAt(e, idx, tau), rank: lerp(ra, rb, f) };
     }).filter(r => r.v != null && r.rank < N);
@@ -562,7 +585,7 @@
 
   CHART_DRAW.bars = function (ctx, C, st) {
     const S = st.S, T = st.T, ds = st.ds, o = st.o, li = st.view.idx.at(-1);
-    let rows = ds.entities.filter(e => e.values[li] != null).map(e => ({ e, v: e.values[li] }));
+    let rows = ds.entities.filter(PS.rankable(o)).filter(e => e.values[li] != null).map(e => ({ e, v: e.values[li] }));
     rows.sort((a, b) => (o.sortAsc ? a.v - b.v : b.v - a.v));
     const total = rows.length;
     const N = Math.min(o.topN || 10, total);
@@ -593,13 +616,16 @@
 
   CHART_DRAW.choropleth = function (ctx, C, st) {
     const S = st.S, T = st.T, ds = st.ds, o = st.o, idx = st.view.idx;
-    const G = geo(ds.geo);
+    const G = geo(ds.geo, ds.geo === 'us-counties' ? o.scope : null);
     const tau = st.q * (idx.length - 1);
     const vals = new Map(ds.entities.map(e => [String(e.id), valAt(e, idx, tau)]));
     // fixed color domain across every frame (2nd-98th percentile), so a color means one value throughout
     const allv = idx.flatMap(i => ds.entities.map(e => e.values[i])).filter(v => v != null).sort((a, b) => a - b);
-    const lo = o.colorZero ? 0 : allv[Math.floor(allv.length * 0.02)], hi = allv[Math.floor(allv.length * 0.98)];
+    let lo = o.colorZero ? 0 : allv[Math.floor(allv.length * 0.02)], hi = allv[Math.floor(allv.length * 0.98)];
+    const diverging = ds.zeroLine && lo < 0 && hi > 0;
+    if (diverging) { const m = Math.max(-lo, hi); lo = -m; hi = m; }
     const norm = v => (v - lo) / (hi - lo || 1);
+    const colorOf = v => (diverging ? st.div(v / hi) : st.ramp(norm(v)));
     const land = C.w > C.h * 1.6;
     const sideW = land ? C.w * 0.27 : 0;
     const legendH = 74 * S, listH = land ? 0 : Math.min(230 * S, C.h * 0.26);
@@ -610,20 +636,26 @@
     ctx.font = font(st, 800, 58 * S * st.ts, st.head); ctx.fillStyle = T.ink; ctx.textBaseline = 'top';
     if (!ds.singleTime) ctx.fillText(dateTxt, C.x, C.y);
     ctx.save();
-    ctx.translate(ox, oy - (G.y0 || 0) * k); ctx.scale(k, k);
+    ctx.translate(ox - (G.x0 || 0) * k, oy - (G.y0 || 0) * k); ctx.scale(k, k);
     for (const f of G.features) {
       const v = vals.get(f.id);
-      ctx.fillStyle = v == null ? (st.dark ? '#2b2f36' : '#e9e7e1') : st.ramp(norm(v));
+      ctx.fillStyle = v == null ? (st.dark ? '#2b2f36' : '#e9e7e1') : colorOf(v);
       ctx.fill(f.p);
     }
-    ctx.strokeStyle = T.bg; ctx.lineWidth = (ds.geo === 'world' ? 0.9 : 1.3) * S / k; ctx.lineJoin = 'round';
+    ctx.strokeStyle = T.bg; ctx.lineJoin = 'round';
+    ctx.lineWidth = (ds.geo === 'world' ? 0.9 : ds.geo === 'us-counties' ? (o.scope ? 0.9 : 0.25) : 1.3) * S / k;
     for (const f of G.features) ctx.stroke(f.p);
+    if (G.borders) {
+      // State lines over county fills (national view) or the state's outline (zoomed view).
+      ctx.strokeStyle = G.outline ? T.axis : T.bg; ctx.lineWidth = (G.outline ? 2 : 1.6) * S / k;
+      ctx.stroke(G.borders);
+    }
     if (o.highlight) { const f = G.features.find(f => f.id === o.highlight); if (f) { ctx.strokeStyle = T.ink; ctx.lineWidth = 3.5 * S / k; ctx.stroke(f.p); } }
     ctx.restore();
     // legend
     const lgY = mapBox.y + mapBox.h + 18 * S, lgW = Math.min(mapBox.w * 0.7, 640 * S), lgX = C.x;
     const g = ctx.createLinearGradient(lgX, 0, lgX + lgW, 0);
-    for (let i = 0; i <= 10; i++) g.addColorStop(i / 10, st.ramp(i / 10));
+    for (let i = 0; i <= 10; i++) g.addColorStop(i / 10, diverging ? st.div(i / 5 - 1) : st.ramp(i / 10));
     ctx.fillStyle = g; roundRect(ctx, lgX, lgY, lgW, 18 * S, Math.min(st.r, 9 * S)); ctx.fill();
     ctx.font = font(st, 400, 21 * S * st.ts); ctx.fillStyle = T.faint; ctx.textBaseline = 'top';
     const lts = lgW < 420 * S ? [0, 0.5, 1] : [0, 0.25, 0.5, 0.75, 1];
@@ -636,14 +668,14 @@
     ctx.fillStyle = st.dark ? '#2b2f36' : '#e9e7e1'; roundRect(ctx, lgX + lgW + 30 * S, lgY, 18 * S, 18 * S, 3 * S); ctx.fill();
     ctx.fillStyle = T.faint; ctx.fillText('No data', lgX + lgW + 56 * S, lgY - 2 * S);
     // ranked lists
-    const ranked = ds.entities.map(e => ({ e, v: vals.get(String(e.id)) })).filter(r => r.v != null).sort((a, b) => b.v - a.v);
+    const ranked = ds.entities.filter(PS.rankable(o)).map(e => ({ e, v: vals.get(String(e.id)) })).filter(r => r.v != null).sort((a, b) => b.v - a.v);
     const n = land ? 5 : 3;
     const lists = [['Highest', ranked.slice(0, n)], ['Lowest', ranked.slice(-n).reverse()]];
     const drawList = (title, items, x, y, w) => {
       ctx.font = font(st, 700, 22 * S * st.ts); ctx.fillStyle = T.muted; spaced(ctx, 1.5 * S); ctx.fillText(title.toUpperCase(), x, y); spaced(ctx, 0);
       y += 36 * S;
       items.forEach(r => {
-        ctx.fillStyle = st.ramp(norm(r.v)); roundRect(ctx, x, y + 4 * S, 18 * S, 18 * S, 4 * S); ctx.fill();
+        ctx.fillStyle = colorOf(r.v); roundRect(ctx, x, y + 4 * S, 18 * S, 18 * S, 4 * S); ctx.fill();
         ctx.font = font(st, 500, 24 * S * st.ts); ctx.fillStyle = T.ink; ctx.textAlign = 'left';
         const nm = PS.fit(ctx, r.e.name, w - 150 * S);
         ctx.fillText(nm, x + 30 * S, y);

@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-08T15:04:43.772Z",
+ "generated": "2026-11-08T15:18:43.671Z",
  "tiers": [
   {
    "id": "federal",
@@ -496,6 +496,16 @@
      "host": "open.alabama.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=ecupH7bxameyeamw",
+     "name": "Alabama Department of Economic and Community Affairs",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "ecupH7bxameyeamw",
+     "datasets": 226,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -559,7 +569,7 @@
      "platform": "ckan",
      "host": "data.ca.gov",
      "datasets": 4696,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     },
     {
      "url": "https://bythenumbers.sco.ca.gov/",
@@ -568,7 +578,7 @@
      "platform": "socrata",
      "host": "bythenumbers.sco.ca.gov",
      "datasets": 101,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -584,7 +594,7 @@
      "platform": "socrata",
      "host": "data.colorado.gov",
      "datasets": 640,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -600,7 +610,7 @@
      "platform": "socrata",
      "host": "data.ct.gov",
      "datasets": 589,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -616,7 +626,7 @@
      "platform": "socrata",
      "host": "data.delaware.gov",
      "datasets": 180,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -624,7 +634,18 @@
    "code": "DC",
    "fips": "11",
    "name": "District of Columbia",
-   "portals": []
+   "portals": [
+    {
+     "url": "https://opendata.dc.gov/",
+     "name": "Open Data DC (DC government)",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "neT9SoYxizqTHZPH",
+     "datasets": 5509,
+     "checked": "2026-11-08T15:18:43.671Z"
+    }
+   ]
   },
   {
    "code": "FL",
@@ -639,6 +660,36 @@
      "host": "geodata.florida.gov",
      "datasets": null,
      "checked": null
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=nRHtyn3uE1kyzoYc",
+     "name": "Florida Department of Environmental Protection",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "nRHtyn3uE1kyzoYc",
+     "datasets": 1416,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=O1JpcwDW8sjYuddV",
+     "name": "Florida Department of Transportation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "O1JpcwDW8sjYuddV",
+     "datasets": 1316,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=z6TmTIyYXEYhuNM0",
+     "name": "Florida Fish and Wildlife Conservation Commission",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "z6TmTIyYXEYhuNM0",
+     "datasets": 1125,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -655,6 +706,36 @@
      "host": "open.georgia.gov",
      "datasets": null,
      "checked": null
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=6RaeG1zfsIoM9Lze",
+     "name": "Georgia Department of Transportation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "6RaeG1zfsIoM9Lze",
+     "datasets": 531,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=Za9Nk6CPIPbvR1t7",
+     "name": "Georgia Geospatial Information Office",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "Za9Nk6CPIPbvR1t7",
+     "datasets": 198,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=Gqyymy5JISeLzyNM",
+     "name": "Georgia Department of Community Affairs",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "Gqyymy5JISeLzyNM",
+     "datasets": 183,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -679,7 +760,7 @@
      "platform": "socrata",
      "host": "highways.hidot.hawaii.gov",
      "datasets": 304,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -696,6 +777,36 @@
      "host": "data.gis.idaho.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=CNPdEkvnGl65jCX8",
+     "name": "State of Idaho",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "CNPdEkvnGl65jCX8",
+     "datasets": 1252,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=Qqv4dYPC8Vv8e3c3",
+     "name": "Idaho Transportation Department",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "Qqv4dYPC8Vv8e3c3",
+     "datasets": 347,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=iRCkLgFRU45VAYn3",
+     "name": "Idaho Department of Water Resources",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "iRCkLgFRU45VAYn3",
+     "datasets": 258,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -712,6 +823,26 @@
      "host": "data.illinois.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=aIrBD8yn1TDTEXoz",
+     "name": "Illinois Department of Transportation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "aIrBD8yn1TDTEXoz",
+     "datasets": 221,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=b9DHj1BjfdLLFv11",
+     "name": "Illinois Department of Natural Resources",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "b9DHj1BjfdLLFv11",
+     "datasets": 187,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -744,6 +875,36 @@
      "host": "data.iowa.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=vPD5PVLI6sfkZ5E4",
+     "name": "State of Iowa",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "vPD5PVLI6sfkZ5E4",
+     "datasets": 269,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=8lRhdTsQyJpO52F1",
+     "name": "Iowa Department of Transportation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "8lRhdTsQyJpO52F1",
+     "datasets": 290,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=r6iFVcMJeA4kB4GC",
+     "name": "Iowa Department of Natural Resources",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "r6iFVcMJeA4kB4GC",
+     "datasets": 263,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -776,6 +937,16 @@
      "host": "kygeonet.ky.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://opendata-kygeonet.opendata.arcgis.com/",
+     "name": "KyGovMaps (Commonwealth of Kentucky)",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "ghsX9CKghMvyYjBU",
+     "datasets": 485,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -792,6 +963,16 @@
      "host": "data-ladotd.opendata.arcgis.com",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=PLiuXYMBpMK5h36e",
+     "name": "Louisiana Department of Transportation & Development",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "PLiuXYMBpMK5h36e",
+     "datasets": 248,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -808,6 +989,16 @@
      "host": "www.maine.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=RbMX0mRVOFNTdLzd",
+     "name": "State of Maine",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "RbMX0mRVOFNTdLzd",
+     "datasets": 1177,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -823,7 +1014,7 @@
      "platform": "socrata",
      "host": "opendata.maryland.gov",
      "datasets": 1532,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -840,6 +1031,16 @@
      "host": "www.mass.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://open-data-massgis.hub.arcgis.com/",
+     "name": "MassGIS, Bureau of Geographic Information",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "hGdibHYSPO59RG1h",
+     "datasets": 601,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -855,7 +1056,7 @@
      "platform": "socrata",
      "host": "data.michigan.gov",
      "datasets": 242,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -871,7 +1072,7 @@
      "platform": "arcgis",
      "host": "gis.data.mn.gov",
      "datasets": 914,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -903,7 +1104,7 @@
      "platform": "socrata",
      "host": "data.mo.gov",
      "datasets": 262,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -920,6 +1121,36 @@
      "host": "data.mt.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=qnjIrwR8z5Izc0ij",
+     "name": "Montana State Library",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "qnjIrwR8z5Izc0ij",
+     "datasets": 587,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=DRQySz3VhPgOv7Bo",
+     "name": "Montana Department of Natural Resources & Conservation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "DRQySz3VhPgOv7Bo",
+     "datasets": 291,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=dKlvxNSUvl36IGMp",
+     "name": "Montana Department of Transportation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "dKlvxNSUvl36IGMp",
+     "datasets": 274,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -936,6 +1167,16 @@
      "host": "www.ne.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=Sj9eBhzWwOMzQCfI",
+     "name": "State of Nebraska",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "Sj9eBhzWwOMzQCfI",
+     "datasets": 156,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -952,6 +1193,36 @@
      "host": "goed.nv.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=RyxlXSfFi87rAosq",
+     "name": "Nevada Department of Wildlife",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "RyxlXSfFi87rAosq",
+     "datasets": 389,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=9Y4hSlLf13E9S0Eo",
+     "name": "Nevada Department of Transportation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "9Y4hSlLf13E9S0Eo",
+     "datasets": 71,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=hKjkLA70e5yLFrt0",
+     "name": "Nevada Department of Conservation and Natural Resources",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "hKjkLA70e5yLFrt0",
+     "datasets": 34,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -983,7 +1254,7 @@
      "platform": "socrata",
      "host": "data.nj.gov",
      "datasets": 116,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1000,6 +1271,16 @@
      "host": "www.sunshineportalnm.com",
      "datasets": null,
      "checked": null
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=qXZbWTdPDbTjl7Dy",
+     "name": "New Mexico Office of the State Engineer",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "qXZbWTdPDbTjl7Dy",
+     "datasets": 87,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1015,7 +1296,7 @@
      "platform": "socrata",
      "host": "data.ny.gov",
      "datasets": 1036,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1048,6 +1329,16 @@
      "host": "www.gis.nd.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=GOcSXpzwBHyk2nog",
+     "name": "State of North Dakota",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "GOcSXpzwBHyk2nog",
+     "datasets": 205,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1064,6 +1355,36 @@
      "host": "data.ohio.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=1AlElnGrgBM62OSj",
+     "name": "Ohio Department of Transportation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "1AlElnGrgBM62OSj",
+     "datasets": 549,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=ajRlmtxbNBjZggOT",
+     "name": "Ohio Department of Natural Resources",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "ajRlmtxbNBjZggOT",
+     "datasets": 128,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=MlJ0G8iWUyC7jAmu",
+     "name": "Ohio Geographically Referenced Information Program",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "MlJ0G8iWUyC7jAmu",
+     "datasets": 87,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1095,7 +1416,7 @@
      "platform": "socrata",
      "host": "data.oregon.gov",
      "datasets": 540,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1111,7 +1432,7 @@
      "platform": "socrata",
      "host": "data.pa.gov",
      "datasets": 352,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1128,6 +1449,26 @@
      "host": "www.ri.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=EOvMKOFaeiXUzBcH",
+     "name": "State of Rhode Island - DOA - Division of Planning",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "EOvMKOFaeiXUzBcH",
+     "datasets": 42,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=7arM4WYbUOtKu3Zq",
+     "name": "Rhode Island State Enterprise GIS",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "7arM4WYbUOtKu3Zq",
+     "datasets": 40,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1144,6 +1485,36 @@
      "host": "www.sc.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=VaY7cY9pvUYUP1Lf",
+     "name": "South Carolina Department of Transportation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "VaY7cY9pvUYUP1Lf",
+     "datasets": 891,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=acgZYxoN5Oj8pDLa",
+     "name": "South Carolina Department of Natural Resources",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "acgZYxoN5Oj8pDLa",
+     "datasets": 258,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=OMDIQXm11z4wcK26",
+     "name": "South Carolina Department of Environmental Services",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "OMDIQXm11z4wcK26",
+     "datasets": 87,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1184,7 +1555,7 @@
      "platform": "socrata",
      "host": "healthdata.tn.gov",
      "datasets": 295,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1200,7 +1571,7 @@
      "platform": "socrata",
      "host": "data.texas.gov",
      "datasets": 830,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1217,6 +1588,26 @@
      "host": "gis.utah.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=KaHXE9OkiB9e63uE",
+     "name": "Utah Division of Emergency Management",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "KaHXE9OkiB9e63uE",
+     "datasets": 288,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://opendata.gis.utah.gov/",
+     "name": "Utah Geospatial Resource Center (UGRC)",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "99lidPhWCzftIe9K",
+     "datasets": 863,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1232,7 +1623,7 @@
      "platform": "socrata",
      "host": "data.vermont.gov",
      "datasets": 172,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1264,7 +1655,7 @@
      "platform": "socrata",
      "host": "data.wa.gov",
      "datasets": 1076,
-     "checked": "2026-11-08T15:04:43.772Z"
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1281,6 +1672,16 @@
      "host": "dep.wv.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=3iZGO9lgMHNG1V3R",
+     "name": "West Virginia Department of Environmental Protection",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "3iZGO9lgMHNG1V3R",
+     "datasets": 227,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },
@@ -1297,6 +1698,36 @@
      "host": "sagic.wi.gov",
      "datasets": null,
      "checked": "2026-11-08T15:04:43.772Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=Ul9AyFFeFTjf08DW",
+     "name": "Wisconsin Department of Natural Resources",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "Ul9AyFFeFTjf08DW",
+     "datasets": 414,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=0pgGLzT0Nh7FVjon",
+     "name": "Wisconsin Dept of Transportation",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "0pgGLzT0Nh7FVjon",
+     "datasets": 151,
+     "checked": "2026-11-08T15:18:43.671Z"
+    },
+    {
+     "url": "https://hub.arcgis.com/search?q=&orgId=o4NJgD3NfeHnWy06",
+     "name": "Wisconsin Department of Public Instruction",
+     "scope": "agency",
+     "platform": "arcgis-org",
+     "host": "hub.arcgis.com",
+     "orgId": "o4NJgD3NfeHnWy06",
+     "datasets": 74,
+     "checked": "2026-11-08T15:18:43.671Z"
     }
    ]
   },

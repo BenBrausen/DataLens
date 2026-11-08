@@ -146,9 +146,11 @@
   PS.fetchRemoteText = async url => (await PS.fetchRemote(url)).text;
 
   // ---------- state & local portals ----------
-  PS.SEARCHABLE = ['socrata', 'ckan', 'arcgis'];
+  PS.SEARCHABLE = ['socrata', 'ckan', 'arcgis', 'arcgis-org'];
   PS.statePortals = code => (PS.REGISTRY?.states.find(s => s.code === code)?.portals || []);
   const stateOfHost = host => PS.REGISTRY?.states.find(s => s.portals.some(p => p.host === host));
+  const orgIndex = () => new Map((PS.REGISTRY?.states || []).flatMap(s => s.portals.filter(p => p.orgId).map(p => [p.orgId, { state: s.name, name: p.name }])));
+  const arcgisDownload = (id, type) => (type === 'CSV' ? `https://www.arcgis.com/sharing/rest/content/items/${id}/data` : `https://hub.arcgis.com/api/download/v1/items/${id}/csv?redirect=true&layers=0`);
 
   const ADAPTERS = {
     async socrata(portals, q) {
@@ -197,6 +199,24 @@
     },
   };
 
+  // State agencies on ArcGIS Online: one central search across all their organizations.
+  ADAPTERS['arcgis-org'] = async (portals, q) => {
+    const idx = orgIndex();
+    const ids = [...new Set(portals.map(p => p.orgId))];
+    const qs = new URLSearchParams({ limit: '40', filter: `orgid IN (${ids.map(x => `'${x}'`).join(',')}) AND type IN ('Feature Service','Table','CSV')` });
+    if (q) qs.set('q', q);
+    const j = await fetchJSON(`https://hub.arcgis.com/api/search/v1/collections/dataset/items?${qs}`);
+    return (j.features || []).map(f => {
+      const pr = f.properties, org = idx.get(pr.orgId) || {};
+      return {
+        id: f.id, title: pr.title, description: String(pr.snippet || pr.description || '').replace(/<[^>]+>/g, ' ').slice(0, 400),
+        publisher: pr.source || org.name || 'State agency', state: org.state, host: 'hub.arcgis.com', platform: 'arcgis-org', tier: 'state',
+        modified: pr.modified ? new Date(pr.modified).toISOString() : null, landing: `https://hub.arcgis.com/datasets/${f.id}`,
+        files: [{ url: arcgisDownload(f.id, pr.type), type: 'text/csv' }],
+      };
+    });
+  };
+
   // Searches the portals of one state (code) or of every state (null). Results
   // from different portals are interleaved so no single portal floods the list.
   PS.searchPortals = async (code, q) => {
@@ -205,12 +225,12 @@
     const groups = {}; portals.forEach(p => (groups[p.platform] ||= []).push(p));
     const errors = [];
     const lists = await Promise.all(Object.entries(groups).map(([plat, ps]) => {
-      // Search every Socrata portal in one call; CKAN/ArcGIS only for one state at a time.
-      if (plat !== 'socrata' && !code) return [];
+      // Socrata and ArcGIS-org search every state in one call; CKAN and ArcGIS sites only one state at a time.
+      if (!['socrata', 'arcgis-org'].includes(plat) && !code) return [];
       return ADAPTERS[plat](ps, q).catch(e => { errors.push(`${ps.map(p => p.host).join(', ')}: ${e.message}`); return []; });
     }));
     const byHost = {};
-    lists.flat().forEach(r => (byHost[r.host] ||= []).push(r));
+    lists.flat().forEach(r => (byHost[r.host + '|' + (r.state || '')] ||= []).push(r));
     const queues = Object.values(byHost), results = [];
     while (queues.some(qq => qq.length)) queues.forEach(qq => qq.length && results.push(qq.shift()));
     return { results, errors, portals: portals.length };
@@ -262,8 +282,54 @@
     return null;
   }
 
-  // Profiles each column: date | number | state | country | text
-  PS.profile = function ({ header, rows }) {
+  // ---------- counties ----------
+  // Name lookup per state, built from the county map. Matches "Albany", "Albany County",
+  // "ALBANY CO.", "St. Louis city", "Orleans Parish", "Anchorage Municipality".
+  const normCounty = v => String(v).toLowerCase().replace(/\./g, '').replace(/\bsaint\b/g, 'st').replace(/\s+(county|co|parish|borough|census area|municipality|city and borough)$/, '').replace(/[^a-z0-9 ]/g, '').trim();
+  let COUNTY_IDX = null;
+  function countyIndex() {
+    if (COUNTY_IDX) return COUNTY_IDX;
+    const C = window.PS_GEO_COUNTIES; if (!C) return null;
+    COUNTY_IDX = { byState: new Map(), cities: new Map(), ids: new Set(), names: new Map() };
+    const abbr = new Map(STATE_LIST.map(([a, f]) => [f, a]));
+    for (const g of C.objects.counties.geometries) {
+      const id = String(g.id), st = id.slice(0, 2), n = normCounty(g.properties.name);
+      COUNTY_IDX.ids.add(id);
+      // Independent cities (St. Louis city, Baltimore city, most of Virginia's) have
+      // county codes of 500+ and share names with real counties.
+      const isCity = +id.slice(2) >= 500;
+      COUNTY_IDX.names.set(id, `${g.properties.name}${isCity ? ' city' : st === '22' ? ' Parish' : st === '02' ? '' : ' County'}, ${abbr.get(st) || ''}`);
+      const bucket = isCity ? COUNTY_IDX.cities : COUNTY_IDX.byState;
+      if (!bucket.has(st)) bucket.set(st, new Map());
+      bucket.get(st).set(n, id);
+    }
+    return COUNTY_IDX;
+  }
+  PS.countyName = id => countyIndex()?.names.get(id) || id;
+  const countyFips = v => { const s = String(v).trim(); if (!/^\d{4,5}$/.test(s)) return null; const id = s.padStart(5, '0'); return countyIndex()?.ids.has(id) ? id : null; };
+  function countyByName(v, stateFips) {
+    const idx = countyIndex(); if (!idx) return null;
+    const raw = String(v).trim(), city = / city$/i.test(raw);
+    const n = normCounty(city ? raw.replace(/ city$/i, '') : raw);
+    const order = city ? [idx.cities, idx.byState] : [idx.byState, idx.cities];
+    for (const bucket of order) {
+      if (stateFips) { const id = bucket.get(stateFips)?.get(n); if (id) return id; continue; }
+      for (const m of bucket.values()) if (m.has(n)) return m.get(n);
+    }
+    return null;
+  }
+  PS.needsCountyMap = header => header.some(h => /county|parish|borough|fips|geoid|area/i.test(h));
+
+  // Judged on distinct values: a file can hold one state row per month and dozens of
+  // county rows, and it's the county names that matter.
+  function isCountyCol(name, distinct, stateFips) {
+    if (!distinct.length || distinct.length > 4000) return false;
+    const share = f => distinct.filter(f).length / distinct.length;
+    const looks = /county|parish|borough/i.test(name) || share(v => /\b(county|parish|borough)$/i.test(String(v).trim())) > 0.3;
+    return looks && share(v => countyByName(v, stateFips)) > 0.3;
+  }
+  // Profiles each column: date | number | state | country | county | countyfips | text
+  PS.profile = function ({ header, rows }, ctx = {}) {
     // Sample evenly across the file: many files are sorted (totals first), so the
     // first rows alone can hide most of a column's values.
     const step = Math.max(1, Math.floor(rows.length / 2000));
@@ -278,7 +344,9 @@
       let type = 'text';
       const allInts = share(v => /^-?\d+$/.test(String(v).trim())) > 0.95;
       if (share(v => toDate(v)) > 0.9 && (!allInts || isYearish)) type = 'date';
+      else if (/fips|geoid|county.?(code|id)|cnty/i.test(name) && share(v => countyFips(v)) > 0.8) type = 'countyfips';
       else if (share(v => stateOf(v)) > 0.8 && !/^\d+$/.test(vals[0])) type = 'state';
+      else if (isCountyCol(name, [...new Set(vals)], ctx.stateFips)) type = 'county';
       else if (share(v => countryOf(v)) > 0.7 && !/^\d+$/.test(vals[0])) type = 'country';
       else if (share(v => Number.isFinite(num(v))) > 0.9) type = 'number';
       const pct = vals.some(v => /%/.test(v)) || /percent|rate|pct|share/.test(lname);
@@ -292,15 +360,19 @@
   PS.guessMapping = (cols, table) => {
     const date = cols.find(c => c.type === 'date');
     const month = date && /year|yr/i.test(date.name) ? cols.find(c => c.type === 'month') : null;
-    const geo = cols.find(c => c.type === 'state' || c.type === 'country');
+    // The most detailed geography wins: counties over states.
+    const geo = cols.find(c => c.type === 'countyfips') || cols.find(c => c.type === 'county') || cols.find(c => c.type === 'state' || c.type === 'country');
+    const stateCol = cols.find(c => c.type === 'state');
     const value = cols.filter(c => c.type === 'number' && c !== date).sort((a, b) => (b.pct - a.pct) || (b.distinct - a.distinct))[0];
     // The most detailed text column is usually the "place" or "category".
     const cat = geo || cols.filter(c => c.type === 'text' && c.distinct > 1 && c.distinct <= 300).sort((a, b) => b.distinct - a.distinct)[0];
     // A low-cardinality "level" column (area_type = State/County/Metro) means the
     // file mixes totals with their parts. Default to the level with the most rows.
     const level = cols.find(c => c !== cat && c.type === 'text' && c.values && c.values.length >= 2 && c.values.length <= 8 && /type|level|geo|area|category|class/i.test(c.name));
-    return { time: date?.i ?? -1, month: month?.i ?? -1, value: value?.i ?? -1, category: cat?.i ?? -1, agg: value?.pct ? 'mean' : 'sum',
-      filterCol: level ? level.i : -1, filterVal: level ? level.values[0] : '' };
+    // With a county column, keep the county rows; otherwise the level with the most rows.
+    const levelVal = level ? (['county', 'countyfips'].includes(cat?.type) && level.values.find(v => /county/i.test(v))) || level.values[0] : '';
+    return { time: date?.i ?? -1, month: month?.i ?? -1, value: value?.i ?? -1, category: cat?.i ?? -1, agg: value?.pct ? 'mean' : 'sum', stateCol: stateCol?.i ?? -1,
+      filterCol: level ? level.i : -1, filterVal: levelVal };
   };
 
   // Builds a normalized dataset from a parsed table and a column mapping.
@@ -315,15 +387,24 @@
     let dupes = 0;
     const vc = cols[map.value], cc = cols[map.category], tc = cols[map.time];
     if (!vc) throw new Error('Choose a numeric value column.');
-    const unit = { label: vc.name, format: vc.pct ? 'pct' : vc.usd ? 'usd' : 'number', decimals: vc.pct ? 1 : 0 };
+    // "unemployment_rate" -> "Unemployment rate"
+    const pretty = n => { const t = String(n).replace(/[_]+/g, ' ').replace(/\s+/g, ' ').trim(); return /[a-z]/.test(t) && t === t.toLowerCase() ? t.charAt(0).toUpperCase() + t.slice(1) : t; };
+    const unit = { label: pretty(vc.name), format: vc.pct ? 'pct' : vc.usd ? 'usd' : 'number', decimals: vc.pct ? 1 : 0 };
     const agg = (arr) => {
       if (!arr.length) return null;
       if (map.agg === 'count') return arr.length;
       const s = arr.reduce((a, b) => a + b, 0);
       return map.agg === 'mean' ? s / arr.length : map.agg === 'max' ? Math.max(...arr) : map.agg === 'min' ? Math.min(...arr) : s;
     };
-    const geoType = cc?.type === 'state' ? 'us-states' : cc?.type === 'country' ? 'world' : null;
-    const keyOf = v => {
+    const geoType = cc?.type === 'state' ? 'us-states' : cc?.type === 'country' ? 'world' : ['county', 'countyfips'].includes(cc?.type) ? 'us-counties' : null;
+    const metaState = meta.stateFips || (meta.state && stateOf(meta.state)?.[0]) || null;
+    const keyOf = (v, r) => {
+      if (cc?.type === 'countyfips') { const id = countyFips(v); if (!id) return null; const nm = PS.countyName(id); return { id, name: nm, short: nm.replace(/, [A-Z]{2}$/, '') }; }
+      if (cc?.type === 'county') {
+        const st = map.stateCol >= 0 ? stateOf(r[map.stateCol])?.[0] : metaState;
+        const id = countyByName(v, st);
+        return id ? { id, name: String(v).trim(), short: String(v).trim() } : null;
+      }
       if (geoType === 'us-states') { const s = stateOf(v); return s ? { id: s[0], name: s[1] } : null; }
       if (geoType === 'world') { const id = countryOf(v); return id ? { id, name: String(v).trim() } : null; }
       const s = String(v).trim(); return s ? { id: s, name: s } : null;
@@ -338,7 +419,7 @@
     if (tc && cc) {
       const groups = new Map(), timeset = new Set();
       for (const r of rows) {
-        const d = timeOf(r), k = keyOf(r[map.category]), v = vals(r);
+        const d = timeOf(r), k = keyOf(r[map.category], r), v = vals(r);
         if (!d || !k || (!Number.isFinite(v) && map.agg !== 'count')) { skipped++; continue; }
         timeset.add(d);
         if (!groups.has(k.id)) groups.set(k.id, { ...k, by: new Map() });
@@ -364,7 +445,7 @@
     if (cc) {
       const by = new Map();
       for (const r of rows) {
-        const k = keyOf(r[map.category]), v = vals(r);
+        const k = keyOf(r[map.category], r), v = vals(r);
         if (!k || (!Number.isFinite(v) && map.agg !== 'count')) { skipped++; continue; }
         if (!by.has(k.id)) by.set(k.id, { ...k, arr: [] }); else dupes++;
         by.get(k.id).arr.push(v);

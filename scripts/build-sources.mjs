@@ -12,7 +12,7 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { TIERS, TOPICS, FEDERAL, THIRD_PARTY, DATASET_TAGS, EXTRA_STATE_PORTALS } from './sources/catalog.mjs';
+import { TIERS, TOPICS, FEDERAL, THIRD_PARTY, DATASET_TAGS, EXTRA_STATE_PORTALS, ARCGIS_STATE_ORGS } from './sources/catalog.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const OUT = path.join(ROOT, 'public/sources/registry.json');
@@ -66,6 +66,12 @@ const portalsByState = new Map(STATES.map(([, , n]) => [n, []]));
 for (const r of starter) portalsByState.get(r.State)?.push({ url: r['Portal URL'], name: `${r.State} open data`, scope: r.Category === 'General' ? 'statewide' : 'specialized' });
 for (const p of EXTRA_STATE_PORTALS) portalsByState.get(p.state)?.push({ url: p.url, name: p.name, scope: p.scope });
 
+async function countOrg(orgId) {
+  const qs = new URLSearchParams({ limit: '1', filter: `orgid='${orgId}' AND type IN ('Feature Service','Table','CSV')` });
+  const r = await get(`https://hub.arcgis.com/api/search/v1/collections/dataset/items?${qs}`);
+  return r.ok ? r.body.numberMatched ?? 0 : null;
+}
+
 const states = [];
 let checked = 0, kept = 0;
 for (const [code, fips, name] of STATES) {
@@ -77,6 +83,15 @@ for (const [code, fips, name] of STATES) {
     checked++;
     portals.push({ ...p, platform: d.platform || 'unknown', host: d.host, datasets: d.datasets ?? null, checked: d.reachable ? NOW : prev?.checked ?? null });
     process.stdout.write(`${name.padEnd(15)} ${(d.platform || 'unreachable').padEnd(11)} ${String(d.datasets ?? '').padStart(6)}  ${d.host}\n`);
+  }
+  for (const o of ARCGIS_STATE_ORGS.filter(x => x.state === name)) {
+    let n = null;
+    try { n = await countOrg(o.orgId); } catch { }
+    const prev = prevPortal.get(o.url);
+    if (n == null && prev) { portals.push(prev); kept++; continue; }
+    checked++;
+    portals.push({ url: o.url, name: o.name, scope: 'agency', platform: n ? 'arcgis-org' : 'unknown', host: 'hub.arcgis.com', orgId: o.orgId, datasets: n, checked: n != null ? NOW : null });
+    process.stdout.write(`${name.padEnd(15)} ${'arcgis-org'.padEnd(11)} ${String(n ?? '').padStart(6)}  ${o.name}\n`);
   }
   states.push({ code, fips, name, portals });
 }
@@ -93,5 +108,6 @@ try {
 const registry = { generated: NOW, tiers: TIERS, topics: TOPICS, federal: FEDERAL, thirdParty: THIRD_PARTY, datasetTags: DATASET_TAGS, states, catalogOrgs };
 await fs.mkdir(path.dirname(OUT), { recursive: true });
 await fs.writeFile(OUT, JSON.stringify(registry, null, 1));
-const searchable = states.flatMap(s => s.portals).filter(p => ['socrata', 'ckan', 'arcgis'].includes(p.platform));
-console.log(`\n${searchable.length} searchable portals (${states.filter(s => s.portals.some(p => ['socrata', 'ckan', 'arcgis'].includes(p.platform))).length} states); ${checked} checked, ${kept} kept from previous run; ${catalogOrgs.length} data.gov publishers.`);
+const SEARCHABLE = ['socrata', 'ckan', 'arcgis', 'arcgis-org'];
+const searchable = states.flatMap(s => s.portals).filter(p => SEARCHABLE.includes(p.platform));
+console.log(`\n${searchable.length} searchable portals (${states.filter(s => s.portals.some(p => SEARCHABLE.includes(p.platform))).length} states); ${checked} checked, ${kept} kept from previous run; ${catalogOrgs.length} data.gov publishers.`);

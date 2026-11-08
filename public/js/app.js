@@ -16,7 +16,7 @@
     accent: '', bg: '', bgGradient: false, radius: 6, lineWidth: 5, grid: 'light', textScale: 1, annotate: true, zeroBase: true,
     series: [], entities: [], topN: 10, highlight: '', sortAsc: false, rangeStart: null, rangeEnd: null, handle: '', brand: true,
     motion: 'steady', takeaway: true, takeawayText: '', captions: true, script: '', scriptEdited: false, voice: '', speakPreview: false,
-    kicker: '', title: '', subtitle: '', note: '', colorZero: false, focus: '', compareNational: true, titleEdited: false,
+    kicker: '', title: '', subtitle: '', note: '', colorZero: false, focus: '', compareNational: true, titleEdited: false, minPop: 0, scope: '',
   };
   let o = { ...DEFAULTS };
 
@@ -39,6 +39,7 @@
   function autoTitle(ds) {
     const st = stateInfo();
     if (o.focus && st && o.chart === 'line') return `${ds.title.replace(/ by state$/i, '')} in ${st.name}`;
+    if (st && ds.geo === 'us-counties') return `${ds.title} in ${st.name}`;
     return ds.title;
   }
   function palette() {
@@ -53,10 +54,23 @@
     return 1;
   }
 
+  // County datasets with a state chosen: only that state's counties, with short names.
+  function viewOf(ds) {
+    const st = stateInfo();
+    if (ds.geo !== 'us-counties' || !st) { o.scope = ''; return ds; }
+    o.scope = st.fips;
+    const entities = ds.entities.filter(e => e.id.startsWith(st.fips)).map(e => ({ ...e, name: e.short || e.name }));
+    return entities.length ? { ...ds, entities, scopeName: st.name } : ds;
+  }
+  async function ensureGeo(kind) {
+    if (PS.geoReady(kind)) return;
+    await new Promise((res, rej) => { const sc = document.createElement('script'); sc.src = 'js/geo-counties.js'; sc.onload = res; sc.onerror = () => rej(new Error('Could not load the county map.')); document.head.appendChild(sc); });
+  }
+
   // ---------- core update ----------
   function update({ relayout = true, panels = true } = {}) {
     if (!S.ds) return;
-    const ds = S.ds;
+    const ds = viewOf(S.ds);
     const T = PS.THEMES[o.theme];
     const pc = PS.checkPalette(palette(), o.bg || T.bg, colorsInUse());
     S.analysis = PS.analyze(ds, { ...o, paletteCheck: colorsInUse() > 1 ? pc : null });
@@ -120,6 +134,7 @@
     pause();
     let ds = S.custom.find(d => d.id === id);
     if (!ds) { try { ds = await PS.loadDataset(id); } catch (e) { toast(e.message); return; } }
+    if (ds.geo) { try { await ensureGeo(ds.geo); } catch (e) { toast(e.message); return; } }
     S.ds = ds;
     const charts = PS.chartsFor(ds).map(c => c.id);
     o.chart = charts.includes(o.chart) && keepStory ? o.chart : PS.defaultChart(ds);
@@ -130,6 +145,7 @@
     o.focus = st && ds.geo === 'us-states' && ds.entities.some(e => e.id === st.fips) ? st.fips : '';
     o.highlight = o.focus;
     if (o.focus && ds.national && !keepStory) o.chart = 'line';
+    o.minPop = ds.geo === 'us-counties' && ds.isRate ? 5000 : 0;
     o.title = autoTitle(ds); o.subtitle = autoSubtitle(ds); o.kicker = '';
     o.zeroBase = !(ds.kind === 'timeseries' && ds.unit.format === 'usd' && false);
     if (ds.zeroLine) o.zeroBase = false;
@@ -160,14 +176,14 @@
 
   const TIER_BADGE = { federal: 'Federal', state: 'State', local: 'Local', academic: 'Academic', nonprofit: 'Nonprofit', industry: 'Company', international: 'Intl.' };
   const tierBadge = t => `<span class="badge tier-${t || 'federal'}">${TIER_BADGE[t] || 'Federal'}</span>`;
-  const PLATFORM_NAME = { socrata: 'Socrata', ckan: 'CKAN', arcgis: 'ArcGIS Hub', website: 'Website', unknown: 'Not yet checked' };
+  const PLATFORM_NAME = { socrata: 'Socrata', ckan: 'CKAN', arcgis: 'ArcGIS Hub', 'arcgis-org': 'ArcGIS Online', website: 'Website', unknown: 'Not yet checked' };
   const fmtThrough = c => PS.fmtDate(c.lastObservation, c.frequency === 'real-time' ? 'daily' : c.frequency);
 
   function dsCard(c) {
     const st = stateInfo();
     const active = S.ds && (S.ds.id === c.id || c.reframes?.includes(S.ds.id));
     const kind = c.kind === 'events' ? '<span class="badge live">Live</span>' : c.geo ? '<span class="badge">Map</span>' : c.kind === 'panel' ? '<span class="badge">Compare</span>' : '';
-    const local = st && c.geo === "us-states" ? `<span class="local">Shows ${esc(st.name)}${c.hasNational ? ' vs. U.S.' : ''}</span>` : '';
+    const local = st && c.geo === 'us-states' ? `<span class="local">Shows ${esc(st.name)}${c.hasNational ? ' vs. U.S.' : ''}</span>` : st && c.geo === 'us-counties' ? `<span class="local">Zooms to ${esc(st.name)}'s counties</span>` : '';
     return `<button class="ds ${active ? 'active' : ''}" data-ds="${c.id}"><b>${esc(c.title)}${kind}${tierBadge(c.tier)}</b><span>${esc(c.source.publisher)} · through ${esc(fmtThrough(c))}</span>${local}</button>`;
   }
   const heads = list => list.filter(c => !c.reframes || c.reframes[0] === c.id);
@@ -178,7 +194,7 @@
   function portalChips(code) {
     const ps = PS.statePortals(code);
     if (!ps.length) return '<p class="muted">No portals registered yet.</p>';
-    return `<div class="portal-list">${ps.map(p => `<a class="portal" href="${esc(p.url)}" target="_blank" rel="noopener"><b>${esc(p.name)}</b><span>${esc(p.host || new URL(p.url).hostname)} · ${PLATFORM_NAME[p.platform] || 'Not yet checked'}${p.datasets ? ` · ${p.datasets.toLocaleString()} datasets` : ''}${p.scope === 'specialized' ? ' · GIS/agency' : ''}</span></a>`).join('')}</div>`;
+    return `<div class="portal-list">${ps.map(p => `<a class="portal" href="${esc(p.url)}" target="_blank" rel="noopener"><b>${esc(p.name)}</b><span>${esc(p.platform === 'arcgis-org' ? 'ArcGIS Online' : (p.host || new URL(p.url).hostname))} · ${PLATFORM_NAME[p.platform] || 'Not yet checked'}${p.datasets ? ` · ${p.datasets.toLocaleString()} datasets` : ''}${p.scope === 'specialized' ? ' · GIS/agency' : ''}</span></a>`).join('')}</div>`;
   }
 
   STEPS.data = () => {
@@ -194,9 +210,10 @@
       body += `<div class="chips topic-chips"><button class="chip ${S.topic === 'all' ? 'active' : ''}" data-topic="all">All</button>${topics.map(t => `<button class="chip ${S.topic === t.id ? 'active' : ''}" data-topic="${t.id}">${esc(t.name)} <small>${t.n}</small></button>`).join('')}</div>`;
       body += lensHTML();
       let list = heads(S.catalog).filter(c => S.topic === 'all' || c.topic === S.topic);
-      if (st) list = [...list.filter(c => c.geo === 'us-states'), ...list.filter(c => c.geo !== 'us-states')];
+      const rank = c => (c.geo === 'us-counties' ? 0 : c.geo === 'us-states' ? 1 : 2);
+      if (st) list = [...list].sort((a, b) => rank(a) - rank(b));
       const groups = {};
-      list.forEach(c => { const g = st && c.geo === 'us-states' ? `${st.name} & the U.S.` : (reg?.topics.find(t => t.id === c.topic)?.name || c.category); (groups[g] ||= []).push(c); });
+      list.forEach(c => { const g = st && c.geo === 'us-counties' ? `${st.name} counties` : st && c.geo === 'us-states' ? `${st.name} & the U.S.` : (reg?.topics.find(t => t.id === c.topic)?.name || c.category); (groups[g] ||= []).push(c); });
       if (S.custom.length && S.topic === 'all') groups['Your data'] = S.custom;
       body += Object.entries(groups).map(([g, l]) => `<div class="ds-group"><h3>${esc(g)}</h3>${l.map(dsCard).join('')}</div>`).join('');
       if (st) {
@@ -251,14 +268,16 @@
     return stateSel + tabs + body;
   };
 
+  let searchSeq = 0;
   async function runSearch() {
-    const sc = S.search, st = stateInfo();
+    const sc = S.search, st = stateInfo(), mySeq = ++searchSeq;
     Object.assign(sc, { busy: true, err: '', info: '', results: [] }); renderStep();
     const jobs = [];
     if (sc.scope === 'all' || sc.scope === 'datagov') jobs.push(PS.searchCatalog(sc.q, null, sc.org).then(r => ({ results: r.results })).catch(e => ({ results: [], err: sc.scope === 'datagov' ? e.message : 'data.gov search needs the Plainsight server or proxy; showing state portals only.' })));
     if (!sc.org && (sc.scope === 'state' || (sc.scope === 'all' && st))) jobs.push(PS.searchPortals(st.code, sc.q).then(r => ({ results: r.results, errs: r.errors, portals: r.portals })));
     if (!sc.org && (sc.scope === 'states' || (sc.scope === 'all' && !st))) jobs.push(PS.searchPortals(null, sc.q).then(r => ({ results: r.results, errs: r.errors, portals: r.portals })));
     const out = await Promise.all(jobs);
+    if (mySeq !== searchSeq) return; // a newer search started; drop these stale results
     // State results first when a state is chosen, otherwise interleave.
     const lists = out.map(x => x.results), merged = [];
     while (lists.some(l => l.length)) lists.forEach(l => l.length && merged.push(l.shift()));
@@ -292,18 +311,22 @@
       ${field('Time', opt('time', ['date'], 'None (one moment)'))}
       ${im.cols.some(c => c.type === 'month') ? field('Month column (combined with year)', opt('month', ['month'], 'None')) : ''}
       ${im.cols.some(c => c.values && c.values.length >= 2) ? field('Only rows where', `<div class="row"><select data-map="filterCol"><option value="-1">No filter</option>${im.cols.filter(c => c.values && c.values.length >= 2).map(c => `<option value="${c.i}" ${im.map.filterCol === c.i ? 'selected' : ''}>${esc(c.name)}</option>`).join('')}</select>${im.map.filterCol >= 0 ? `<select data-map="filterVal">${im.cols[im.map.filterCol].values.map(v => `<option ${im.map.filterVal === v ? 'selected' : ''}>${esc(v)}</option>`).join('')}</select>` : ''}</div><p class="muted">Use this when a file mixes totals and their parts, like a state total plus its counties.</p>`) : ''}
-      ${field('Place or category', opt('category', ['state', 'country', 'text'], 'None (single series)'))}
+      ${field('Place or category', opt('category', ['county', 'countyfips', 'state', 'country', 'text'], 'None (single series)'))}
       ${field('Value', opt('value', ['number'], ''))}
       ${field('Combine duplicate rows by', `<select data-map="agg">${['sum', 'mean', 'max', 'min', 'count'].map(a => `<option ${im.map.agg === a ? 'selected' : ''}>${a}</option>`).join('')}</select>`)}
       <button class="btn primary block" data-act="build">Build chart</button>
       <table><tr>${im.table.header.slice(0, 5).map(h => `<th>${esc(h)}</th>`).join('')}</tr>${im.table.rows.slice(0, 4).map(r => `<tr>${r.slice(0, 5).map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</table></div>`;
   }
 
-  function importTable(text, meta) {
+  async function importTable(text, meta) {
     try {
       const table = PS.parseCSV(text);
       if (!table.rows.length) throw new Error('No rows found.');
-      const cols = PS.profile(table);
+      // County matching needs the county map's name list.
+      if (PS.needsCountyMap(table.header)) await ensureGeo('us-counties').catch(() => {});
+      const stateFips = meta.state ? PS.STATE_LIST.find(x => x[2] === meta.state)?.[1] : null;
+      if (stateFips) meta.stateFips = stateFips;
+      const cols = PS.profile(table, { stateFips });
       S.imported = { table, cols, map: PS.guessMapping(cols, table), meta };
       renderStep();
     } catch (e) { toast('Could not read that file: ' + e.message); }
@@ -328,7 +351,7 @@
       try {
         const { text, truncated } = await PS.fetchRemote(r.files[0].url);
         importTable(text, {
-          title: r.title, category: r.state || 'data.gov', description: r.description, tier: r.tier,
+          title: r.title, category: r.state || 'data.gov', state: r.state || null, description: r.description, tier: r.tier,
           source: { publisher: r.publisher + (r.state && !r.publisher.includes(r.state) ? `, ${r.state}` : ''), dataset: r.title, url: r.landing, portal: r.host },
           howToRead: r.description ? [r.description.slice(0, 220)] : [],
           caveats: truncated ? ['This file is very large, so Plainsight loaded only its first rows. Check that the chart covers the period you mean to show.'] : [],
@@ -459,6 +482,7 @@
     if (ds.kind === 'panel' && ['barrace', 'bars', 'choropleth'].includes(o.chart))
       html += field('Highlight one', select('highlight', [['', 'None'], ...ds.entities.map(e => [e.id, e.name]).sort((a, b) => a[1].localeCompare(b[1]))]));
     if (o.chart === 'bars') html += check('sortAsc', 'Show lowest first');
+    if (ds.entities?.some(e => e.pop != null)) html += field('Leave out of rankings', `<select data-k="minPop" data-num>${[[0, 'Nothing (rank every place)'], [1000, 'Places under 1,000 people'], [5000, 'Places under 5,000 people'], [10000, 'Places under 10,000 people'], [50000, 'Places under 50,000 people']].map(([v, l]) => `<option value="${v}" ${o.minPop === v ? 'selected' : ''}>${l}</option>`).join('')}</select><p class="muted">Small places stay on the map; this only affects "highest" and "lowest".</p>`);
     if (['line', 'area'].includes(o.chart)) html += check('zeroBase', 'Start axis at zero (recommended)') + check('annotate', 'Label the peak');
     if (o.chart === 'columns' && ds.kind !== 'events') html += check('highlightLast', 'Highlight latest year');
     if (o.chart === 'choropleth') html += check('colorZero', 'Color scale starts at zero');

@@ -20,6 +20,10 @@ for (const g of world.objects.countries.geometries) names[g.properties.name.toLo
 Object.assign(names, { 'united states of america': '840', 'usa': '840', 'us': '840', 'uk': '826', 'russia': '643', 'south korea': '410', 'north korea': '408', 'iran': '364', 'syria': '760', 'vietnam': '704', 'laos': '418', 'bolivia': '068', 'venezuela': '862', 'tanzania': '834', 'czechia': '203', 'turkiye': '792', 'egypt, arab rep.': '818' });
 const out = `window.PS_GEO=${JSON.stringify({ states, world, iso3ToNum: iso3, countryNameToNum: names })};`;
 fs.writeFileSync('public/js/geo-data.js', out);
+// County geometry is large (~800 KB), so it ships as its own file and loads on demand.
+const counties = JSON.parse(fs.readFileSync('node_modules/us-atlas/counties-albers-10m.json'));
+delete counties.objects.nation;
+fs.writeFileSync('public/js/geo-counties.js', `window.PS_GEO_COUNTIES=${JSON.stringify(counties)};`);
 fs.copyFileSync('node_modules/d3/dist/d3.min.js', 'public/vendor/d3.min.js');
 fs.copyFileSync('node_modules/topojson-client/dist/topojson-client.min.js', 'public/vendor/topojson-client.min.js');
 console.log('geo-data.js', (out.length / 1024).toFixed(0) + 'KB');

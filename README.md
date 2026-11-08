@@ -61,6 +61,9 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 | Consumer sentiment | University of Michigan (academic) | time series | monthly |
 | Job postings index | Indeed Hiring Lab (company) | time series | weekly |
 | CO2 emissions per person by country | Our World in Data (academic) | panel, world map | annual |
+| Population, growth since 2020, net domestic migration by county | Census (Vintage 2025) | panel, county map | annual |
+| Obesity, diabetes, depression, smoking, uninsured adults by county | CDC PLACES (model-based) | county map | annual |
+| Median household income and poverty by county | Census ACS 5-year | panel, county map | annual; turns on when a `CENSUS_API_KEY` secret is added (not yet exercised) |
 | GDP by country, 1960 to now | World Bank | panel, world map | annual |
 | Life expectancy by country | World Bank / UN | panel, world map | annual |
 
@@ -88,12 +91,24 @@ Browse three ways in the Data step: **Topics** (jobs, prices, housing, health an
 | Socrata | one call covers every state portal | `/resource/<id>.csv` | NY, WA, TX, CO, CT, MD and 9 more |
 | CKAN | `/api/3/action/package_search` | resource CSV URL | California (4,696 datasets) |
 | ArcGIS Hub | `/api/search/v1` (OGC Records) | Hub download API | Minnesota (moved from gisdata.mn.gov) |
+| ArcGIS Online agencies | one central `hub.arcgis.com` search filtered by `orgid` | Hub download API | Florida, Ohio, D.C., Utah and 18 more |
+
+Coverage: 74 searchable portals in 50 of 51 jurisdictions (South Dakota is the gap). For states whose starter portal is a plain website, `ARCGIS_STATE_ORGS` in `scripts/sources/catalog.mjs` adds state agencies found through ArcGIS Hub's site directory, filtered to state-government publishers and reviewed by hand. Universities, regional councils and city/county sites were rejected.
 
 All three allow direct browser requests, so state search works on a static site with no proxy. Downloads are capped at 30 MB (some GIS exports are 160 MB+); a capped load is flagged on the chart.
 
 **Adding a third-party source** (`THIRD_PARTY` in `scripts/sources/catalog.mjs`): it must publish its methodology, offer a stable public download or API, and state who funds it. Industry sources always ship with a disclosure. Candidates not yet added (no open bulk download or still to be reviewed): Pew Research Center, KFF, Brookings, Federal Reserve Bank of New York, Redfin Data Center, Realtor.com Research.
 
 **Importing safely.** The CSV mapper samples the whole file, combines `year` + `month` columns into dates, and offers an "Only rows where…" filter that defaults to the most detailed level (counties, not the state total), so files that mix totals with their parts are not double counted. Whenever rows get summed or averaged, a trust check says so.
+
+## County maps
+
+Pick **Your state** and county maps zoom to that state's counties, rankings and takeaways are computed within the state ("In Ohio, Union County ranks highest (17.0%)…"), and the Topics tab lists that state's county data first.
+
+- Data that can go negative (growth, migration) uses a two-sided red/blue scale with a gray midpoint at zero.
+- Rankings leave out counties under 5,000 residents by default (changeable in the Chart step). Those counties still appear on the map, and a trust check says how many were skipped. Without it, 52-person Loving County, TX "leads the nation" in migration.
+- Imports recognize county FIPS codes, county names with a state column, and county names on a state portal (data.ny.gov files map to New York's counties automatically). Independent cities (St. Louis city, Baltimore city, most of Virginia's) are told apart from counties by their FIPS codes.
+- Connecticut replaced counties with planning regions in 2022; the county map still uses the old counties, so Connecticut shows as no data.
 
 ## Being the central data source
 

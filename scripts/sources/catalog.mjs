@@ -117,6 +117,16 @@ export const DATASET_TAGS = {
   'consumer-sentiment': { topic: 'economy', source: 'umich' },
   'job-postings': { topic: 'economy', source: 'indeed' },
   'world-co2': { topic: 'environment', source: 'owid' },
+  'county-population': { topic: 'people', source: 'census' },
+  'county-growth': { topic: 'people', source: 'census' },
+  'county-migration': { topic: 'people', source: 'census' },
+  'county-obesity': { topic: 'health', source: 'cdc' },
+  'county-diabetes': { topic: 'health', source: 'cdc' },
+  'county-depression': { topic: 'health', source: 'cdc' },
+  'county-smoking': { topic: 'health', source: 'cdc' },
+  'county-uninsured': { topic: 'health', source: 'cdc' },
+  'county-income': { topic: 'economy', source: 'census' },
+  'county-poverty': { topic: 'economy', source: 'census' },
 };
 
 // State portals found through the Socrata discovery API that the starter list
@@ -127,4 +137,56 @@ export const EXTRA_STATE_PORTALS = [
   { state: 'California', url: 'https://bythenumbers.sco.ca.gov/', name: 'State Controller: By the Numbers', scope: 'agency' },
   { state: 'Tennessee', url: 'https://healthdata.tn.gov/', name: 'Department of Health', scope: 'agency' },
   { state: 'Hawaii', url: 'https://highways.hidot.hawaii.gov/', name: 'Department of Transportation, Highways', scope: 'agency' },
+];
+
+// State agencies that publish on ArcGIS Online without a standalone portal on the
+// starter list. Found through ArcGIS Hub's site directory, filtered to state
+// government publishers, and reviewed by hand. Searched centrally through
+// hub.arcgis.com by organization ID. (Rejected in review: New Mexico State
+// University and the Nevada Bureau of Mines, which are universities; regional
+// planning councils; one-off project microsites.)
+export const ARCGIS_STATE_ORGS = [
+  { state: "Alabama", orgId: 'ecupH7bxameyeamw', name: "Alabama Department of Economic and Community Affairs", url: "https://hub.arcgis.com/search?q=&orgId=ecupH7bxameyeamw" },
+  { state: "Florida", orgId: 'nRHtyn3uE1kyzoYc', name: "Florida Department of Environmental Protection", url: "https://hub.arcgis.com/search?q=&orgId=nRHtyn3uE1kyzoYc" },
+  { state: "Florida", orgId: 'O1JpcwDW8sjYuddV', name: "Florida Department of Transportation", url: "https://hub.arcgis.com/search?q=&orgId=O1JpcwDW8sjYuddV" },
+  { state: "Florida", orgId: 'z6TmTIyYXEYhuNM0', name: "Florida Fish and Wildlife Conservation Commission", url: "https://hub.arcgis.com/search?q=&orgId=z6TmTIyYXEYhuNM0" },
+  { state: "Georgia", orgId: '6RaeG1zfsIoM9Lze', name: "Georgia Department of Transportation", url: "https://hub.arcgis.com/search?q=&orgId=6RaeG1zfsIoM9Lze" },
+  { state: "Georgia", orgId: 'Za9Nk6CPIPbvR1t7', name: "Georgia Geospatial Information Office", url: "https://hub.arcgis.com/search?q=&orgId=Za9Nk6CPIPbvR1t7" },
+  { state: "Georgia", orgId: 'Gqyymy5JISeLzyNM', name: "Georgia Department of Community Affairs", url: "https://hub.arcgis.com/search?q=&orgId=Gqyymy5JISeLzyNM" },
+  { state: "Idaho", orgId: 'CNPdEkvnGl65jCX8', name: "State of Idaho", url: "https://hub.arcgis.com/search?q=&orgId=CNPdEkvnGl65jCX8" },
+  { state: "Idaho", orgId: 'Qqv4dYPC8Vv8e3c3', name: "Idaho Transportation Department", url: "https://hub.arcgis.com/search?q=&orgId=Qqv4dYPC8Vv8e3c3" },
+  { state: "Idaho", orgId: 'iRCkLgFRU45VAYn3', name: "Idaho Department of Water Resources", url: "https://hub.arcgis.com/search?q=&orgId=iRCkLgFRU45VAYn3" },
+  { state: "Illinois", orgId: 'aIrBD8yn1TDTEXoz', name: "Illinois Department of Transportation", url: "https://hub.arcgis.com/search?q=&orgId=aIrBD8yn1TDTEXoz" },
+  { state: "Illinois", orgId: 'b9DHj1BjfdLLFv11', name: "Illinois Department of Natural Resources", url: "https://hub.arcgis.com/search?q=&orgId=b9DHj1BjfdLLFv11" },
+  { state: "Iowa", orgId: 'vPD5PVLI6sfkZ5E4', name: "State of Iowa", url: "https://hub.arcgis.com/search?q=&orgId=vPD5PVLI6sfkZ5E4" },
+  { state: "Iowa", orgId: '8lRhdTsQyJpO52F1', name: "Iowa Department of Transportation", url: "https://hub.arcgis.com/search?q=&orgId=8lRhdTsQyJpO52F1" },
+  { state: "Iowa", orgId: 'r6iFVcMJeA4kB4GC', name: "Iowa Department of Natural Resources", url: "https://hub.arcgis.com/search?q=&orgId=r6iFVcMJeA4kB4GC" },
+  { state: "Louisiana", orgId: 'PLiuXYMBpMK5h36e', name: "Louisiana Department of Transportation & Development", url: "https://hub.arcgis.com/search?q=&orgId=PLiuXYMBpMK5h36e" },
+  { state: "Maine", orgId: 'RbMX0mRVOFNTdLzd', name: "State of Maine", url: "https://hub.arcgis.com/search?q=&orgId=RbMX0mRVOFNTdLzd" },
+  { state: "Montana", orgId: 'qnjIrwR8z5Izc0ij', name: "Montana State Library", url: "https://hub.arcgis.com/search?q=&orgId=qnjIrwR8z5Izc0ij" },
+  { state: "Montana", orgId: 'DRQySz3VhPgOv7Bo', name: "Montana Department of Natural Resources & Conservation", url: "https://hub.arcgis.com/search?q=&orgId=DRQySz3VhPgOv7Bo" },
+  { state: "Montana", orgId: 'dKlvxNSUvl36IGMp', name: "Montana Department of Transportation", url: "https://hub.arcgis.com/search?q=&orgId=dKlvxNSUvl36IGMp" },
+  { state: "Nebraska", orgId: 'Sj9eBhzWwOMzQCfI', name: "State of Nebraska", url: "https://hub.arcgis.com/search?q=&orgId=Sj9eBhzWwOMzQCfI" },
+  { state: "Nevada", orgId: 'RyxlXSfFi87rAosq', name: "Nevada Department of Wildlife", url: "https://hub.arcgis.com/search?q=&orgId=RyxlXSfFi87rAosq" },
+  { state: "Nevada", orgId: '9Y4hSlLf13E9S0Eo', name: "Nevada Department of Transportation", url: "https://hub.arcgis.com/search?q=&orgId=9Y4hSlLf13E9S0Eo" },
+  { state: "Nevada", orgId: 'hKjkLA70e5yLFrt0', name: "Nevada Department of Conservation and Natural Resources", url: "https://hub.arcgis.com/search?q=&orgId=hKjkLA70e5yLFrt0" },
+  { state: "New Mexico", orgId: 'qXZbWTdPDbTjl7Dy', name: "New Mexico Office of the State Engineer", url: "https://hub.arcgis.com/search?q=&orgId=qXZbWTdPDbTjl7Dy" },
+  { state: "North Dakota", orgId: 'GOcSXpzwBHyk2nog', name: "State of North Dakota", url: "https://hub.arcgis.com/search?q=&orgId=GOcSXpzwBHyk2nog" },
+  { state: "Ohio", orgId: '1AlElnGrgBM62OSj', name: "Ohio Department of Transportation", url: "https://hub.arcgis.com/search?q=&orgId=1AlElnGrgBM62OSj" },
+  { state: "Ohio", orgId: 'ajRlmtxbNBjZggOT', name: "Ohio Department of Natural Resources", url: "https://hub.arcgis.com/search?q=&orgId=ajRlmtxbNBjZggOT" },
+  { state: "Ohio", orgId: 'MlJ0G8iWUyC7jAmu', name: "Ohio Geographically Referenced Information Program", url: "https://hub.arcgis.com/search?q=&orgId=MlJ0G8iWUyC7jAmu" },
+  { state: "Rhode Island", orgId: 'EOvMKOFaeiXUzBcH', name: "State of Rhode Island - DOA - Division of Planning", url: "https://hub.arcgis.com/search?q=&orgId=EOvMKOFaeiXUzBcH" },
+  { state: "South Carolina", orgId: 'VaY7cY9pvUYUP1Lf', name: "South Carolina Department of Transportation", url: "https://hub.arcgis.com/search?q=&orgId=VaY7cY9pvUYUP1Lf" },
+  { state: "South Carolina", orgId: 'acgZYxoN5Oj8pDLa', name: "South Carolina Department of Natural Resources", url: "https://hub.arcgis.com/search?q=&orgId=acgZYxoN5Oj8pDLa" },
+  { state: "South Carolina", orgId: 'OMDIQXm11z4wcK26', name: "South Carolina Department of Environmental Services", url: "https://hub.arcgis.com/search?q=&orgId=OMDIQXm11z4wcK26" },
+  { state: "Utah", orgId: 'KaHXE9OkiB9e63uE', name: "Utah Division of Emergency Management", url: "https://hub.arcgis.com/search?q=&orgId=KaHXE9OkiB9e63uE" },
+  { state: "West Virginia", orgId: '3iZGO9lgMHNG1V3R', name: "West Virginia Department of Environmental Protection", url: "https://hub.arcgis.com/search?q=&orgId=3iZGO9lgMHNG1V3R" },
+  { state: "Wisconsin", orgId: 'Ul9AyFFeFTjf08DW', name: "Wisconsin Department of Natural Resources", url: "https://hub.arcgis.com/search?q=&orgId=Ul9AyFFeFTjf08DW" },
+  { state: "Wisconsin", orgId: '0pgGLzT0Nh7FVjon', name: "Wisconsin Dept of Transportation", url: "https://hub.arcgis.com/search?q=&orgId=0pgGLzT0Nh7FVjon" },
+  { state: "Wisconsin", orgId: 'o4NJgD3NfeHnWy06', name: "Wisconsin Department of Public Instruction", url: "https://hub.arcgis.com/search?q=&orgId=o4NJgD3NfeHnWy06" },
+  { state: "District of Columbia", orgId: 'neT9SoYxizqTHZPH', name: "Open Data DC (DC government)", url: "https://opendata.dc.gov/" },
+  { state: "Massachusetts", orgId: 'hGdibHYSPO59RG1h', name: "MassGIS, Bureau of Geographic Information", url: "https://open-data-massgis.hub.arcgis.com/" },
+  { state: "Utah", orgId: '99lidPhWCzftIe9K', name: "Utah Geospatial Resource Center (UGRC)", url: "https://opendata.gis.utah.gov/" },
+  { state: "Kentucky", orgId: 'ghsX9CKghMvyYjBU', name: "KyGovMaps (Commonwealth of Kentucky)", url: "https://opendata-kygeonet.opendata.arcgis.com/" },
+  { state: "Rhode Island", orgId: '7arM4WYbUOtKu3Zq', name: "Rhode Island State Enterprise GIS", url: "https://hub.arcgis.com/search?q=&orgId=7arM4WYbUOtKu3Zq" },
 ];

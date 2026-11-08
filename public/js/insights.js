@@ -53,11 +53,14 @@
     return { headline, facts, trend: Math.sign(last.v - first.v), stats: { first, last, peak, trough, avg } };
   }
 
+  // Places too small to rank fairly (rates swing on a handful of people) stay on the
+  // map but are left out of rankings.
+  PS.rankable = o => e => !(o.minPop > 0 && e.pop != null && e.pop < o.minPop);
   const vals0 = now => { const a = now.map(x => x.v).sort((p, q) => p - q); return a[Math.floor(a.length / 2)]; };
   function panelFacts(ds, view, o) {
     const u = ds.unit, f = ds.frequency, idx = view.idx;
     const li = idx[idx.length - 1], fi = idx[0];
-    const at = i => ds.entities.filter(e => e.values[i] != null).map(e => ({ e, v: e.values[i] })).sort((a, b) => b.v - a.v);
+    const at = i => ds.entities.filter(PS.rankable(o)).filter(e => e.values[i] != null).map(e => ({ e, v: e.values[i] })).sort((a, b) => b.v - a.v);
     const now = at(li), then = at(fi);
     const d = i => PS.fmtDate(ds._tms[i], f, true), v = x => PS.fmt(x, u);
     const facts = [];
@@ -68,7 +71,7 @@
     const race = o.chart === 'barrace' || o.chart === 'bars';
     if (race && then.length && then[0].e.id !== top.e.id && fi !== li)
       headline = `${top.e.name} now ranks first in ${lbl} at ${v(top.v)}. In ${PS.fmtDate(ds._tms[fi], f)}, ${then[0].e.name} led.`;
-    else headline = `${top.e.name} has the highest ${lbl} (${v(top.v)}) and ${bot.e.name} the lowest (${v(bot.v)}) as of ${d(li)}.`;
+    else headline = `${ds.scopeName ? `In ${ds.scopeName}, ` : ''}${top.e.name} ranks highest (${v(top.v)}) and ${bot.e.name} lowest (${v(bot.v)}) for ${lbl}, as of ${d(li)}.`;
     // A chosen state leads the story.
     const fe = o.focus && ds.entities.find(e => e.id === o.focus);
     if (fe && fe.values[li] != null) {
@@ -84,16 +87,17 @@
     facts.push({ k: 'top', text: `Highest: ${now.slice(0, 3).map(x => `${x.e.name} (${v(x.v)})`).join(', ')}.` });
     facts.push({ k: 'bottom', text: `Lowest: ${now.slice(-3).reverse().map(x => `${x.e.name} (${v(x.v)})`).join(', ')}.` });
     const vals = now.map(x => x.v).sort((a, b) => a - b), med = vals[Math.floor(vals.length / 2)];
-    facts.push({ k: 'median', text: `The typical (median) ${ds.geo === 'world' ? 'country' : ds.geo === 'us-states' ? 'state' : 'entry'}: ${v(med)}.` });
+    const unitName = ds.geo === 'world' ? 'country' : ds.geo === 'us-states' ? 'state' : ds.geo === 'us-counties' ? 'county' : 'entry';
+    facts.push({ k: 'median', text: `The typical (median) ${unitName}${ds.scopeName ? ` in ${ds.scopeName}` : ''}: ${v(med)} across ${now.length.toLocaleString()} ${unitName === 'county' ? 'counties' : unitName === 'country' ? 'countries' : unitName + 's'}.` });
     let trend = 0;
     if (fi !== li) {
-      const ch = ds.entities.map(e => ({ e, a: e.values[fi], b: e.values[li] })).filter(x => x.a != null && x.b != null && x.a !== 0)
+      const ch = ds.entities.filter(PS.rankable(o)).map(e => ({ e, a: e.values[fi], b: e.values[li] })).filter(x => x.a != null && x.b != null && x.a !== 0)
         .map(x => ({ ...x, d: u.format === 'pct' || ds.isRate ? x.b - x.a : (x.b - x.a) / Math.abs(x.a) }));
       if (ch.length) {
         ch.sort((a, b) => b.d - a.d);
         const up = ch[0], dn = ch[ch.length - 1];
-        facts.push({ k: 'mover', text: `Biggest rise since ${PS.fmtDate(ds._tms[fi], f)}: ${up.e.name}, ${PS.fmtChange(up.a, up.b, u)}.` });
-        if (dn.d < 0) facts.push({ k: 'faller', text: `Biggest drop: ${dn.e.name}, ${PS.fmtChange(dn.a, dn.b, u)}.` });
+        facts.push({ k: 'mover', text: `Biggest rise since ${PS.fmtDate(ds._tms[fi], f)}: ${up.e.name}, ${PS.fmtChange(up.a, up.b, u, { noRel: ds.zeroLine })}.` });
+        if (dn.d < 0) facts.push({ k: 'faller', text: `Biggest drop: ${dn.e.name}, ${PS.fmtChange(dn.a, dn.b, u, { noRel: ds.zeroLine })}.` });
         const medA = ch.map(x => x.a).sort((a, b) => a - b)[Math.floor(ch.length / 2)], medB = ch.map(x => x.b).sort((a, b) => a - b)[Math.floor(ch.length / 2)];
         trend = Math.sign(medB - medA);
       }
@@ -136,6 +140,12 @@
     else add('pass', 'Source cited on every frame',`${ds.source.publisher}${ds.source.via ? ', via ' + ds.source.via : ''}. Retrieved ${PS.fmtRetrieved(ds.retrieved)}. Citations can be restyled but not removed.`);
 
     if (ds.aggWarning) add('warn', `Rows were ${ds.aggWarning.agg === 'sum' ? 'added together' : 'averaged'}`, `${ds.aggWarning.rows.toLocaleString()} rows shared a date or place and were combined. If the file mixes totals with their parts (a state total plus its counties), the result double counts. Check the "Only rows where" filter.`);
+    if (o.minPop > 0 && ds.kind === 'panel') {
+      const skipped = ds.entities.filter(e => e.pop != null && e.pop < o.minPop).length;
+      if (skipped) add('info', `Rankings skip ${skipped.toLocaleString()} small ${ds.geo === 'us-counties' ? 'counties' : 'places'}`, `Places with fewer than ${o.minPop.toLocaleString()} residents still appear on the map, but are left out of "highest" and "lowest", where a few people can swing a rate wildly.`, { type: 'set', key: 'minPop', value: 0, label: 'Rank every place' });
+    } else if (ds.geo === 'us-counties' && ds.isRate && !o.minPop) {
+      add('warn', 'Tiny counties can top the rankings', 'Rates in counties with a few hundred people swing on a handful of residents.', { type: 'set', key: 'minPop', value: 5000, label: 'Skip counties under 5,000' });
+    }
     // Source tier
     const TP = (PS.REGISTRY?.thirdParty || []).find(x => x.id === ds.sourceId);
     if (ds.tier === 'industry') add('warn', 'Company data', `${TP?.disclosure || 'This comes from a company with a business interest in the topic.'} The citation labels it as company data.`);

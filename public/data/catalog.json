@@ -505,6 +505,150 @@
   "firstObservation": "1993-04-30"
  },
  {
+  "id": "county-obesity",
+  "title": "Adult obesity by county",
+  "category": "Health",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "unit": {
+   "label": "Adults with obesity (BMI 30+) (age-adjusted %)",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Adults with obesity (BMI 30+), age-adjusted, as estimated by the CDC for every county.",
+  "source": {
+   "publisher": "CDC, Division of Population Health",
+   "dataset": "PLACES: Local Data for Better Health, County Data",
+   "url": "https://www.cdc.gov/places/"
+  },
+  "howToRead": [
+   "Age-adjusted, so counties with older or younger populations can be compared fairly."
+  ],
+  "caveats": [
+   "These are model-based estimates from a national survey (BRFSS) combined with Census data, not direct counts for each county. Small differences between neighboring counties are not meaningful.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T15:23:59.319Z",
+  "lastObservation": "2023-12-31",
+  "hasNational": false,
+  "topic": "health",
+  "sourceId": "cdc",
+  "tier": "federal",
+  "nEntities": 2957,
+  "firstObservation": "2023-12-31"
+ },
+ {
+  "id": "county-smoking",
+  "title": "Adult smoking by county",
+  "category": "Health",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "unit": {
+   "label": "Adults who currently smoke cigarettes (age-adjusted %)",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Adults who currently smoke cigarettes, age-adjusted, as estimated by the CDC for every county.",
+  "source": {
+   "publisher": "CDC, Division of Population Health",
+   "dataset": "PLACES: Local Data for Better Health, County Data",
+   "url": "https://www.cdc.gov/places/"
+  },
+  "howToRead": [
+   "Age-adjusted, so counties with older or younger populations can be compared fairly."
+  ],
+  "caveats": [
+   "These are model-based estimates from a national survey (BRFSS) combined with Census data, not direct counts for each county. Small differences between neighboring counties are not meaningful.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T15:23:59.319Z",
+  "lastObservation": "2023-12-31",
+  "hasNational": false,
+  "topic": "health",
+  "sourceId": "cdc",
+  "tier": "federal",
+  "nEntities": 2957,
+  "firstObservation": "2023-12-31"
+ },
+ {
+  "id": "county-depression",
+  "title": "Depression by county",
+  "category": "Health",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "unit": {
+   "label": "Adults ever told they have depression (age-adjusted %)",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Adults ever told they have depression, age-adjusted, as estimated by the CDC for every county.",
+  "source": {
+   "publisher": "CDC, Division of Population Health",
+   "dataset": "PLACES: Local Data for Better Health, County Data",
+   "url": "https://www.cdc.gov/places/"
+  },
+  "howToRead": [
+   "Age-adjusted, so counties with older or younger populations can be compared fairly."
+  ],
+  "caveats": [
+   "These are model-based estimates from a national survey (BRFSS) combined with Census data, not direct counts for each county. Small differences between neighboring counties are not meaningful.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T15:23:59.319Z",
+  "lastObservation": "2023-12-31",
+  "hasNational": false,
+  "topic": "health",
+  "sourceId": "cdc",
+  "tier": "federal",
+  "nEntities": 2957,
+  "firstObservation": "2023-12-31"
+ },
+ {
+  "id": "county-diabetes",
+  "title": "Diagnosed diabetes by county",
+  "category": "Health",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "unit": {
+   "label": "Adults ever told they have diabetes (age-adjusted %)",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Adults ever told they have diabetes, age-adjusted, as estimated by the CDC for every county.",
+  "source": {
+   "publisher": "CDC, Division of Population Health",
+   "dataset": "PLACES: Local Data for Better Health, County Data",
+   "url": "https://www.cdc.gov/places/"
+  },
+  "howToRead": [
+   "Age-adjusted, so counties with older or younger populations can be compared fairly."
+  ],
+  "caveats": [
+   "These are model-based estimates from a national survey (BRFSS) combined with Census data, not direct counts for each county. Small differences between neighboring counties are not meaningful.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T15:23:59.319Z",
+  "lastObservation": "2023-12-31",
+  "hasNational": false,
+  "topic": "health",
+  "sourceId": "cdc",
+  "tier": "federal",
+  "nEntities": 2957,
+  "firstObservation": "2023-12-31"
+ },
+ {
   "category": "Health",
   "frequency": "annual",
   "geo": "us-states",
@@ -583,6 +727,42 @@
   "tier": "federal",
   "nEntities": 51,
   "firstObservation": "2015-12-31"
+ },
+ {
+  "id": "county-uninsured",
+  "title": "Uninsured adults by county",
+  "category": "Health",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "unit": {
+   "label": "Adults 18-64 without health insurance (age-adjusted %)",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Adults 18-64 without health insurance, age-adjusted, as estimated by the CDC for every county.",
+  "source": {
+   "publisher": "CDC, Division of Population Health",
+   "dataset": "PLACES: Local Data for Better Health, County Data",
+   "url": "https://www.cdc.gov/places/"
+  },
+  "howToRead": [
+   "Age-adjusted, so counties with older or younger populations can be compared fairly."
+  ],
+  "caveats": [
+   "These are model-based estimates from a national survey (BRFSS) combined with Census data, not direct counts for each county. Small differences between neighboring counties are not meaningful.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T15:23:59.319Z",
+  "lastObservation": "2023-12-31",
+  "hasNational": false,
+  "topic": "health",
+  "sourceId": "cdc",
+  "tier": "federal",
+  "nEntities": 2957,
+  "firstObservation": "2023-12-31"
  },
  {
   "id": "mortgage-rate",
@@ -764,6 +944,46 @@
   "firstObservation": "2000-01-31"
  },
  {
+  "category": "People",
+  "frequency": "annual",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "County Population Totals, Vintage 2025",
+   "url": "https://www.census.gov/programs-surveys/popest.html"
+  },
+  "reframes": [
+   "county-population",
+   "county-growth",
+   "county-migration"
+  ],
+  "id": "county-population",
+  "title": "Population by county",
+  "lens": "People",
+  "unit": {
+   "label": "Resident population (July 1)",
+   "format": "number",
+   "decimals": 0
+  },
+  "description": "Estimated number of people living in each county on July 1 of each year.",
+  "howToRead": [
+   "Annual estimates built from births, deaths and migration since the 2020 Census."
+  ],
+  "caveats": [
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isCount": true,
+  "geo": "us-counties",
+  "kind": "panel",
+  "retrieved": "2026-11-08T15:23:59.319Z",
+  "lastObservation": "2025-07-01",
+  "hasNational": false,
+  "topic": "people",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2020-07-01"
+ },
+ {
   "id": "state-population",
   "title": "Population by state",
   "category": "People",
@@ -796,6 +1016,90 @@
   "tier": "federal",
   "nEntities": 51,
   "firstObservation": "1900-01-01"
+ },
+ {
+  "category": "People",
+  "frequency": "annual",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "County Population Totals, Vintage 2025",
+   "url": "https://www.census.gov/programs-surveys/popest.html"
+  },
+  "reframes": [
+   "county-population",
+   "county-growth",
+   "county-migration"
+  ],
+  "id": "county-growth",
+  "title": "Population growth by county since 2020",
+  "lens": "Growth since 2020",
+  "unit": {
+   "label": "Population change since April 2020",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "How much each county's population has grown or shrunk since the 2020 Census.",
+  "howToRead": [
+   "Percent change from the April 2020 Census base, so small counties can swing a lot from a few hundred people."
+  ],
+  "caveats": [
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map.",
+   "Percent change computed by Plainsight from Census estimates."
+  ],
+  "isRate": true,
+  "zeroLine": true,
+  "geo": "us-counties",
+  "kind": "panel",
+  "retrieved": "2026-11-08T15:23:59.319Z",
+  "lastObservation": "2025-07-01",
+  "hasNational": false,
+  "topic": "people",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2020-07-01"
+ },
+ {
+  "category": "People",
+  "frequency": "annual",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "County Population Totals, Vintage 2025",
+   "url": "https://www.census.gov/programs-surveys/popest.html"
+  },
+  "reframes": [
+   "county-population",
+   "county-growth",
+   "county-migration"
+  ],
+  "id": "county-migration",
+  "title": "Where Americans are moving, by county",
+  "lens": "Moves within the U.S.",
+  "unit": {
+   "label": "Net domestic migration per 1,000 residents",
+   "format": "number",
+   "decimals": 1
+  },
+  "description": "People moving into a county from elsewhere in the U.S., minus people moving out, per 1,000 residents.",
+  "howToRead": [
+   "Positive means more people arrived from other parts of the U.S. than left. Immigration from abroad is counted separately and is not included."
+  ],
+  "caveats": [
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map.",
+   "The first year (2020) covers only April to July."
+  ],
+  "isRate": true,
+  "zeroLine": true,
+  "geo": "us-counties",
+  "kind": "panel",
+  "retrieved": "2026-11-08T15:23:59.319Z",
+  "lastObservation": "2025-07-01",
+  "hasNational": false,
+  "topic": "people",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2021-07-01"
  },
  {
   "id": "world-co2",

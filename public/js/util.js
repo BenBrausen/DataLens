@@ -38,11 +38,12 @@ window.PS = window.PS || {};
     }
   }
   // Change between two values, phrased for the unit (percentage points for rates).
-  function fmtChange(a, b, unit) {
+  function fmtChange(a, b, unit, opts = {}) {
     const diff = b - a;
     const sign = diff > 0 ? '+' : diff < 0 ? '-' : '';
     if (unit.format === 'pct') return `${sign}${withCommas(Math.abs(diff), unit.decimals ?? 1)} pts`;
-    const rel = a !== 0 ? (diff / Math.abs(a)) * 100 : null;
+    // A percent change of a rate that can cross zero (migration, growth) means nothing.
+    const rel = a !== 0 && !opts.noRel && !(a < 0 || b < 0) ? (diff / Math.abs(a)) * 100 : null;
     return `${sign}${fmt(Math.abs(diff), unit, { short: true })}${rel != null ? ` (${sign}${withCommas(Math.abs(rel), Math.abs(rel) >= 100 ? 0 : 1)}%)` : ''}`;
   }
 
