@@ -190,7 +190,7 @@ This repo is built to be the one place everyone reads from:
 
 1. `.github/workflows/refresh-and-deploy.yml` runs every 6 hours. It pulls every source, commits changed snapshots (each dataset gets a git history) and deploys `public/` to GitHub Pages.
 2. Anyone, including other apps, can read `https://<owner>.github.io/<repo>/data/catalog.json` and `/data/<id>.json`. No API keys are needed, and the government APIs aren't hit once per viewer.
-3. A static site can't search data.gov directly because the catalog sends no CORS headers. Deploy `worker/proxy.js` to Cloudflare Workers (free tier) and set `window.PS_API_BASE` to its URL. The local `server.js` already includes the same proxy.
+3. A static site can't search data.gov directly because the catalog sends no CORS headers. The live site uses `worker/proxy.js` on Cloudflare Workers (free tier) at `https://plainsight-proxy.misty-brook-457e.workers.dev/`, set as `window.PS_PROXY` in `public/index.html`. To redeploy after editing it: `npx wrangler deploy worker/proxy.js --name plainsight-proxy --compatibility-date 2024-09-01`. The local `server.js` has the same proxy built in and does not use the Worker.
 
 Free API keys worth getting, stored as GitHub Action secrets and never in the browser:
 

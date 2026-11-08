@@ -3,7 +3,9 @@
 (function (PS) {
   // API_BASE: where /api/search and /api/proxy live (server.js on the same origin, or the
   // Cloudflare Worker in worker/ for static hosting). DATA_BASE: where snapshots are published.
-  const API = window.PS_API_BASE ?? '';
+  // Same-origin server.js when present; otherwise (GitHub Pages, single-file build)
+  // the Cloudflare Worker in worker/proxy.js, set as PS_PROXY in index.html.
+  const API = window.PS_API_BASE ?? (window.PS_HAS_SERVER ? '' : (window.PS_PROXY || ''));
   const DATA = window.PS_DATA_BASE ?? '';
   const hasServer = () => PS._serverOk === true;
 
