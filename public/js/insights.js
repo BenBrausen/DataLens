@@ -151,6 +151,7 @@
     const TP = (PS.REGISTRY?.thirdParty || []).find(x => x.id === ds.sourceId);
     if (ds.tier === 'industry') add('warn', 'Company data', `${TP?.disclosure || 'This comes from a company with a business interest in the topic.'} The citation labels it as company data.`);
     else if (ds.tier === 'academic' || ds.tier === 'nonprofit') add('info', ds.tier === 'academic' ? 'Academic source' : 'Nonprofit research source', `${TP?.org ? TP.org + '. ' : ''}${TP?.why || ''} ${TP?.disclosure || ''}`.trim());
+    else if (ds.tier === 'local') add('pass', 'Official local government source', `Published by ${ds.source.publisher} on ${ds.source.portal || 'its open-data portal'}. Local data often covers only one city or county; check the boundaries before comparing places.`);
     else if (ds.tier === 'state') add('pass', 'Official state source', `Published by ${ds.source.publisher} on ${ds.source.portal || 'its open-data portal'}.`);
 
     // Freshness

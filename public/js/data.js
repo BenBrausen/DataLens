@@ -149,6 +149,10 @@
   PS.SEARCHABLE = ['socrata', 'ckan', 'arcgis', 'arcgis-org'];
   PS.statePortals = code => (PS.REGISTRY?.states.find(s => s.code === code)?.portals || []);
   const stateOfHost = host => PS.REGISTRY?.states.find(s => s.portals.some(p => p.host === host));
+  // City/county portals are "local" tier; everything else in a state's list is "state".
+  const portalOf = host => PS.REGISTRY?.states.flatMap(s => s.portals).find(p => p.host === host);
+  const tierOf = host => (portalOf(host)?.scope === 'local' ? 'local' : 'state');
+  const fallbackPublisher = (host, st) => { const p = portalOf(host); return p?.scope === 'local' ? p.name : st ? `State of ${st.name}` : host; };
   const orgIndex = () => new Map((PS.REGISTRY?.states || []).flatMap(s => s.portals.filter(p => p.orgId).map(p => [p.orgId, { state: s.name, name: p.name }])));
   const arcgisDownload = (id, type) => (type === 'CSV' ? `https://www.arcgis.com/sharing/rest/content/items/${id}/data` : `https://hub.arcgis.com/api/download/v1/items/${id}/csv?redirect=true&layers=0`);
 
@@ -161,7 +165,7 @@
         const host = r.metadata.domain, st = stateOfHost(host);
         return {
           id: r.resource.id, title: r.resource.name, description: (r.resource.description || '').slice(0, 400),
-          publisher: r.resource.attribution || (st ? `State of ${st.name}` : host), state: st?.name, host, platform: 'socrata', tier: 'state',
+          publisher: r.resource.attribution || fallbackPublisher(host, st), state: st?.name, host, platform: 'socrata', tier: tierOf(host),
           topic: r.classification?.domain_category || '', modified: r.resource.updatedAt, landing: r.permalink || `https://${host}/d/${r.resource.id}`,
           files: [{ url: `https://${host}/resource/${r.resource.id}.csv?$limit=50000`, type: 'text/csv' }],
         };
@@ -172,8 +176,8 @@
         const j = await fetchJSON(`https://${p.host}/api/3/action/package_search?${new URLSearchParams({ q: q || '*:*', rows: '20', fq: 'res_format:CSV' })}`);
         const st = stateOfHost(p.host);
         return j.result.results.map(r => ({
-          id: r.id, title: r.title, description: (r.notes || '').slice(0, 400), publisher: r.organization?.title || `State of ${st?.name}`,
-          state: st?.name, host: p.host, platform: 'ckan', tier: 'state', modified: r.metadata_modified, landing: `https://${p.host}/dataset/${r.name}`,
+          id: r.id, title: r.title, description: (r.notes || '').slice(0, 400), publisher: r.organization?.title || fallbackPublisher(p.host, st),
+          state: st?.name, host: p.host, platform: 'ckan', tier: tierOf(p.host), modified: r.metadata_modified, landing: `https://${p.host}/dataset/${r.name}`,
           files: (r.resources || []).filter(x => /csv/i.test(x.format || '') && x.url).map(x => ({ url: x.url, type: 'text/csv', title: x.name })),
         })).filter(r => r.files.length);
       }));
@@ -189,7 +193,7 @@
           const url = pr.type === 'CSV' ? `https://www.arcgis.com/sharing/rest/content/items/${f.id}/data` : `https://hub.arcgis.com/api/download/v1/items/${f.id}/csv?redirect=true&layers=0`;
           return {
             id: f.id, title: pr.title, description: String(pr.snippet || pr.description || '').replace(/<[^>]+>/g, ' ').slice(0, 400),
-            publisher: pr.source || (st ? `State of ${st.name}` : p.name), state: st?.name, host: p.host, platform: 'arcgis', tier: 'state',
+            publisher: pr.source || fallbackPublisher(p.host, st), state: st?.name, host: p.host, platform: 'arcgis', tier: tierOf(p.host),
             modified: pr.modified ? new Date(pr.modified).toISOString() : null, landing: `https://${p.host}/datasets/${f.id}`,
             files: [{ url, type: 'text/csv' }],
           };
@@ -217,6 +221,8 @@
     });
   };
 
+  // Agency GIS accounts publish scratch layers ("testpoints4", "Copy of …"); keep them out of results.
+  const JUNK = /^(test|copy of|untitled|sample|template|draft)\b|\btest\d*$|^testpoints|_test\b|\bdo not use\b/i;
   // Searches the portals of one state (code) or of every state (null). Results
   // from different portals are interleaved so no single portal floods the list.
   PS.searchPortals = async (code, q) => {
@@ -230,7 +236,7 @@
       return ADAPTERS[plat](ps, q).catch(e => { errors.push(`${ps.map(p => p.host).join(', ')}: ${e.message}`); return []; });
     }));
     const byHost = {};
-    lists.flat().forEach(r => (byHost[r.host + '|' + (r.state || '')] ||= []).push(r));
+    lists.flat().filter(r => !JUNK.test((r.title || '').trim())).forEach(r => (byHost[r.host + '|' + (r.state || '')] ||= []).push(r));
     const queues = Object.values(byHost), results = [];
     while (queues.some(qq => qq.length)) queues.forEach(qq => qq.length && results.push(qq.shift()));
     return { results, errors, portals: portals.length };

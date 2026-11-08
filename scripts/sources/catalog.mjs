@@ -9,6 +9,7 @@
 export const TIERS = [
   { id: 'federal', name: 'Federal government', short: 'Federal', desc: 'U.S. agencies with legally mandated statistical programs.' },
   { id: 'state', name: 'State government', short: 'State', desc: 'Official open-data portals run by state governments and agencies.' },
+  { id: 'local', name: 'Cities, counties & regions', short: 'Local', desc: 'Official open-data portals of cities, counties and regional agencies. Searchable portals are verified weekly.' },
   { id: 'academic', name: 'Universities & research', short: 'Academic', desc: 'University programs and academic research groups that publish their methods.' },
   { id: 'nonprofit', name: 'Nonprofit research', short: 'Nonprofit', desc: 'Independent, nonpartisan research organizations.' },
   { id: 'industry', name: 'Industry & companies', short: 'Industry', desc: 'Companies and trade groups. Useful and timely, but they have a business interest; a disclosure travels with every chart.' },
@@ -189,4 +190,43 @@ export const ARCGIS_STATE_ORGS = [
   { state: "Utah", orgId: '99lidPhWCzftIe9K', name: "Utah Geospatial Resource Center (UGRC)", url: "https://opendata.gis.utah.gov/" },
   { state: "Kentucky", orgId: 'ghsX9CKghMvyYjBU', name: "KyGovMaps (Commonwealth of Kentucky)", url: "https://opendata-kygeonet.opendata.arcgis.com/" },
   { state: "Rhode Island", orgId: '7arM4WYbUOtKu3Zq', name: "Rhode Island State Enterprise GIS", url: "https://hub.arcgis.com/search?q=&orgId=7arM4WYbUOtKu3Zq" },
+];
+
+// National sources with local detail, from the reviewed source list. `status`:
+//   built      already a ready-made dataset
+//   next       strong candidate: open download, no key, high story value
+//   key        needs a free API key (add as a GitHub secret)
+//   search     reachable through data.gov or a federal portal search today
+//   reference  supporting data (boundaries), not something to chart
+//   care       sensitive or very large; needs extra design before adding
+export const FEDERAL_CANDIDATES = [
+  { name: 'CDC PLACES', status: 'built', note: 'County health measures (obesity, diabetes, depression, smoking, uninsured).' },
+  { name: 'BLS Local Area Unemployment', status: 'built', note: 'State level built; county level next (monthly county rates).' },
+  { name: 'US Census ACS and Decennial', status: 'key', note: 'County income and poverty builder is ready; activates with CENSUS_API_KEY.' },
+  { name: 'FEMA National Risk Index', status: 'next', note: 'County and tract risk scores for 18 hazards; bulk CSV, no key.' },
+  { name: 'FEMA OpenFEMA', status: 'next', note: 'Disaster declarations by county since 1953; open API, no key. Strong animated map.' },
+  { name: 'USDA Food Access Research Atlas', status: 'next', note: 'Food deserts by tract; bulk CSV.' },
+  { name: 'CDC Social Vulnerability Index', status: 'next', note: 'County and tract vulnerability; bulk CSV.' },
+  { name: 'NHTSA FARS', status: 'next', note: 'Fatal crashes by state and county; open API.' },
+  { name: 'USASpending', status: 'next', note: 'Federal spending by state and county; open API, no key.' },
+  { name: 'USGS Water Data', status: 'next', note: 'Streamflow and groundwater stations; live, no key. Event-style map.' },
+  { name: 'NOAA National Weather Service', status: 'next', note: 'Live alerts by zone; no key. Event-style map.' },
+  { name: 'NCES Common Core of Data', status: 'next', note: 'School enrollment by district; bulk files (or via Urban Institute API, already registered).' },
+  { name: 'US Census County Business Patterns', status: 'key', note: 'Businesses, jobs and payroll by county and industry.' },
+  { name: 'BEA Regional Data', status: 'key', note: 'County GDP and personal income.' },
+  { name: 'EPA AirData', status: 'key', note: 'Air quality by monitor; the AQS API needs an email key.' },
+  { name: 'NOAA Climate Data Online', status: 'key', note: 'Weather station history; needs a token.' },
+  { name: 'EIA Open Data', status: 'key', note: 'Energy by state; free key.' },
+  { name: 'USDA NASS Quick Stats', status: 'key', note: 'County agriculture; free key.' },
+  { name: 'US Department of Education College Scorecard', status: 'key', note: 'College cost and earnings; api.data.gov key.' },
+  { name: 'EPA Envirofacts', status: 'search', note: 'Facility-level records; better as search results than a curated chart.' },
+  { name: 'HUD Open Data', status: 'search', note: 'ArcGIS Hub; reachable through data.gov search.' },
+  { name: 'US DOT BTS Open Data', status: 'search', note: 'ArcGIS Hub; reachable through data.gov search.' },
+  { name: 'NTD National Transit Database', status: 'next', note: 'Transit ridership by agency; the statistical counterpart to transit schedule feeds.' },
+  { name: 'FHWA Highway Statistics', status: 'care', note: 'Published as formatted spreadsheet tables; needs a custom parser per table.' },
+  { name: 'FCC Broadband Data', status: 'care', note: 'Very large location-level files; needs pre-aggregation to county.' },
+  { name: 'US Census LEHD LODES', status: 'care', note: 'Commute flows; very large origin-destination files; needs a flow-map chart type.' },
+  { name: 'NCES IPEDS', status: 'care', note: 'Institution-level; useful but needs a college-level chart, not a map.' },
+  { name: 'US Election Assistance Commission', status: 'care', note: 'Election administration data. Elections need extra editorial safeguards before adding.' },
+  { name: 'US Census TIGER Line', status: 'reference', note: 'Boundaries, not statistics. The app already ships county and state boundaries.' },
 ];

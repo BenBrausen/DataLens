@@ -1,0 +1,89 @@
+State,Name,Level,URL,PlatformHint,Examples
+NY,New York City,city,https://data.cityofnewyork.us/,Socrata,Housing; public safety; transport; 311
+IL,Chicago,city,https://data.cityofchicago.org/,Socrata,Crime; permits; finance; transit
+CA,Los Angeles,city,https://data.lacity.org/,Socrata,City services; finance; housing
+CA,Los Angeles GeoHub,city,https://geohub.lacity.org/,ArcGIS Hub,Parcels; planning; GIS
+CA,San Francisco,city-county,https://data.sfgov.org/,Socrata,Transportation; health; safety; finance
+TX,Austin,city,https://data.austintexas.gov/,Socrata,311; police; buildings; budgets
+WA,Seattle,city,https://data.seattle.gov/,Socrata,Emergency; transport; permits
+MA,Boston Analyze Boston,city,https://data.boston.gov/,CKAN,311; permits; planning; public safety
+PA,Philadelphia OpenDataPhilly,regional,https://opendataphilly.org/,CKAN/catalog,Property; permits; streets; services
+MD,Baltimore,city,https://data.baltimorecity.gov/,ArcGIS Hub,Housing; crime; services
+CO,Denver,city-county,https://www.denvergov.org/opendata,ArcGIS Hub,Parcels; public safety; finance
+MI,Detroit,city,https://data.detroitmi.gov/,Socrata,Blight; permits; property; services
+TX,Dallas,city,https://www.dallasopendata.com/,Socrata,Police; 311; finance; permits
+CA,Oakland,city,https://data.oaklandca.gov/,Socrata,Crime; budgets; housing
+MN,Minneapolis,city,https://opendata.minneapolismn.gov/,ArcGIS Hub,Streets; parks; inspections; GIS
+MA,Cambridge,city,https://data.cambridgema.gov/,Socrata,Housing; transport; services
+LA,New Orleans,city,https://data.nola.gov/,Socrata,Police; permits; 311
+AZ,Tucson,city,https://gisdata.tucsonaz.gov/,ArcGIS Hub,Land use; GIS; environment
+MO,Kansas City,city,https://data.kcmo.org/,Socrata,311; crime; infrastructure
+NC,Raleigh,city,https://data-ral.opendata.arcgis.com/,ArcGIS Hub,Planning; utilities; transportation
+FL,Tampa,city,https://city-tampa.opendata.arcgis.com/,ArcGIS Hub,City GIS; permits; infrastructure
+WI,Milwaukee,city,https://data.milwaukee.gov/,Socrata,Property; inspections; public safety
+CO,Boulder,city,https://open-data.bouldercolorado.gov/,ArcGIS Hub,Transportation; sustainability; GIS
+CA,San Jose,city,https://data.sanjoseca.gov/,CKAN,311; planning; public safety
+TN,Nashville Davidson County,city-county,https://data.nashville.gov/,Socrata,Police; 311; permits; finance
+TX,San Antonio,city,https://data.sanantonio.gov/,CKAN,Public services; planning; finance
+CA,Sacramento,city,https://data.cityofsacramento.org/,Socrata,Police; permits; civic services
+AZ,Phoenix,city,https://www.phoenixopendata.com/,Socrata,Water; planning; city government
+NY,Buffalo,city,https://data.buffalony.gov/,Socrata,Housing; inspections; police
+CT,Hartford,city,https://data.hartford.gov/,Socrata,Property; city operations
+RI,Providence,city,https://data.providenceri.gov/,Socrata,Housing; public safety; finance
+OH,Cincinnati,city,https://data.cincinnati-oh.gov/,Socrata,Crime; services; transportation
+HI,Honolulu,city-county,https://honolulu-cchnl.opendata.arcgis.com/,ArcGIS Hub,GIS; services; environment
+TN,Memphis,city,https://data.memphistn.gov/,Socrata,Public safety; service requests
+OH,Columbus,city,https://opendata.columbus.gov/,ArcGIS Hub,Infrastructure; GIS; community
+TX,Fort Worth,city,https://data.fortworthtexas.gov/,Socrata,Public safety; budgets; permits
+VA,Richmond,city,https://data.richmondgov.com/,ArcGIS Hub,GIS; property; city services
+CA,Long Beach,city,https://data.longbeach.gov/,Opendatasoft,Planning; city services
+NC,Charlotte,city,https://data.charlottenc.gov/,ArcGIS Hub,Parcels; streets; planning
+OR,Portland Maps,city,https://gis-pdx.opendata.arcgis.com/,ArcGIS Hub,Parcels; roads; planning
+IN,Indianapolis,city-county,https://data.indy.gov/,ArcGIS Hub,Geospatial; transport; services
+TX,Houston Public Works,city,https://cohgis-mycity.opendata.arcgis.com/,ArcGIS Hub,Roads; water; public works
+MN,St Paul,city,https://information.stpaul.gov/,Socrata,Property; permits; public services
+WI,Madison,city,https://data-cityofmadison.opendata.arcgis.com/,ArcGIS Hub,Transportation; GIS; city services
+PA,Pittsburgh WPRDC,regional,https://data.wprdc.org/,CKAN,Housing; property; safety; transit
+KY,Louisville Metro,city-county,https://data.louisvilleky.gov/,ArcGIS Hub,Land use; permits; GIS
+CA,San Diego County,county,https://data.sandiegocounty.gov/,Socrata,Health; environment; public services
+CA,Los Angeles County,county,https://data.lacounty.gov/,ArcGIS Hub,Social services; property; infrastructure
+CA,Orange County Public Works,county,https://ocpublicworks-data-ocpw.opendata.arcgis.com/,ArcGIS Hub,Parcels; drainage; roads
+IL,Cook County,county,https://datacatalog.cookcountyil.gov/,Socrata,Tax; land; courts; health
+MD,Montgomery County,county,https://data.montgomerycountymd.gov/,Socrata,Police; recreation; inspections
+WA,King County,county,https://data.kingcounty.gov/,Socrata,Elections; transit; environment
+CA,Santa Clara County,county,https://data.sccgov.org/,Socrata,Health; housing; services
+CA,San Mateo County,county,https://data.smcgov.org/,Socrata,Health; budgeting; elections
+CA,Marin County,county,https://data.marincounty.gov/,Socrata,Land; health; services
+CA,Sonoma County,county,https://data.sonomacounty.ca.gov/,Socrata,Wildfire; property; environment
+CA,Riverside County,county,https://data.countyofriverside.us/,ArcGIS Hub,Planning; parcels; environment
+FL,Miami Dade County,county,https://gis-mdc.opendata.arcgis.com/,ArcGIS Hub,Property; infrastructure; GIS
+MN,Hennepin County GIS,county,https://gis-hennepin.hub.arcgis.com/,ArcGIS Hub,Parcels; GIS; transport
+MN,Ramsey County GIS,county,https://gis-ramseygis.opendata.arcgis.com/,ArcGIS Hub,Parcels; parks; boundaries
+VA,Fairfax County,county,https://data-fairfaxcountygis.opendata.arcgis.com/,ArcGIS Hub,Property; zoning; infrastructure
+VA,Arlington County,county,https://data-arlingtonva.opendata.arcgis.com/,ArcGIS Hub,Transport; land use; services
+MD,Prince Georges County,county,https://data.princegeorgescountymd.gov/,Socrata,Property; public safety; permits
+FL,Broward County,county,https://geohub-bcgis.opendata.arcgis.com/,ArcGIS Hub,GIS; property; infrastructure
+NV,Clark County,county,https://opendata.gis.clarkcountynv.gov/,ArcGIS Hub,Parcels; land use; infrastructure
+AZ,Maricopa County,county,https://data-maricopa.opendata.arcgis.com/,ArcGIS Hub,GIS; property; public services
+AZ,Pima County,county,https://gis.pima.gov/,GIS downloads,GIS; roads; property
+OR,Multnomah County,county,https://gis-multco.opendata.arcgis.com/,ArcGIS Hub,Property; GIS; transport
+NC,Wake County,county,https://data-wake.opendata.arcgis.com/,ArcGIS Hub,Parcels; boundaries; infrastructure
+NC,Mecklenburg County,county,https://maps.mecknc.gov/openmapping/,GIS downloads,Property; zoning; parcels
+TX,Harris County,county,https://geo-harriscounty.opendata.arcgis.com/,ArcGIS Hub,Flood; land; public infrastructure
+TX,Travis County,county,https://data-traviscountytx.opendata.arcgis.com/,ArcGIS Hub,Elections; GIS; property
+TX,Dallas County,county,https://gis.dallascounty.org/,GIS downloads,Property; elections; geospatial
+CA,SACOG,regional,https://data-sacog.opendata.arcgis.com/,ArcGIS Hub,Transportation; land use; planning
+IL,Chicago Metropolitan Agency for Planning,regional,https://datahub.cmap.illinois.gov/,ArcGIS Hub,Demographics; planning; GIS
+TX,Houston Galveston Area Council,regional,https://data-h-gac.opendata.arcgis.com/,ArcGIS Hub,Regional transport; demographics
+WA,Puget Sound Regional Council,regional,https://data-psrc.opendata.arcgis.com/,ArcGIS Hub,Regional growth; transportation
+TX,North Central Texas Council of Governments,regional,https://data-nctcoggis.opendata.arcgis.com/,ArcGIS Hub,Transportation; infrastructure
+CA,Metropolitan Transportation Commission,regional,https://opendata.mtc.ca.gov/,ArcGIS Hub,Traffic; transport; planning
+CA,Southern California Association of Governments,regional,https://gisdata-scag.opendata.arcgis.com/,ArcGIS Hub,Planning; demographics; transportation
+UT,Wasatch Front Regional Council,regional,https://data-wfrc.opendata.arcgis.com/,ArcGIS Hub,Planning; transportation
+MI,Southeast Michigan Council of Governments,regional,https://maps-semcog.opendata.arcgis.com/,ArcGIS Hub,Land use; transport; demographics
+OH,Mid Ohio Regional Planning Commission,regional,https://data-morpc.opendata.arcgis.com/,ArcGIS Hub,Population; GIS; transport
+MD,Baltimore Metropolitan Council,regional,https://gis-bmc.opendata.arcgis.com/,ArcGIS Hub,Housing; transportation; GIS
+NY,NYC Planning Labs,city,https://www.nyc.gov/site/planning/data-maps/open-data.page,Bulk/GIS,Zoning; land use; planning
+NY,NYC Department of Finance,city,https://www.nyc.gov/site/finance/property/property.page,Bulk/portal,Assessment; parcel tax
+NY,NYC Comptroller Checkbook,city,https://www.checkbooknyc.com/,API/portal,Contracts; expenditure; procurement
+CA,LA Controller ControlPanel,city,https://controllerdata.lacity.org/,Socrata,Payroll; spending; contracts

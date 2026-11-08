@@ -217,10 +217,12 @@
     if (!S.ds?.reframes) return '';
     return `<div class="lens"><p><b>Same data, different lens.</b> The lens changes the story; pick the one that answers the question honestly.</p><div class="chips">${S.ds.reframes.map(id => { const c = S.catalog.find(x => x.id === id); return c ? `<button class="chip ${S.ds.id === id ? 'active' : ''}" data-ds="${id}">${esc(c.lens || c.title)}</button>` : ''; }).join('')}</div></div>`;
   }
-  function portalChips(code) {
-    const ps = PS.statePortals(code);
+  const LEVEL_NAME = { city: 'City', county: 'County', 'city-county': 'City & county', regional: 'Regional', district: 'District' };
+  function portalChips(code, which = 'state') {
+    const ps = PS.statePortals(code).filter(p => (which === 'local') === (p.scope === 'local'));
+    if (!ps.length && which === 'local') return '';
     if (!ps.length) return '<p class="muted">No portals registered yet.</p>';
-    return `<div class="portal-list">${ps.map(p => `<a class="portal" href="${esc(p.url)}" target="_blank" rel="noopener"><b>${esc(p.name)}</b><span>${esc(p.platform === 'arcgis-org' ? 'ArcGIS Online' : (p.host || new URL(p.url).hostname))} · ${PLATFORM_NAME[p.platform] || 'Not yet checked'}${p.datasets ? ` · ${p.datasets.toLocaleString()} datasets` : ''}${p.scope === 'specialized' ? ' · GIS/agency' : ''}</span></a>`).join('')}</div>`;
+    return `<div class="portal-list">${ps.map(p => `<a class="portal" href="${esc(p.url)}" target="_blank" rel="noopener"><b>${esc(p.name)}</b><span>${p.level ? esc(LEVEL_NAME[p.level] || '') + ' · ' : ''}${esc(p.platform === 'arcgis-org' ? 'ArcGIS Online' : (p.host || new URL(p.url).hostname))} · ${PLATFORM_NAME[p.platform] || 'Not yet checked'}${p.datasets ? ` · ${p.datasets.toLocaleString()} datasets` : ''}${p.scope === 'specialized' ? ' · GIS/agency' : ''}</span></a>`).join('')}</div>`;
   }
 
   STEPS.data = () => {
@@ -244,7 +246,8 @@
       body += Object.entries(groups).map(([g, l]) => `<div class="ds-group"><h3>${esc(g)}</h3>${l.map(dsCard).join('')}</div>`).join('');
       if (st) {
         const t = reg?.topics.find(x => x.id === S.topic);
-        body += `<div class="ds-group"><h3>From ${esc(st.name)}'s government</h3>${portalChips(st.code)}
+        const localChips = portalChips(st.code, 'local');
+        body += `<div class="ds-group"><h3>From ${esc(st.name)}'s government</h3>${portalChips(st.code)}${localChips ? `<h3>Cities, counties & regions in ${esc(st.name)}</h3>${localChips}` : ''}
           <button class="btn block" data-act="portalBrowse" data-q="${esc(t ? t.kw[0] : '')}">Browse ${esc(st.name)} datasets${t ? ' about ' + esc(t.name.toLowerCase()) : ''}</button></div>`;
       }
       if (S.ds?.id === 'earthquakes') body = `<button class="btn block" data-act="live">Refresh live from USGS</button>` + body;
@@ -271,6 +274,10 @@
             return `<button class="state-cell ${S.state === s.code ? 'active' : ''}" data-statebrowse="${s.code}" title="${esc(s.name)}"><b>${s.code}</b><span>${ps.length ? (n ? n.toLocaleString() : 'Searchable') : s.portals.length ? 'Link' : '—'}</span></button>`;
           }).join('')}</div><p class="muted">Numbers are searchable datasets. "Link" means the portal has no search API yet and opens in a new tab.</p>`;
         }
+        else if (tier.id === 'local') {
+          const byState = reg.states.map(s => [s, s.portals.filter(p => p.scope === 'local')]).filter(([, ps]) => ps.length);
+          body += byState.map(([s, ps]) => `<details class="local-state"><summary>${esc(s.name)} <span class="muted">${ps.length} portal${ps.length > 1 ? 's' : ''} · ${ps.filter(p => PS.SEARCHABLE.includes(p.platform)).length} searchable</span></summary>${portalChips(s.code, 'local')}<button class="btn block" data-statebrowse="${s.code}">Search ${esc(s.name)} state and local portals</button></details>`).join('');
+        }
         else body += (reg.thirdParty || []).filter(x => x.tier === tier.id).map(x => card(x, tier.id)).join('') || '<p class="muted">None yet.</p>';
         body += '</div>';
       }
@@ -282,7 +289,7 @@
       body += `<form id="searchForm" class="row"><input type="search" id="q" placeholder="e.g. broadband, crashes, school enrollment" value="${esc(sc.q)}"><button class="btn primary" style="flex:none">Search</button></form>
         <div class="chips scope-chips">${scopes.map(([k, l]) => `<button class="chip ${sc.scope === k ? 'active' : ''}" data-scope="${k}">${esc(l)}</button>`).join('')}</div>
         ${sc.org ? `<p class="muted">Limited to ${esc(sc.orgName)} <button class="linkbtn" data-act="clearOrg">clear</button></p>` : ''}
-        ${st && sc.scope === 'state' ? portalChips(st.code) : ''}
+        ${st && sc.scope === 'state' ? portalChips(st.code) + portalChips(st.code, 'local') : ''}
         <div class="results">${sc.busy ? '<p class="muted">Searching…</p>' : ''}${sc.err ? `<p class="err">${esc(sc.err)}</p>` : ''}${sc.info ? `<p class="muted">${esc(sc.info)}</p>` : ''}
         ${sc.results.map((r, i) => `<div class="result"><b>${esc(r.title)}</b><div class="meta">${tierBadge(r.tier)} ${esc(r.publisher)}${r.state && !r.publisher.includes(r.state) ? ' · ' + esc(r.state) : ''}${r.modified ? ' · updated ' + esc(String(r.modified).slice(0, 10)) : ''} · ${esc(r.platform === 'data.gov' ? 'data.gov' : r.host)}</div>${r.description ? `<p>${esc(r.description)}</p>` : ''}<div class="row"><button class="btn" data-load="${i}">Load data</button><a class="muted" href="${esc(r.landing)}" target="_blank" rel="noopener" style="flex:none">Source page ↗</a></div></div>`).join('')}</div>` + mapperHTML();
     }

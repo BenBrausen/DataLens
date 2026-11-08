@@ -65,6 +65,10 @@ const starter = parseCsv(await fs.readFile(path.join(ROOT, 'scripts/sources/stat
 const portalsByState = new Map(STATES.map(([, , n]) => [n, []]));
 for (const r of starter) portalsByState.get(r.State)?.push({ url: r['Portal URL'], name: `${r.State} open data`, scope: r.Category === 'General' ? 'statewide' : 'specialized' });
 for (const p of EXTRA_STATE_PORTALS) portalsByState.get(p.state)?.push({ url: p.url, name: p.name, scope: p.scope });
+// Cities, counties and regional agencies (scripts/sources/local-portals.csv).
+const abbrName = new Map(STATES.map(([ab, , n]) => [ab, n]));
+for (const r of parseCsv(await fs.readFile(path.join(ROOT, 'scripts/sources/local-portals.csv'), 'utf8')))
+  portalsByState.get(abbrName.get(r.State))?.push({ url: r.URL, name: r.Name, scope: 'local', level: r.Level, examples: r.Examples });
 
 async function countOrg(orgId) {
   const qs = new URLSearchParams({ limit: '1', filter: `orgid='${orgId}' AND type IN ('Feature Service','Table','CSV')` });

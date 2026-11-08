@@ -97,6 +97,19 @@ Coverage: 74 searchable portals in 50 of 51 jurisdictions (South Dakota is the g
 
 All three allow direct browser requests, so state search works on a static site with no proxy. Downloads are capped at 30 MB (some GIS exports are 160 MB+); a capped load is flagged on the chart.
 
+**Cities, counties and regions** (`scripts/sources/local-portals.csv`, 88 portals from the reviewed source list): 42 cities, 27 counties, 13 regional agencies, 6 combined city-counties. They are verified the same way as state portals, appear under **Your state** and in the **Local** tier, and are cited as official local sources. 25 are confirmed searchable so far, including New York City (2,416 datasets), Chicago (924), Cook County (523) and Los Angeles (361); the weekly check classifies the rest.
+
+**How the reviewed source list was categorized**
+
+| Rows | Treatment |
+|---|---|
+| 88 city, county, regional portals | Local tier, verified weekly, searchable when the platform allows |
+| 29 national sources with local detail | Federal candidates (`FEDERAL_CANDIDATES` in `scripts/sources/catalog.mjs`): 2 built, 11 next (open, no key), 8 need a free key, 3 already reachable via search, 4 need extra design, 1 reference only |
+| 9 transit feeds (GTFS) | Not added as data sources: they are schedules and live vehicle positions, not statistics, and several need keys. Transit ridership comes from the National Transit Database instead. Feeds fit a future "transit map" chart type |
+| OpenStreetMap | Not added: community-made, not official. Could later serve as a context layer (labeled "Community data, OpenStreetMap contributors", ODbL) |
+| Minnesota Pollution Control Agency | Already covered: its datasets are on Minnesota's state portal |
+| Duplicates | Pittsburgh WPRDC listed twice; Washington DC is already the District's state-level portal |
+
 **Adding a third-party source** (`THIRD_PARTY` in `scripts/sources/catalog.mjs`): it must publish its methodology, offer a stable public download or API, and state who funds it. Industry sources always ship with a disclosure. Candidates not yet added (no open bulk download or still to be reviewed): Pew Research Center, KFF, Brookings, Federal Reserve Bank of New York, Redfin Data Center, Realtor.com Research.
 
 **Importing safely.** The CSV mapper samples the whole file, combines `year` + `month` columns into dates, and offers an "Only rows where…" filter that defaults to the most detailed level (counties, not the state total), so files that mix totals with their parts are not double counted. Whenever rows get summed or averaged, a trust check says so.

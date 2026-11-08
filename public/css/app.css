@@ -216,3 +216,7 @@ details summary { cursor: pointer; font-weight: 600; font-size: 13px; padding: 8
 .cmp.ok:hover { border-color: var(--accent); }
 .cmp.no { opacity: .75; background: none; }
 .howto.fit { border-left: 3px solid var(--accent); }
+
+.local-state { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; margin-bottom: 5px; }
+.local-state summary { font-size: 13px; }
+.local-state .portal-list { margin-top: 8px; }
