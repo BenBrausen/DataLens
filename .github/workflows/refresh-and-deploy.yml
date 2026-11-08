@@ -1,0 +1,40 @@
+# Keeps every dataset current and publishes the site + data snapshots to GitHub Pages.
+# The JSON under /data/ is the central, versioned copy everyone reads from:
+#   https://<owner>.github.io/<repo>/data/catalog.json
+name: Refresh data and deploy
+on:
+  schedule:
+    - cron: '17 */6 * * *'   # every 6 hours
+  workflow_dispatch:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency: { group: pages, cancel-in-progress: false }
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - name: Pull latest data from official sources
+        run: node scripts/refresh-data.mjs
+        env:
+          # Optional free keys raise rate limits / unlock sources. Add as repo secrets.
+          CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      - run: node scripts/build-artifact.mjs
+      - name: Commit changed snapshots (gives every dataset a version history)
+        run: |
+          git config user.name "plainsight-bot"
+          git config user.email "plainsight-bot@users.noreply.github.com"
+          git add public/data
+          git diff --cached --quiet || git commit -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: public }
+      - uses: actions/deploy-pages@v4

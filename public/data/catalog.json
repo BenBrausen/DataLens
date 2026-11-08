@@ -1,0 +1,562 @@
+[
+ {
+  "id": "us-inflation",
+  "title": "U.S. inflation rate",
+  "category": "Economy",
+  "frequency": "monthly",
+  "unit": {
+   "label": "Year-over-year change in prices",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "How much consumer prices rose compared with the same month a year earlier (CPI-U, seasonally adjusted).",
+  "source": {
+   "publisher": "U.S. Bureau of Labor Statistics",
+   "dataset": "Consumer Price Index for All Urban Consumers (CPI-U)",
+   "url": "https://www.bls.gov/cpi/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "This is the rate prices are rising, not the price level. Falling inflation means prices are rising more slowly, not that they are falling.",
+   "\"Core\" inflation removes food and energy, which swing a lot month to month."
+  ],
+  "caveats": [
+   "CPI tracks a basket of goods for urban consumers; individual households can experience very different inflation."
+  ],
+  "defaultSeries": [
+   "CPIAUCSL"
+  ],
+  "zeroLine": true,
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:14:56.913Z",
+  "lastObservation": "2026-09-01",
+  "nSeries": 2,
+  "firstObservation": "1948-01-01"
+ },
+ {
+  "id": "us-unemployment",
+  "title": "U.S. unemployment rate",
+  "category": "Economy",
+  "frequency": "monthly",
+  "unit": {
+   "label": "Unemployment rate",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Share of the labor force that is jobless and actively looking for work, seasonally adjusted.",
+  "source": {
+   "publisher": "U.S. Bureau of Labor Statistics",
+   "dataset": "Current Population Survey (LNS14000000)",
+   "url": "https://www.bls.gov/cps/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "The headline rate (U-3) only counts people actively searching for work in the past four weeks.",
+   "U-6 adds discouraged workers and part-timers who want full-time work, so it always runs higher."
+  ],
+  "caveats": [
+   "People who stop looking for work leave the labor force and are not counted as unemployed, which can push the headline rate down even when the job market is weak."
+  ],
+  "defaultSeries": [
+   "UNRATE"
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:14:56.913Z",
+  "lastObservation": "2026-10-01",
+  "nSeries": 2,
+  "firstObservation": "1948-01-01"
+ },
+ {
+  "id": "state-unemployment",
+  "title": "Unemployment rate by state",
+  "category": "Economy",
+  "frequency": "monthly",
+  "geo": "us-states",
+  "unit": {
+   "label": "Unemployment rate",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Seasonally adjusted unemployment rate for each state and D.C.",
+  "source": {
+   "publisher": "U.S. Bureau of Labor Statistics",
+   "dataset": "Local Area Unemployment Statistics (LAUS)",
+   "url": "https://www.bls.gov/lau/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "State rates are modeled estimates and are revised every year in March."
+  ],
+  "caveats": [
+   "Small states have larger margins of error; month-to-month moves of a few tenths of a point are often noise."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T07:16:08.153Z",
+  "lastObservation": "2026-09-01",
+  "nEntities": 51,
+  "firstObservation": "1976-01-01"
+ },
+ {
+  "category": "Energy",
+  "frequency": "weekly",
+  "source": {
+   "publisher": "U.S. Energy Information Administration",
+   "dataset": "Weekly Retail Gasoline Prices, Regular, All Formulations",
+   "url": "https://www.eia.gov/petroleum/gasdiesel/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "National average of regular gasoline prices, including taxes."
+  ],
+  "reframes": [
+   "gas-price",
+   "gas-price-real"
+  ],
+  "id": "gas-price",
+  "title": "U.S. gas price",
+  "lens": "Nominal dollars",
+  "unit": {
+   "label": "Dollars per gallon",
+   "format": "usd",
+   "decimals": 2
+  },
+  "description": "Average retail price of a gallon of regular gasoline in the U.S.",
+  "caveats": [
+   "Prices are in dollars of each year. A $3 gallon in 2008 cost more in today's money than a $3 gallon today."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:15:26.223Z",
+  "lastObservation": "2026-11-02",
+  "nSeries": 1,
+  "firstObservation": "1990-08-20"
+ },
+ {
+  "category": "Energy",
+  "frequency": "weekly",
+  "source": {
+   "publisher": "U.S. Energy Information Administration",
+   "dataset": "Weekly Retail Gasoline Prices, Regular, All Formulations",
+   "url": "https://www.eia.gov/petroleum/gasdiesel/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "National average of regular gasoline prices, including taxes."
+  ],
+  "reframes": [
+   "gas-price",
+   "gas-price-real"
+  ],
+  "id": "gas-price-real",
+  "title": "U.S. gas price, adjusted for inflation",
+  "lens": "Today's dollars",
+  "unit": {
+   "label": "Dollars per gallon (2026-09 dollars)",
+   "format": "usd",
+   "decimals": 2
+  },
+  "description": "Average retail price of regular gasoline, converted into today's dollars using CPI-U.",
+  "caveats": [
+   "Adjusted with the all-items CPI computed by Plainsight; the source publishes nominal prices only."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:15:26.223Z",
+  "lastObservation": "2026-09-28",
+  "nSeries": 1,
+  "firstObservation": "1990-08-20"
+ },
+ {
+  "id": "earthquakes",
+  "title": "Earthquakes in the past 30 days",
+  "category": "Environment",
+  "kind": "events",
+  "geo": "world",
+  "frequency": "real-time",
+  "unit": {
+   "label": "Magnitude",
+   "format": "number",
+   "decimals": 1
+  },
+  "description": "Every earthquake of magnitude 2.5 or greater recorded worldwide in the last 30 days.",
+  "source": {
+   "publisher": "U.S. Geological Survey",
+   "dataset": "Earthquake Hazards Program real-time feed (M2.5+, past 30 days)",
+   "url": "https://earthquake.usgs.gov/earthquakes/feed/"
+  },
+  "howToRead": [
+   "Magnitude is logarithmic: each whole number up releases about 32 times more energy."
+  ],
+  "caveats": [
+   "Small quakes are detected far more often near dense sensor networks (like the U.S.), so the map over-represents those regions at low magnitudes."
+  ],
+  "retrieved": "2026-11-08T07:14:56.913Z",
+  "lastObservation": "2026-11-08T06:30:19.447Z",
+  "nEvents": 2069,
+  "firstObservation": "2026-10-09T07:31:58.275Z"
+ },
+ {
+  "category": "Government",
+  "reframes": [
+   "federal-debt",
+   "federal-debt-gdp",
+   "federal-debt-real"
+  ],
+  "id": "federal-debt",
+  "title": "U.S. national debt",
+  "lens": "Nominal dollars",
+  "frequency": "monthly",
+  "unit": {
+   "label": "Total public debt outstanding",
+   "format": "usdT",
+   "decimals": 2
+  },
+  "description": "Total public debt outstanding of the U.S. government, end of each month.",
+  "source": {
+   "publisher": "U.S. Department of the Treasury",
+   "dataset": "Debt to the Penny",
+   "url": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/"
+  },
+  "howToRead": [
+   "Includes debt held by the public and money the government owes to its own trust funds (like Social Security)."
+  ],
+  "caveats": [
+   "A growing economy and inflation make nominal debt rise almost every year. Debt as a share of GDP is the measure economists use to judge whether it is getting harder to carry."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:15:26.223Z",
+  "lastObservation": "2026-11-05",
+  "nSeries": 1,
+  "firstObservation": "1993-04-30"
+ },
+ {
+  "category": "Government",
+  "reframes": [
+   "federal-debt",
+   "federal-debt-gdp",
+   "federal-debt-real"
+  ],
+  "id": "federal-debt-gdp",
+  "title": "U.S. national debt as a share of GDP",
+  "lens": "Share of the economy",
+  "frequency": "quarterly",
+  "unit": {
+   "label": "Debt as % of GDP",
+   "format": "pct",
+   "decimals": 0
+  },
+  "description": "Total public debt divided by the size of the U.S. economy (gross domestic product).",
+  "source": {
+   "publisher": "U.S. Office of Management and Budget",
+   "dataset": "Total Public Debt as Percent of GDP (GFDEGDQ188S)",
+   "url": "https://fred.stlouisfed.org/series/GFDEGDQ188S",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "Above 100% means the debt is larger than one full year of everything the U.S. economy produces."
+  ],
+  "caveats": [
+   "GDP collapsed briefly in 2020, which spiked the ratio even before new borrowing showed up."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:15:26.223Z",
+  "lastObservation": "2026-04-01",
+  "nSeries": 1,
+  "firstObservation": "1966-01-01"
+ },
+ {
+  "category": "Government",
+  "reframes": [
+   "federal-debt",
+   "federal-debt-gdp",
+   "federal-debt-real"
+  ],
+  "id": "federal-debt-real",
+  "title": "U.S. national debt, adjusted for inflation",
+  "lens": "Today's dollars",
+  "frequency": "monthly",
+  "unit": {
+   "label": "Total public debt (today's dollars)",
+   "format": "usdT",
+   "decimals": 2
+  },
+  "description": "Total public debt converted into today's dollars with CPI-U.",
+  "source": {
+   "publisher": "U.S. Department of the Treasury",
+   "dataset": "Debt to the Penny, deflated by BLS CPI-U",
+   "url": "https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/"
+  },
+  "howToRead": [
+   "Removes the effect of rising prices so years can be compared directly."
+  ],
+  "caveats": [
+   "Inflation adjustment computed by Plainsight with CPI-U."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:15:26.223Z",
+  "lastObservation": "2026-09-30",
+  "nSeries": 1,
+  "firstObservation": "1993-04-30"
+ },
+ {
+  "category": "Health",
+  "frequency": "annual",
+  "geo": "us-states",
+  "reframes": [
+   "overdose-deaths",
+   "overdose-rate"
+  ],
+  "source": {
+   "publisher": "CDC National Center for Health Statistics",
+   "dataset": "VSRR Provisional Drug Overdose Death Counts",
+   "url": "https://www.cdc.gov/nchs/nvss/vsrr/drug-overdose-data.htm"
+  },
+  "howToRead": [
+   "Each year is the 12 months ending in December, by the state where the death occurred."
+  ],
+  "id": "overdose-rate",
+  "title": "Drug overdose death rate by state",
+  "lens": "Per 100,000 people",
+  "unit": {
+   "label": "Deaths per 100,000 residents",
+   "format": "number",
+   "decimals": 1
+  },
+  "description": "Reported drug overdose deaths per 100,000 residents, 12 months ending in December.",
+  "caveats": [
+   "Rate computed by Plainsight using Census population estimates. It is not age-adjusted, unlike CDC's official rates.",
+   "Recent months are provisional and are usually revised upward."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T07:16:08.153Z",
+  "lastObservation": "2025-12-31",
+  "nEntities": 51,
+  "firstObservation": "2015-12-31"
+ },
+ {
+  "category": "Health",
+  "frequency": "annual",
+  "geo": "us-states",
+  "reframes": [
+   "overdose-deaths",
+   "overdose-rate"
+  ],
+  "source": {
+   "publisher": "CDC National Center for Health Statistics",
+   "dataset": "VSRR Provisional Drug Overdose Death Counts",
+   "url": "https://www.cdc.gov/nchs/nvss/vsrr/drug-overdose-data.htm"
+  },
+  "howToRead": [
+   "Each year is the 12 months ending in December, by the state where the death occurred."
+  ],
+  "id": "overdose-deaths",
+  "title": "Drug overdose deaths by state",
+  "lens": "Total deaths",
+  "unit": {
+   "label": "Overdose deaths (12 months)",
+   "format": "number",
+   "decimals": 0
+  },
+  "description": "Reported drug overdose deaths in each state for the 12 months ending in December.",
+  "caveats": [
+   "Totals mostly track population size. Compare states using the per-100,000 rate instead.",
+   "Recent months are provisional and are usually revised upward."
+  ],
+  "isCount": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T07:16:08.153Z",
+  "lastObservation": "2025-12-31",
+  "nEntities": 51,
+  "firstObservation": "2015-12-31"
+ },
+ {
+  "id": "mortgage-rate",
+  "title": "30-year mortgage rate",
+  "category": "Housing",
+  "frequency": "weekly",
+  "unit": {
+   "label": "Average rate",
+   "format": "pct",
+   "decimals": 2
+  },
+  "description": "Average rate on a 30-year fixed-rate mortgage in the U.S., surveyed weekly.",
+  "source": {
+   "publisher": "Freddie Mac",
+   "dataset": "Primary Mortgage Market Survey",
+   "url": "https://www.freddiemac.com/pmms",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "Rates are averages for borrowers with strong credit and 20% down; most people are quoted something different."
+  ],
+  "caveats": [
+   "A lower rate does not always mean cheaper housing; home prices often rise when rates fall."
+  ],
+  "defaultSeries": [
+   "MORTGAGE30US"
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:14:56.913Z",
+  "lastObservation": "2026-11-05",
+  "nSeries": 2,
+  "firstObservation": "1971-04-02"
+ },
+ {
+  "category": "Housing",
+  "frequency": "quarterly",
+  "source": {
+   "publisher": "U.S. Census Bureau and HUD",
+   "dataset": "Median Sales Price of Houses Sold for the United States (MSPUS)",
+   "url": "https://www.census.gov/construction/nrs/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "This is the median price of newly built single-family homes sold, not all homes."
+  ],
+  "reframes": [
+   "home-price",
+   "home-price-real"
+  ],
+  "id": "home-price",
+  "title": "Median price of new U.S. homes",
+  "lens": "Nominal dollars",
+  "unit": {
+   "label": "Median sales price",
+   "format": "usd",
+   "decimals": 0
+  },
+  "description": "Median sales price of new houses sold in the United States.",
+  "caveats": [
+   "Not adjusted for inflation, and the mix of homes being built changes over time (bigger homes push the median up)."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:15:26.223Z",
+  "lastObservation": "2026-07-01",
+  "nSeries": 1,
+  "firstObservation": "1963-01-01"
+ },
+ {
+  "category": "Housing",
+  "frequency": "quarterly",
+  "source": {
+   "publisher": "U.S. Census Bureau and HUD",
+   "dataset": "Median Sales Price of Houses Sold for the United States (MSPUS)",
+   "url": "https://www.census.gov/construction/nrs/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "This is the median price of newly built single-family homes sold, not all homes."
+  ],
+  "reframes": [
+   "home-price",
+   "home-price-real"
+  ],
+  "id": "home-price-real",
+  "title": "Median price of new U.S. homes, adjusted for inflation",
+  "lens": "Today's dollars",
+  "unit": {
+   "label": "Median sales price (today's dollars)",
+   "format": "usd",
+   "decimals": 0
+  },
+  "description": "Median sales price of new houses converted into today's dollars with CPI-U.",
+  "caveats": [
+   "Inflation adjustment computed by Plainsight using CPI-U."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T07:15:26.223Z",
+  "lastObservation": "2026-07-01",
+  "nSeries": 1,
+  "firstObservation": "1963-01-01"
+ },
+ {
+  "id": "state-population",
+  "title": "Population by state",
+  "category": "People",
+  "frequency": "annual",
+  "geo": "us-states",
+  "unit": {
+   "label": "Resident population",
+   "format": "number",
+   "decimals": 0
+  },
+  "description": "Resident population of each state and D.C., annual estimates (decennial counts in census years).",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "Annual Resident Population Estimates",
+   "url": "https://www.census.gov/programs-surveys/popest.html",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "Between censuses these are estimates built from births, deaths and migration records."
+  ],
+  "caveats": [
+   "Estimates are revised after each decennial census, so older numbers may change."
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-08T07:16:08.153Z",
+  "lastObservation": "2025-01-01",
+  "nEntities": 51,
+  "firstObservation": "1900-01-01"
+ },
+ {
+  "id": "world-gdp",
+  "title": "GDP by country",
+  "category": "World",
+  "frequency": "annual",
+  "geo": "world",
+  "unit": {
+   "label": "Gross domestic product (current US$)",
+   "format": "usdB",
+   "decimals": 0
+  },
+  "description": "Total value of goods and services produced in each country, converted to U.S. dollars at market exchange rates.",
+  "source": {
+   "publisher": "World Bank",
+   "dataset": "World Development Indicators (NY.GDP.MKTP.CD)",
+   "url": "https://data.worldbank.org/indicator/NY.GDP.MKTP.CD"
+  },
+  "howToRead": [
+   "Values are in each year's dollars, so everyone grows over time partly because of inflation."
+  ],
+  "caveats": [
+   "Market exchange rates understate economies where everyday goods are cheap (China, India). Purchasing-power comparisons tell a different story.",
+   "GDP measures the size of an economy, not how well off its people are; divide by population for that."
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-08T07:14:56.913Z",
+  "lastObservation": "2025-12-31",
+  "nEntities": 214,
+  "firstObservation": "1960-12-31"
+ },
+ {
+  "id": "life-expectancy",
+  "title": "Life expectancy by country",
+  "category": "World",
+  "frequency": "annual",
+  "geo": "world",
+  "unit": {
+   "label": "Life expectancy at birth (years)",
+   "format": "number",
+   "decimals": 1
+  },
+  "description": "How many years a newborn would live if current death rates stayed the same for their whole life.",
+  "source": {
+   "publisher": "World Bank",
+   "dataset": "World Development Indicators (SP.DYN.LE00.IN), from UN Population Division",
+   "url": "https://data.worldbank.org/indicator/SP.DYN.LE00.IN"
+  },
+  "howToRead": [
+   "Low life expectancy in the past was driven mostly by child deaths, not people dying at 40."
+  ],
+  "caveats": [
+   "It is a snapshot of death rates in a given year, so shocks like COVID-19 dip it temporarily."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T07:14:56.913Z",
+  "lastObservation": "2024-12-31",
+  "nEntities": 217,
+  "firstObservation": "1960-12-31"
+ }
+]
