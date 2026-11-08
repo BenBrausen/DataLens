@@ -12,7 +12,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
-concurrency: { group: pages, cancel-in-progress: false }
+concurrency: { group: refresh, cancel-in-progress: false }
 jobs:
   refresh:
     runs-on: ubuntu-latest
@@ -34,7 +34,11 @@ jobs:
           git config user.email "plainsight-bot@users.noreply.github.com"
           git add public/data
           git diff --cached --quiet || git commit -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
-          git push
-      - uses: actions/upload-pages-artifact@v3
+          git pull --rebase origin main && git push
+      # Publishing is opt-in: enable Pages (Settings > Pages > Source: GitHub Actions),
+      # then add a repository variable PAGES_ENABLED = true.
+      - if: vars.PAGES_ENABLED == 'true'
+        uses: actions/upload-pages-artifact@v3
         with: { path: public }
-      - uses: actions/deploy-pages@v4
+      - if: vars.PAGES_ENABLED == 'true'
+        uses: actions/deploy-pages@v4
