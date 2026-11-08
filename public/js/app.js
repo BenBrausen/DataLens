@@ -267,7 +267,12 @@
       body += lensHTML();
       for (const tier of tiers) {
         body += `<div class="ds-group"><h3>${esc(tier.name)}</h3><p class="muted tier-desc">${esc(tier.desc)}</p>`;
-        if (tier.id === 'federal') body += (reg.federal || []).map(f => card(f, 'federal')).join('');
+        if (tier.id === 'federal') {
+          body += (reg.federal || []).map(f => card(f, 'federal')).join('');
+          // Every federal publisher in the data.gov catalog, each searchable.
+          const orgs = (reg.catalogOrgs || []).filter(x => x.type === 'Federal Government');
+          if (orgs.length) body += `<details class="local-state"><summary>All ${orgs.length} federal publishers on data.gov <span class="muted">${orgs.reduce((a, x) => a + x.datasets, 0).toLocaleString()} datasets</span></summary><div class="portal-list">${orgs.map(x => `<button class="cmp ok" data-act="orgSearch" data-org="${esc(x.slug)}" data-name="${esc(x.name)}"><b>${esc(x.name)}</b><span>${x.datasets.toLocaleString()} datasets · search</span></button>`).join('')}</div></details>`;
+        }
         else if (tier.id === 'state') {
           body += `<div class="state-grid">${reg.states.map(s => {
             const ps = s.portals.filter(p => PS.SEARCHABLE.includes(p.platform)), n = ps.reduce((a, p) => a + (p.datasets || 0), 0);

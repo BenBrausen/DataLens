@@ -25,6 +25,8 @@ window.PS = window.PS || {};
   function fmt(v, unit = {}, opts = {}) {
     if (v == null || !Number.isFinite(v)) return 'n/a';
     const d = opts.decimals ?? unit.decimals ?? 1;
+    // Signed units like temperature anomalies: "+1.18°C".
+    if (unit.suffix) return (unit.signed && v > 0 ? '+' : v < 0 ? '-' : '') + withCommas(Math.abs(v), d) + unit.suffix;
     switch (unit.format) {
       case 'pct': return withCommas(v, d) + '%';
       case 'usd':
@@ -44,7 +46,7 @@ window.PS = window.PS || {};
     if (unit.format === 'pct') return `${sign}${withCommas(Math.abs(diff), unit.decimals ?? 1)} pts`;
     // A percent change of a rate that can cross zero (migration, growth) means nothing.
     const rel = a !== 0 && !opts.noRel && !(a < 0 || b < 0) ? (diff / Math.abs(a)) * 100 : null;
-    return `${sign}${fmt(Math.abs(diff), unit, { short: true })}${rel != null ? ` (${sign}${withCommas(Math.abs(rel), Math.abs(rel) >= 100 ? 0 : 1)}%)` : ''}`;
+    return `${sign}${fmt(Math.abs(diff), { ...unit, signed: false }, { short: true })}${rel != null ? ` (${sign}${withCommas(Math.abs(rel), Math.abs(rel) >= 100 ? 0 : 1)}%)` : ''}`;
   }
 
   // ---------- dates ----------

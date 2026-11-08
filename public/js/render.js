@@ -493,7 +493,8 @@
       const pts = st.view.series[0].pts;
       const by = d3.rollup(pts, v => d3.mean(v, p => p.v), p => new Date(p.t).getUTCFullYear());
       bars = [...by.entries()].sort((a, b) => a[0] - b[0]).map(([k, v]) => ({ k, label: String(k), v }));
-      if (bars.length > 60) bars = bars.slice(-60);
+      // Long records (NASA's starts in 1880) keep every year; bars just get thinner.
+      if (bars.length > 160) bars = bars.slice(-160);
       label = ds.frequency === 'annual' ? '' : 'Annual average';
     }
     const n = bars.length;

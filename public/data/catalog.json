@@ -32,6 +32,46 @@
   "firstObservation": "2020-02-01"
  },
  {
+  "category": "Economy",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "Small Area Income and Poverty Estimates (SAIPE)",
+   "url": "https://www.census.gov/programs-surveys/saipe.html"
+  },
+  "reframes": [
+   "county-poverty",
+   "county-income"
+  ],
+  "howToRead": [
+   "Model-based single-year estimates that combine survey data with tax and program records, so even small counties get a yearly number."
+  ],
+  "id": "county-income",
+  "title": "Median household income by county",
+  "lens": "Median income",
+  "unit": {
+   "label": "Median household income",
+   "format": "usd",
+   "decimals": 0
+  },
+  "description": "Income of the household in the middle of each county.",
+  "isRate": true,
+  "caveats": [
+   "Not adjusted for inflation between years, or for local cost of living.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2024-12-31",
+  "hasNational": false,
+  "topic": "economy",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2005-12-31"
+ },
+ {
   "id": "state-income",
   "title": "Median household income by state",
   "category": "Economy",
@@ -103,6 +143,40 @@
   "firstObservation": "1968-01-01"
  },
  {
+  "id": "business-applications",
+  "title": "New business applications by state",
+  "category": "Economy",
+  "frequency": "monthly",
+  "geo": "us-states",
+  "unit": {
+   "label": "Business applications per 100,000 residents (monthly)",
+   "format": "number",
+   "decimals": 1
+  },
+  "description": "Applications for a new employer ID number (EIN) each month, a leading sign of new businesses, per 100,000 residents.",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "Business Formation Statistics (seasonally adjusted)",
+   "url": "https://www.census.gov/econ/bfs/"
+  },
+  "howToRead": [
+   "An application is an intention to start a business; only some become employers. Applications jumped in mid-2020 and stayed high."
+  ],
+  "caveats": [
+   "Per-person rate computed by Plainsight with Census population estimates."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2026-09-01",
+  "hasNational": true,
+  "topic": "economy",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "2004-07-01"
+ },
+ {
   "id": "state-income-pc",
   "title": "Personal income per person by state",
   "category": "Economy",
@@ -135,6 +209,46 @@
   "tier": "federal",
   "nEntities": 51,
   "firstObservation": "1929-01-01"
+ },
+ {
+  "category": "Economy",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "Small Area Income and Poverty Estimates (SAIPE)",
+   "url": "https://www.census.gov/programs-surveys/saipe.html"
+  },
+  "reframes": [
+   "county-poverty",
+   "county-income"
+  ],
+  "howToRead": [
+   "Model-based single-year estimates that combine survey data with tax and program records, so even small counties get a yearly number."
+  ],
+  "id": "county-poverty",
+  "title": "Poverty rate by county",
+  "lens": "Poverty rate",
+  "unit": {
+   "label": "People below the poverty line",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Share of people whose family income is below the federal poverty threshold.",
+  "isRate": true,
+  "caveats": [
+   "Each county estimate has a margin of error; for small counties the 90% range is often several points wide, so close rankings are not meaningful.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2024-12-31",
+  "hasNational": false,
+  "topic": "economy",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2005-12-31"
  },
  {
   "id": "consumer-sentiment",
@@ -357,6 +471,42 @@
   "firstObservation": "1990-08-20"
  },
  {
+  "id": "county-air",
+  "title": "Days with unhealthy air by county",
+  "category": "Environment",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "unit": {
+   "label": "Days with unhealthy air (AQI over 100)",
+   "format": "number",
+   "decimals": 0
+  },
+  "description": "Days each year when the Air Quality Index was unhealthy for sensitive groups or worse.",
+  "source": {
+   "publisher": "U.S. Environmental Protection Agency",
+   "dataset": "Air Quality System, annual AQI by county",
+   "url": "https://aqs.epa.gov/aqsweb/airdata/download_files.html"
+  },
+  "howToRead": [
+   "Above 100 on the Air Quality Index, children, older adults and people with heart or lung disease should limit time outdoors.",
+   "Wildfire smoke drives many of the worst recent years in the West."
+  ],
+  "caveats": [
+   "Only counties with air monitors appear, and only years with at least 120 monitored days. Most rural counties have no monitor, which is not the same as clean air.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2025-12-31",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "epa",
+  "tier": "federal",
+  "nEntities": 1192,
+  "firstObservation": "2000-12-31"
+ },
+ {
   "id": "earthquakes",
   "title": "Earthquakes in the past 30 days",
   "category": "Environment",
@@ -388,6 +538,337 @@
   "tier": "federal",
   "nEvents": 2078,
   "firstObservation": "2026-10-09T15:49:13.171Z"
+ },
+ {
+  "id": "county-disasters",
+  "title": "Federal disaster declarations by county since 1965",
+  "category": "Environment",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "unit": {
+   "label": "Major disaster declarations (running total since 1965)",
+   "format": "number",
+   "decimals": 0
+  },
+  "source": {
+   "publisher": "Federal Emergency Management Agency",
+   "dataset": "OpenFEMA Disaster Declarations Summaries (v2)",
+   "url": "https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2"
+  },
+  "description": "How many major disaster declarations have covered each county, adding up year by year.",
+  "howToRead": [
+   "Watch it fill in: the coasts, Tornado Alley and river valleys light up first."
+  ],
+  "caveats": [
+   "A declaration is a federal funding decision, not a direct measure of how severe a disaster was. Thresholds and politics change over time.",
+   "COVID-19 declarations (2020) are left out because they covered every state at once.",
+   "Statewide declarations without county detail are not counted.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2025-12-31",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "fema",
+  "tier": "federal",
+  "nEntities": 3109,
+  "firstObservation": "1965-12-31"
+ },
+ {
+  "id": "global-temperature",
+  "title": "Global temperature",
+  "category": "Environment",
+  "frequency": "annual",
+  "unit": {
+   "label": "°C above or below the 1951-1980 average",
+   "format": "number",
+   "decimals": 2,
+   "suffix": "°C",
+   "signed": true
+  },
+  "description": "Global average surface temperature over land and ocean compared with the 1951-1980 average.",
+  "source": {
+   "publisher": "NASA Goddard Institute for Space Studies",
+   "dataset": "GISTEMP v4, Land-Ocean Temperature Index",
+   "url": "https://data.giss.nasa.gov/gistemp/"
+  },
+  "howToRead": [
+   "Zero is the 1951-1980 average, not \"normal\" in any deeper sense. The change over time is what matters.",
+   "Single months are noisy (El Niño years run hot); the annual average shows the trend."
+  ],
+  "caveats": [
+   "Recent months are revised slightly as late station reports arrive."
+  ],
+  "zeroLine": true,
+  "defaultSeries": [
+   "ANNUAL"
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T16:14:13.128Z",
+  "lastObservation": "2025-07-01",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "nasa",
+  "tier": "federal",
+  "nSeries": 1,
+  "firstObservation": "1880-07-01"
+ },
+ {
+  "id": "county-heat-risk",
+  "title": "Heat wave risk by county",
+  "category": "Environment",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "source": {
+   "publisher": "Federal Emergency Management Agency",
+   "dataset": "National Risk Index for Natural Hazards (counties)",
+   "url": "https://hazards.fema.gov/nri/"
+  },
+  "unit": {
+   "label": "Heat wave risk score (0-100)",
+   "format": "number",
+   "decimals": 1
+  },
+  "reframes": [
+   "county-risk",
+   "county-wildfire-risk",
+   "county-hurricane-risk",
+   "county-heat-risk",
+   "county-flood-risk"
+  ],
+  "howToRead": [
+   "Scores run from 0 to 100 and rank each county against all others: 90 means riskier than 90% of U.S. counties. It is not a probability.",
+   "Risk combines how often a hazard strikes, what is in harm's way, how vulnerable people are and how well communities can recover."
+  ],
+  "caveats": [
+   "A model built by FEMA from historical hazard data; it is updated every year or two.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "lens": "Heat wave",
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2026-01-01",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "fema",
+  "tier": "federal",
+  "nEntities": 3114,
+  "firstObservation": "2026-01-01"
+ },
+ {
+  "id": "county-hurricane-risk",
+  "title": "Hurricane risk by county",
+  "category": "Environment",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "source": {
+   "publisher": "Federal Emergency Management Agency",
+   "dataset": "National Risk Index for Natural Hazards (counties)",
+   "url": "https://hazards.fema.gov/nri/"
+  },
+  "unit": {
+   "label": "Hurricane risk score (0-100)",
+   "format": "number",
+   "decimals": 1
+  },
+  "reframes": [
+   "county-risk",
+   "county-wildfire-risk",
+   "county-hurricane-risk",
+   "county-heat-risk",
+   "county-flood-risk"
+  ],
+  "howToRead": [
+   "Scores run from 0 to 100 and rank each county against all others: 90 means riskier than 90% of U.S. counties. It is not a probability.",
+   "Risk combines how often a hazard strikes, what is in harm's way, how vulnerable people are and how well communities can recover."
+  ],
+  "caveats": [
+   "A model built by FEMA from historical hazard data; it is updated every year or two.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "lens": "Hurricane",
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2026-01-01",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "fema",
+  "tier": "federal",
+  "nEntities": 2397,
+  "firstObservation": "2026-01-01"
+ },
+ {
+  "id": "county-flood-risk",
+  "title": "Inland flooding risk by county",
+  "category": "Environment",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "source": {
+   "publisher": "Federal Emergency Management Agency",
+   "dataset": "National Risk Index for Natural Hazards (counties)",
+   "url": "https://hazards.fema.gov/nri/"
+  },
+  "unit": {
+   "label": "Inland flooding risk score (0-100)",
+   "format": "number",
+   "decimals": 1
+  },
+  "reframes": [
+   "county-risk",
+   "county-wildfire-risk",
+   "county-hurricane-risk",
+   "county-heat-risk",
+   "county-flood-risk"
+  ],
+  "howToRead": [
+   "Scores run from 0 to 100 and rank each county against all others: 90 means riskier than 90% of U.S. counties. It is not a probability.",
+   "Risk combines how often a hazard strikes, what is in harm's way, how vulnerable people are and how well communities can recover."
+  ],
+  "caveats": [
+   "A model built by FEMA from historical hazard data; it is updated every year or two.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "lens": "Inland flooding",
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2026-01-01",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "fema",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2026-01-01"
+ },
+ {
+  "id": "disasters",
+  "title": "Major disaster declarations per year",
+  "category": "Environment",
+  "frequency": "annual",
+  "unit": {
+   "label": "Major disaster declarations",
+   "format": "number",
+   "decimals": 0
+  },
+  "source": {
+   "publisher": "Federal Emergency Management Agency",
+   "dataset": "OpenFEMA Disaster Declarations Summaries (v2)",
+   "url": "https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2"
+  },
+  "description": "Number of major disaster declarations the President approved each year, by type of disaster.",
+  "howToRead": [
+   "Each declaration unlocks federal aid for a state or tribe after a disaster that overwhelms local resources."
+  ],
+  "caveats": [
+   "A declaration is a federal funding decision, not a direct measure of how severe a disaster was. Thresholds and politics change over time.",
+   "COVID-19 declarations (2020) are left out because they covered every state at once."
+  ],
+  "defaultSeries": [
+   "ALL"
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2025-12-31",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "fema",
+  "tier": "federal",
+  "nSeries": 5,
+  "firstObservation": "1953-12-31"
+ },
+ {
+  "id": "county-risk",
+  "title": "Natural hazard risk by county",
+  "category": "Environment",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "source": {
+   "publisher": "Federal Emergency Management Agency",
+   "dataset": "National Risk Index for Natural Hazards (counties)",
+   "url": "https://hazards.fema.gov/nri/"
+  },
+  "unit": {
+   "label": "Overall risk score (0-100)",
+   "format": "number",
+   "decimals": 1
+  },
+  "reframes": [
+   "county-risk",
+   "county-wildfire-risk",
+   "county-hurricane-risk",
+   "county-heat-risk",
+   "county-flood-risk"
+  ],
+  "howToRead": [
+   "Scores run from 0 to 100 and rank each county against all others: 90 means riskier than 90% of U.S. counties. It is not a probability.",
+   "Risk combines how often a hazard strikes, what is in harm's way, how vulnerable people are and how well communities can recover."
+  ],
+  "caveats": [
+   "A model built by FEMA from historical hazard data; it is updated every year or two.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "lens": "All hazards",
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2026-01-01",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "fema",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2026-01-01"
+ },
+ {
+  "id": "county-wildfire-risk",
+  "title": "Wildfire risk by county",
+  "category": "Environment",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "singleTime": true,
+  "source": {
+   "publisher": "Federal Emergency Management Agency",
+   "dataset": "National Risk Index for Natural Hazards (counties)",
+   "url": "https://hazards.fema.gov/nri/"
+  },
+  "unit": {
+   "label": "Wildfire risk score (0-100)",
+   "format": "number",
+   "decimals": 1
+  },
+  "reframes": [
+   "county-risk",
+   "county-wildfire-risk",
+   "county-hurricane-risk",
+   "county-heat-risk",
+   "county-flood-risk"
+  ],
+  "howToRead": [
+   "Scores run from 0 to 100 and rank each county against all others: 90 means riskier than 90% of U.S. counties. It is not a probability.",
+   "Risk combines how often a hazard strikes, what is in harm's way, how vulnerable people are and how well communities can recover."
+  ],
+  "caveats": [
+   "A model built by FEMA from historical hazard data; it is updated every year or two.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "isRate": true,
+  "lens": "Wildfire",
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2026-01-01",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "fema",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2026-01-01"
  },
  {
   "category": "Government",
@@ -729,6 +1210,78 @@
   "firstObservation": "2015-12-31"
  },
  {
+  "id": "drug-recalls",
+  "title": "Drug recalls",
+  "category": "Health",
+  "frequency": "monthly",
+  "unit": {
+   "label": "Drug recalls reported per month",
+   "format": "number",
+   "decimals": 0
+  },
+  "description": "Drug recalls reported to the FDA each month, by how serious the risk is.",
+  "source": {
+   "publisher": "U.S. Food and Drug Administration",
+   "dataset": "openFDA drug enforcement reports",
+   "url": "https://open.fda.gov/apis/drug/enforcement/"
+  },
+  "howToRead": [
+   "Class I: reasonable chance of serious harm or death. Class II: temporary or reversible harm. Class III: unlikely to cause harm.",
+   "One recall can cover many products and lots, so counts measure recall actions, not the amount of product."
+  ],
+  "caveats": [
+   "openFDA notes its data is not validated for medical decisions. Months reflect when FDA published the report, not when the problem started."
+  ],
+  "defaultSeries": [
+   "I"
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2026-10-01",
+  "hasNational": false,
+  "topic": "health",
+  "sourceId": "fda",
+  "tier": "federal",
+  "nSeries": 3,
+  "firstObservation": "2013-01-01"
+ },
+ {
+  "id": "food-recalls",
+  "title": "Food recalls",
+  "category": "Health",
+  "frequency": "monthly",
+  "unit": {
+   "label": "Food recalls reported per month",
+   "format": "number",
+   "decimals": 0
+  },
+  "description": "Food recalls reported to the FDA each month, by how serious the risk is.",
+  "source": {
+   "publisher": "U.S. Food and Drug Administration",
+   "dataset": "openFDA food enforcement reports",
+   "url": "https://open.fda.gov/apis/food/enforcement/"
+  },
+  "howToRead": [
+   "Class I: reasonable chance of serious harm or death. Class II: temporary or reversible harm. Class III: unlikely to cause harm.",
+   "One recall can cover many products and lots, so counts measure recall actions, not the amount of product."
+  ],
+  "caveats": [
+   "openFDA notes its data is not validated for medical decisions. Months reflect when FDA published the report, not when the problem started."
+  ],
+  "defaultSeries": [
+   "I"
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2026-10-01",
+  "hasNational": false,
+  "topic": "health",
+  "sourceId": "fda",
+  "tier": "federal",
+  "nSeries": 3,
+  "firstObservation": "2013-01-01"
+ },
+ {
   "id": "county-uninsured",
   "title": "Uninsured adults by county",
   "category": "Health",
@@ -911,6 +1464,84 @@
   "firstObservation": "1963-01-01"
  },
  {
+  "category": "Housing",
+  "frequency": "annual",
+  "geo": "us-states",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "Building Permits Survey, annual state totals",
+   "url": "https://www.census.gov/construction/bps/"
+  },
+  "reframes": [
+   "state-permits",
+   "state-permits-total"
+  ],
+  "howToRead": [
+   "Permits are the earliest sign of new housing: most permitted homes are started within a few months."
+  ],
+  "caveats": [
+   "Counts new privately owned units in permit-issuing places, which cover nearly all construction. The latest year can be revised."
+  ],
+  "id": "state-permits-total",
+  "title": "New homes permitted by state",
+  "lens": "Total units",
+  "unit": {
+   "label": "Housing units permitted",
+   "format": "number",
+   "decimals": 0
+  },
+  "description": "New housing units authorized by building permits each year.",
+  "isCount": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2025-12-31",
+  "hasNational": false,
+  "topic": "housing",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "1980-12-31"
+ },
+ {
+  "category": "Housing",
+  "frequency": "annual",
+  "geo": "us-states",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "Building Permits Survey, annual state totals",
+   "url": "https://www.census.gov/construction/bps/"
+  },
+  "reframes": [
+   "state-permits",
+   "state-permits-total"
+  ],
+  "howToRead": [
+   "Permits are the earliest sign of new housing: most permitted homes are started within a few months."
+  ],
+  "caveats": [
+   "Counts new privately owned units in permit-issuing places, which cover nearly all construction. The latest year can be revised."
+  ],
+  "id": "state-permits",
+  "title": "New homes permitted per 1,000 residents",
+  "lens": "Per 1,000 residents",
+  "unit": {
+   "label": "Housing units permitted per 1,000 residents",
+   "format": "number",
+   "decimals": 1
+  },
+  "description": "New housing units authorized by building permits each year, per 1,000 residents.",
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2025-12-31",
+  "hasNational": true,
+  "topic": "housing",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "1980-12-31"
+ },
+ {
   "id": "state-home-values",
   "title": "Typical home value by state",
   "category": "Housing",
@@ -942,6 +1573,132 @@
   "tier": "industry",
   "nEntities": 51,
   "firstObservation": "2000-01-31"
+ },
+ {
+  "category": "People",
+  "frequency": "annual",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "County Population Totals and Components of Change, Vintage 2025",
+   "url": "https://www.census.gov/programs-surveys/popest.html"
+  },
+  "reframes": [
+   "county-population",
+   "county-growth",
+   "county-migration",
+   "county-natural-change",
+   "county-immigration"
+  ],
+  "isRate": true,
+  "zeroLine": true,
+  "id": "county-natural-change",
+  "title": "Births minus deaths by county",
+  "lens": "Births minus deaths",
+  "unit": {
+   "label": "Births minus deaths per 1,000 residents",
+   "format": "number",
+   "decimals": 1
+  },
+  "description": "Natural change: births minus deaths each year, per 1,000 residents. Below zero means deaths outnumbered births.",
+  "howToRead": [
+   "Older counties, especially rural ones, often have more deaths than births even before anyone moves away."
+  ],
+  "caveats": [
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "geo": "us-counties",
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2025-07-01",
+  "hasNational": false,
+  "topic": "people",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2021-07-01"
+ },
+ {
+  "category": "People",
+  "frequency": "annual",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "County Population Totals and Components of Change, Vintage 2025",
+   "url": "https://www.census.gov/programs-surveys/popest.html"
+  },
+  "reframes": [
+   "county-population",
+   "county-growth",
+   "county-migration",
+   "county-natural-change",
+   "county-immigration"
+  ],
+  "isRate": true,
+  "zeroLine": true,
+  "id": "county-immigration",
+  "title": "Immigration by county",
+  "lens": "Moves from abroad",
+  "unit": {
+   "label": "Net international migration per 1,000 residents",
+   "format": "number",
+   "decimals": 1
+  },
+  "description": "People arriving from abroad minus people leaving the U.S., per 1,000 residents.",
+  "howToRead": [
+   "Includes immigrants of all legal statuses, people moving to and from Puerto Rico, and Americans returning from abroad."
+  ],
+  "caveats": [
+   "International migration is the hardest population component to estimate and is revised often.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "geo": "us-counties",
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2025-07-01",
+  "hasNational": false,
+  "topic": "people",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2021-07-01"
+ },
+ {
+  "category": "People",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "County Population by Characteristics (age and sex), Vintage 2025",
+   "url": "https://www.census.gov/programs-surveys/popest.html"
+  },
+  "reframes": [
+   "county-median-age",
+   "county-65plus"
+  ],
+  "caveats": [
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "id": "county-median-age",
+  "title": "Median age by county",
+  "lens": "Median age",
+  "unit": {
+   "label": "Median age (years)",
+   "format": "number",
+   "decimals": 1
+  },
+  "description": "Half the people in each county are older than this, half younger.",
+  "howToRead": [
+   "College towns and military bases are young; retirement areas and rural counties that young people have left are old."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2025-07-01",
+  "hasNational": false,
+  "topic": "people",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2020-07-01"
  },
  {
   "category": "People",
@@ -1062,6 +1819,45 @@
  {
   "category": "People",
   "frequency": "annual",
+  "geo": "us-counties",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "County Population by Characteristics (age and sex), Vintage 2025",
+   "url": "https://www.census.gov/programs-surveys/popest.html"
+  },
+  "reframes": [
+   "county-median-age",
+   "county-65plus"
+  ],
+  "caveats": [
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "id": "county-65plus",
+  "title": "Share of people 65 and older by county",
+  "lens": "Share 65+",
+  "unit": {
+   "label": "Residents 65 and older",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Percent of each county's residents who are 65 or older.",
+  "howToRead": [
+   "The baby boom generation turning 65 is raising this share almost everywhere."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2025-07-01",
+  "hasNational": false,
+  "topic": "people",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2020-07-01"
+ },
+ {
+  "category": "People",
+  "frequency": "annual",
   "source": {
    "publisher": "U.S. Census Bureau",
    "dataset": "County Population Totals, Vintage 2025",
@@ -1134,6 +1930,40 @@
   "tier": "academic",
   "nEntities": 213,
   "firstObservation": "1950-12-31"
+ },
+ {
+  "id": "forest-cover",
+  "title": "Forest cover by country",
+  "category": "World",
+  "frequency": "annual",
+  "geo": "world",
+  "unit": {
+   "label": "Forest area (% of land area)",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Share of each country's land covered by forest.",
+  "source": {
+   "publisher": "World Bank",
+   "dataset": "World Development Indicators (AG.LND.FRST.ZS), from UN FAO Global Forest Resources Assessment",
+   "url": "https://data.worldbank.org/indicator/AG.LND.FRST.ZS"
+  },
+  "howToRead": [
+   "Counts land with trees taller than 5 meters covering more than 10% of the area, including planted forests."
+  ],
+  "caveats": [
+   "A country can lose old-growth forest while gaining plantations and show little net change."
+  ],
+  "isRate": true,
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:10:05.030Z",
+  "lastObservation": "2024-12-31",
+  "hasNational": false,
+  "topic": "environment",
+  "sourceId": "worldbank",
+  "tier": "international",
+  "nEntities": 214,
+  "firstObservation": "1990-12-31"
  },
  {
   "id": "world-gdp",

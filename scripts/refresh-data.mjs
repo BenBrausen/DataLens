@@ -590,32 +590,308 @@ builders['county-health'] = async () => {
   });
 };
 
-// Census ACS 5-year county income and poverty. Runs only when a free Census API key
-// is available (repo secret CENSUS_API_KEY). Not exercised until the key exists.
-builders['county-income'] = async () => {
-  const key = process.env.CENSUS_API_KEY;
-  if (!key) { console.log('  (skipped county-income: add a CENSUS_API_KEY secret to enable)'); return []; }
-  const years = [];
-  for (let y = new Date().getUTCFullYear() - 1; y >= 2015 && years.length < 10; y--) {
-    try {
-      const j = await get(`https://api.census.gov/data/${y}/acs/acs5?get=NAME,B19013_001E,B17001_001E,B17001_002E&for=county:*&key=${key}`, 'json', 1);
-      years.unshift({ y, rows: j.slice(1) });
-    } catch { /* that year is not released yet */ }
+// ---------- FEMA ----------
+async function femaDeclarations() {
+  const rows = [];
+  for (let skip = 0; ; skip += 10000) {
+    const j = await get(`https://www.fema.gov/api/open/v2/DisasterDeclarationsSummaries?$select=disasterNumber,declarationType,declarationDate,incidentType,fipsStateCode,fipsCountyCode&$top=10000&$skip=${skip}`);
+    rows.push(...j.DisasterDeclarationsSummaries);
+    if (j.DisasterDeclarationsSummaries.length < 10000) break;
   }
-  if (!years.length) throw new Error('Census ACS returned no county data');
-  const ids = [...new Set(years.flatMap(({ rows }) => rows.map(r => r[4] + r[5])))];
-  const names = new Map(years.at(-1).rows.map(r => [r[4] + r[5], r[0]]));
-  const val = (yr, id, f) => { const r = yr.rows.find(x => x[4] + x[5] === id); if (!r) return null; const v = f(r); return Number.isFinite(v) && v >= 0 ? v : null; };
-  const src = { publisher: 'U.S. Census Bureau', dataset: 'American Community Survey 5-year estimates', url: 'https://www.census.gov/programs-surveys/acs' };
-  const mk = (id, title, unit, f, extra) => panel({ id, title, category: 'Economy', frequency: 'annual', geo: 'us-counties', source: src, unit,
-    howToRead: ['Each year is a 5-year average (e.g. 2019-2023), which keeps small-county estimates stable but makes recent changes show up slowly.'],
-    caveats: ['Survey estimates with margins of error that can be large for small counties.', COUNTY_CAVEAT], ...extra },
-    years.map(({ y }) => `${y}-12-31`),
-    ids.map(cid => ({ id: cid, code: ABBR[cid.slice(0, 2)], name: (names.get(cid) || cid).replace(/, ([A-Za-z ]+)$/, (m, st) => `, ${STATES.find(s => s[2] === st)?.[0] || st}`), short: (names.get(cid) || '').split(',')[0], values: years.map(yr => val(yr, cid, f)) })));
+  return rows;
+}
+builders['disasters'] = async () => {
+  const rows = await femaDeclarations();
+  const lastFull = new Date().getUTCFullYear() - 1;
+  // Major disaster declarations (DR); COVID-19 (Biological, 2020) is excluded and disclosed.
+  const dr = rows.filter(r => r.declarationType === 'DR' && r.incidentType !== 'Biological');
+  const byYearType = new Map();
+  for (const r of dr) {
+    const y = +r.declarationDate.slice(0, 4); if (y > lastFull) continue;
+    const k = `${y}|${r.incidentType}`; if (!byYearType.has(k)) byYearType.set(k, new Set()); byYearType.get(k).add(r.disasterNumber);
+  }
+  const years = []; for (let y = 1953; y <= lastFull; y++) years.push(y);
+  const typeTotals = new Map();
+  for (const [k, s] of byYearType) { const t = k.split('|')[1]; typeTotals.set(t, (typeTotals.get(t) || 0) + s.size); }
+  const top = [...typeTotals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(x => x[0]);
+  const count = (y, t) => [...byYearType.entries()].filter(([k]) => k.startsWith(y + '|') && (!t || k.endsWith('|' + t))).reduce((a, [, s]) => a + s.size, 0);
+  const series = [{ id: 'ALL', name: 'All major disasters', points: years.map(y => [`${y}-12-31`, count(y)]) },
+    ...top.map(t => ({ id: t.replace(/\W+/g, '_'), name: t, points: years.map(y => [`${y}-12-31`, count(y, t)]) }))];
+  // Cumulative county designations
+  const byCounty = new Map();
+  for (const r of dr) {
+    if (!r.fipsCountyCode || r.fipsCountyCode === '000') continue;
+    const id = r.fipsStateCode + r.fipsCountyCode, y = +r.declarationDate.slice(0, 4);
+    if (y > lastFull) continue;
+    if (!byCounty.has(id)) byCounty.set(id, new Map());
+    const m = byCounty.get(id); if (!m.has(y)) m.set(y, new Set()); m.get(y).add(r.disasterNumber);
+  }
+  let names = new Map(), pops = new Map();
+  try { const { vintage, recs } = await censusCountyFile(); names = new Map(recs.map(r => [r.STATE + r.COUNTY, [r.CTYNAME, ABBR[r.STATE]]])); pops = new Map(recs.map(r => [r.STATE + r.COUNTY, +r[`POPESTIMATE${vintage}`]])); } catch { }
+  const cyears = years.filter(y => y >= 1965);
+  const entities = [...byCounty.entries()].filter(([id]) => names.has(id)).map(([id, m]) => {
+    let acc = 0; for (const [y, s] of m) if (y < cyears[0]) acc += s.size;
+    const [nm, ab] = names.get(id);
+    return { id, code: ab, name: `${nm}, ${ab}`, short: nm, pop: pops.get(id), values: cyears.map(y => (acc += m.get(y)?.size || 0)) };
+  });
+  const src = { publisher: 'Federal Emergency Management Agency', dataset: 'OpenFEMA Disaster Declarations Summaries (v2)', url: 'https://www.fema.gov/openfema-data-page/disaster-declarations-summaries-v2' };
+  const care = ['A declaration is a federal funding decision, not a direct measure of how severe a disaster was. Thresholds and politics change over time.', 'COVID-19 declarations (2020) are left out because they covered every state at once.'];
   return [
-    mk('county-income', 'Median household income by county', { label: 'Median household income', format: 'usd', decimals: 0 }, r => +r[1], { description: 'Income of the household in the middle of each county.', caveats: ['Not adjusted for inflation between years.', COUNTY_CAVEAT] }),
-    mk('county-poverty', 'Poverty rate by county', { label: 'People below the poverty line', format: 'pct', decimals: 1 }, r => round(+r[3] / +r[2] * 100, 1), { description: 'Share of people whose family income is below the federal poverty threshold.', isRate: true }),
+    ts({ id: 'disasters', title: 'Major disaster declarations per year', category: 'Environment', frequency: 'annual',
+      unit: { label: 'Major disaster declarations', format: 'number', decimals: 0 }, source: src,
+      description: 'Number of major disaster declarations the President approved each year, by type of disaster.',
+      howToRead: ['Each declaration unlocks federal aid for a state or tribe after a disaster that overwhelms local resources.'],
+      caveats: care, defaultSeries: ['ALL'] }, series.map(s => ({ ...s, points: s.points }))),
+    panel({ id: 'county-disasters', title: 'Federal disaster declarations by county since 1965', category: 'Environment', frequency: 'annual', geo: 'us-counties',
+      unit: { label: 'Major disaster declarations (running total since 1965)', format: 'number', decimals: 0 }, source: src,
+      description: 'How many major disaster declarations have covered each county, adding up year by year.',
+      howToRead: ['Watch it fill in: the coasts, Tornado Alley and river valleys light up first.'],
+      caveats: [...care, 'Statewide declarations without county detail are not counted.', COUNTY_CAVEAT] }, cyears.map(y => `${y}-12-31`), entities),
   ];
+};
+
+builders['hazard-risk'] = async () => {
+  const fields = ['STCOFIPS', 'COUNTY', 'COUNTYTYPE', 'STATEABBRV', 'POPULATION', 'RISK_SCORE', 'WFIR_RISKS', 'HRCN_RISKS', 'HWAV_RISKS', 'IFLD_RISKS', 'SOVI_SCORE'];
+  const rows = [];
+  for (let off = 0; ; off += 2000) {
+    const j = await get(`https://services.arcgis.com/XG15cJAlne2vxtgt/arcgis/rest/services/National_Risk_Index_Counties/FeatureServer/0/query?where=1%3D1&outFields=${fields.join(',')}&returnGeometry=false&orderByFields=STCOFIPS&resultOffset=${off}&resultRecordCount=2000&f=json`);
+    if (j.error) throw new Error(j.error.message);
+    rows.push(...j.features.map(f => f.attributes));
+    if (!j.exceededTransferLimit && j.features.length < 2000) break;
+  }
+  const y = new Date().getUTCFullYear();
+  const src = { publisher: 'Federal Emergency Management Agency', dataset: 'National Risk Index for Natural Hazards (counties)', url: 'https://hazards.fema.gov/nri/' };
+  const mk = (id, field, title, label, extra = {}) => panel({ id, title, category: 'Environment', frequency: 'annual', geo: 'us-counties', singleTime: true, source: src,
+    unit: { label, format: 'number', decimals: 1 }, reframes: ['county-risk', 'county-wildfire-risk', 'county-hurricane-risk', 'county-heat-risk', 'county-flood-risk'],
+    howToRead: ['Scores run from 0 to 100 and rank each county against all others: 90 means riskier than 90% of U.S. counties. It is not a probability.', 'Risk combines how often a hazard strikes, what is in harm\'s way, how vulnerable people are and how well communities can recover.'],
+    caveats: ['A model built by FEMA from historical hazard data; it is updated every year or two.', COUNTY_CAVEAT], isRate: true, ...extra },
+    [`${y}-01-01`], rows.filter(r => r[field] != null && /^\d{5}$/.test(r.STCOFIPS)).map(r => ({ id: r.STCOFIPS, code: r.STATEABBRV, name: `${r.COUNTY} ${r.COUNTYTYPE || ''}`.trim() + `, ${r.STATEABBRV}`, short: `${r.COUNTY} ${r.COUNTYTYPE || ''}`.trim(), pop: r.POPULATION, values: [round(r[field], 1)] })));
+  return [
+    mk('county-risk', 'RISK_SCORE', 'Natural hazard risk by county', 'Overall risk score (0-100)', { lens: 'All hazards' }),
+    mk('county-wildfire-risk', 'WFIR_RISKS', 'Wildfire risk by county', 'Wildfire risk score (0-100)', { lens: 'Wildfire' }),
+    mk('county-hurricane-risk', 'HRCN_RISKS', 'Hurricane risk by county', 'Hurricane risk score (0-100)', { lens: 'Hurricane' }),
+    mk('county-heat-risk', 'HWAV_RISKS', 'Heat wave risk by county', 'Heat wave risk score (0-100)', { lens: 'Heat wave' }),
+    mk('county-flood-risk', 'IFLD_RISKS', 'Inland flooding risk by county', 'Inland flooding risk score (0-100)', { lens: 'Inland flooding' }),
+  ];
+};
+
+// ---------- Census, no key needed ----------
+builders['county-vitals'] = async () => {
+  const { vintage, recs } = await censusCountyFile();
+  const years = []; for (let y = 2021; y <= vintage; y++) years.push(y);
+  const src = { publisher: 'U.S. Census Bureau', dataset: `County Population Totals and Components of Change, Vintage ${vintage}`, url: 'https://www.census.gov/programs-surveys/popest.html' };
+  const base = { category: 'People', frequency: 'annual', source: src, reframes: ['county-population', 'county-growth', 'county-migration', 'county-natural-change', 'county-immigration'], isRate: true, zeroLine: true };
+  return [
+    countyPanel({ ...base, id: 'county-natural-change', title: 'Births minus deaths by county', lens: 'Births minus deaths',
+      unit: { label: 'Births minus deaths per 1,000 residents', format: 'number', decimals: 1 },
+      description: 'Natural change: births minus deaths each year, per 1,000 residents. Below zero means deaths outnumbered births.',
+      howToRead: ['Older counties, especially rural ones, often have more deaths than births even before anyone moves away.'], caveats: [COUNTY_CAVEAT] },
+      recs, years, (r, y) => round(+r[`RNATURALCHG${y}`], 1)),
+    countyPanel({ ...base, id: 'county-immigration', title: 'Immigration by county', lens: 'Moves from abroad',
+      unit: { label: 'Net international migration per 1,000 residents', format: 'number', decimals: 1 },
+      description: 'People arriving from abroad minus people leaving the U.S., per 1,000 residents.',
+      howToRead: ['Includes immigrants of all legal statuses, people moving to and from Puerto Rico, and Americans returning from abroad.'],
+      caveats: ['International migration is the hardest population component to estimate and is revised often.', COUNTY_CAVEAT] },
+      recs, years, (r, y) => round(+r[`RINTERNATIONALMIG${y}`], 1)),
+  ];
+};
+
+builders['county-age'] = async () => {
+  for (let v = new Date().getUTCFullYear(); v >= 2024; v--) {
+    let text;
+    try { text = await get(`https://www2.census.gov/programs-surveys/popest/datasets/2020-${v}/counties/asrh/cc-est${v}-agesex-all.csv`, 'latin1', 1); } catch { continue; }
+    if (!text.startsWith('SUMLEV')) continue;
+    const rows = parseCSV(text), h = rows[0], ix = k => h.indexOf(k);
+    // YEAR 1 is the April 2020 base; 2 onward are July 1 estimates starting 2020.
+    const recs = rows.slice(1).filter(r => +r[ix('YEAR')] >= 2);
+    const years = [...new Set(recs.map(r => 2018 + +r[ix('YEAR')]))].sort();
+    const by = new Map();
+    for (const r of recs) { const id = r[ix('STATE')] + r[ix('COUNTY')]; if (!by.has(id)) by.set(id, { r, ys: new Map() }); by.get(id).ys.set(2018 + +r[ix('YEAR')], r); }
+    const ent = f => [...by.entries()].map(([id, { r, ys }]) => ({ id, code: ABBR[r[ix('STATE')]], name: `${r[ix('CTYNAME')]}, ${ABBR[r[ix('STATE')]]}`, short: r[ix('CTYNAME')], pop: +ys.get(years.at(-1))?.[ix('POPESTIMATE')], values: years.map(y => { const x = ys.get(y); return x ? f(x) : null; }) }));
+    const src = { publisher: 'U.S. Census Bureau', dataset: `County Population by Characteristics (age and sex), Vintage ${v}`, url: 'https://www.census.gov/programs-surveys/popest.html' };
+    const base = { category: 'People', frequency: 'annual', geo: 'us-counties', source: src, reframes: ['county-median-age', 'county-65plus'], caveats: [COUNTY_CAVEAT] };
+    return [
+      panel({ ...base, id: 'county-median-age', title: 'Median age by county', lens: 'Median age', unit: { label: 'Median age (years)', format: 'number', decimals: 1 },
+        description: 'Half the people in each county are older than this, half younger.', howToRead: ['College towns and military bases are young; retirement areas and rural counties that young people have left are old.'], isRate: true },
+        years.map(y => `${y}-07-01`), ent(x => +x[ix('MEDIAN_AGE_TOT')])),
+      panel({ ...base, id: 'county-65plus', title: 'Share of people 65 and older by county', lens: 'Share 65+', unit: { label: 'Residents 65 and older', format: 'pct', decimals: 1 },
+        description: 'Percent of each county\'s residents who are 65 or older.', howToRead: ['The baby boom generation turning 65 is raising this share almost everywhere.'], isRate: true },
+        years.map(y => `${y}-07-01`), ent(x => round(+x[ix('AGE65PLUS_TOT')] / +x[ix('POPESTIMATE')] * 100, 1))),
+    ];
+  }
+  throw new Error('No county age file found');
+};
+
+// Small Area Income and Poverty Estimates: single-year county poverty and income, no key.
+builders['county-saipe'] = async () => {
+  const years = [], data = new Map();
+  for (let y = 2005; y <= new Date().getUTCFullYear(); y++) {
+    const yy = String(y % 100).padStart(2, '0');
+    let text;
+    try { text = await get(`https://www2.census.gov/programs-surveys/saipe/datasets/${y}/${y}-state-and-county/est${yy}all.txt`, 'latin1', 1); } catch { continue; }
+    if (!/^\d{2}\s+0\s/.test(text)) continue;
+    years.push(y);
+    for (const line of text.split(/\r?\n/)) {
+      const t = line.trim().split(/\s+/);
+      if (t.length < 23 || t[1] === '0') continue;
+      const id = t[0].padStart(2, '0') + t[1].padStart(3, '0');
+      if (!data.has(id)) data.set(id, new Map());
+      const num = v => (v === '.' || v == null ? null : +v);
+      data.get(id).set(y, { pov: num(t[5]), lo: num(t[6]), hi: num(t[7]), inc: num(t[20]) });
+    }
+  }
+  if (!years.length) throw new Error('No SAIPE files found');
+  let names = new Map(), pops = new Map();
+  try { const { vintage, recs } = await censusCountyFile(); names = new Map(recs.map(r => [r.STATE + r.COUNTY, [r.CTYNAME, ABBR[r.STATE]]])); pops = new Map(recs.map(r => [r.STATE + r.COUNTY, +r[`POPESTIMATE${vintage}`]])); } catch { }
+  const ent = f => [...data.entries()].filter(([id]) => names.has(id)).map(([id, m]) => { const [nm, ab] = names.get(id); return { id, code: ab, name: `${nm}, ${ab}`, short: nm, pop: pops.get(id), values: years.map(y => { const x = m.get(y); return x ? f(x) : null; }) }; });
+  const src = { publisher: 'U.S. Census Bureau', dataset: 'Small Area Income and Poverty Estimates (SAIPE)', url: 'https://www.census.gov/programs-surveys/saipe.html' };
+  const base = { category: 'Economy', frequency: 'annual', geo: 'us-counties', source: src, reframes: ['county-poverty', 'county-income'],
+    howToRead: ['Model-based single-year estimates that combine survey data with tax and program records, so even small counties get a yearly number.'] };
+  return [
+    panel({ ...base, id: 'county-poverty', title: 'Poverty rate by county', lens: 'Poverty rate', unit: { label: 'People below the poverty line', format: 'pct', decimals: 1 },
+      description: 'Share of people whose family income is below the federal poverty threshold.', isRate: true,
+      caveats: ['Each county estimate has a margin of error; for small counties the 90% range is often several points wide, so close rankings are not meaningful.', COUNTY_CAVEAT] },
+      years.map(y => `${y}-12-31`), ent(x => x.pov)),
+    panel({ ...base, id: 'county-income', title: 'Median household income by county', lens: 'Median income', unit: { label: 'Median household income', format: 'usd', decimals: 0 },
+      description: 'Income of the household in the middle of each county.', isRate: true,
+      caveats: ['Not adjusted for inflation between years, or for local cost of living.', COUNTY_CAVEAT] },
+      years.map(y => `${y}-12-31`), ent(x => x.inc)),
+  ];
+};
+
+builders['state-permits'] = async () => {
+  const pop = await statePopulation();
+  const byYear = new Map();
+  for (let y = 1980; y <= new Date().getUTCFullYear(); y++) {
+    let text; try { text = await get(`https://www2.census.gov/econ/bps/State/st${y}a.txt`, 'latin1', 1); } catch { continue; }
+    const rows = parseCSV(text).slice(2).filter(r => /^\d{4}/.test((r[0] || '').trim()) && /^\d{2}$/.test((r[1] || '').trim()));
+    if (rows.length < 50) continue;
+    byYear.set(y, new Map(rows.map(r => [r[1].trim(), [6, 9, 12, 15].reduce((a, i) => a + (+r[i] || 0), 0)])));
+  }
+  const years = [...byYear.keys()].sort((a, b) => a - b);
+  const popAt = (ab, y) => { const s = pop[ab + 'POP']; const m = s.find(p => +p[0].slice(0, 4) === y) || s.at(-1); return m[1] * 1000; };
+  const units = STATES.map(([ab, fips, name]) => ({ id: fips, code: ab, name, values: years.map(y => byYear.get(y).get(fips) ?? null) }));
+  const rate = units.map(e => ({ ...e, values: e.values.map((v, i) => (v == null ? null : round(v / popAt(e.code, years[i]) * 1000, 2))) }));
+  const usUnits = years.map((_, i) => units.reduce((a, e) => a + (e.values[i] || 0), 0));
+  const usPop = years.map(y => STATES.reduce((a, [ab]) => a + popAt(ab, y), 0));
+  const src = { publisher: 'U.S. Census Bureau', dataset: 'Building Permits Survey, annual state totals', url: 'https://www.census.gov/construction/bps/' };
+  const base = { category: 'Housing', frequency: 'annual', geo: 'us-states', source: src, reframes: ['state-permits', 'state-permits-total'],
+    howToRead: ['Permits are the earliest sign of new housing: most permitted homes are started within a few months.'], caveats: ['Counts new privately owned units in permit-issuing places, which cover nearly all construction. The latest year can be revised.'] };
+  const times = years.map(y => `${y}-12-31`);
+  return [
+    panel({ ...base, id: 'state-permits', title: 'New homes permitted per 1,000 residents', lens: 'Per 1,000 residents', unit: { label: 'Housing units permitted per 1,000 residents', format: 'number', decimals: 1 },
+      description: 'New housing units authorized by building permits each year, per 1,000 residents.', isRate: true,
+      national: { name: 'United States', values: usUnits.map((u, i) => round(u / usPop[i] * 1000, 2)) } }, times, rate),
+    panel({ ...base, id: 'state-permits-total', title: 'New homes permitted by state', lens: 'Total units', unit: { label: 'Housing units permitted', format: 'number', decimals: 0 },
+      description: 'New housing units authorized by building permits each year.', isCount: true }, times, units),
+  ];
+};
+
+builders['business-applications'] = async () => {
+  const text = await get('https://www.census.gov/econ/bfs/csv/bfs_monthly.csv', 'text');
+  const rows = parseCSV(text), h = rows[0];
+  const M = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'].map(m => h.indexOf(m));
+  const pick = rows.slice(1).filter(r => r[0] === 'A' && r[1] === 'TOTAL' && r[2] === 'BA_BA');
+  const series = new Map();
+  for (const r of pick) for (let m = 0; m < 12; m++) { const v = parseFloat(r[M[m]]); if (!Number.isFinite(v)) continue; if (!series.has(r[3])) series.set(r[3], new Map()); series.get(r[3]).set(`${r[4]}-${String(m + 1).padStart(2, '0')}-01`, v); }
+  const times = [...new Set([...series.values()].flatMap(m => [...m.keys()]))].sort();
+  const pop = await statePopulation();
+  const popAt = (ab, t) => { const s = pop[ab + 'POP']; const y = +t.slice(0, 4); const m = s.find(p => +p[0].slice(0, 4) === y) || s.at(-1); return m[1] * 1000; };
+  const entities = STATES.filter(([ab]) => series.has(ab)).map(([ab, fips, name]) => ({ id: fips, code: ab, name, values: times.map(t => { const v = series.get(ab).get(t); return v == null ? null : round(v / popAt(ab, t) * 1e5, 1); }) }));
+  const usPop = t => STATES.reduce((a, [ab]) => a + popAt(ab, t), 0);
+  return panel({ id: 'business-applications', title: 'New business applications by state', category: 'Economy', frequency: 'monthly', geo: 'us-states',
+    unit: { label: 'Business applications per 100,000 residents (monthly)', format: 'number', decimals: 1 },
+    description: 'Applications for a new employer ID number (EIN) each month, a leading sign of new businesses, per 100,000 residents.',
+    source: { publisher: 'U.S. Census Bureau', dataset: 'Business Formation Statistics (seasonally adjusted)', url: 'https://www.census.gov/econ/bfs/' },
+    howToRead: ['An application is an intention to start a business; only some become employers. Applications jumped in mid-2020 and stayed high.'],
+    caveats: ['Per-person rate computed by Plainsight with Census population estimates.'], isRate: true,
+    national: { name: 'United States', values: times.map(t => { const v = series.get('US')?.get(t); return v == null ? null : round(v / usPop(t) * 1e5, 1); }) } }, times, entities);
+};
+
+// ---------- NASA ----------
+builders['global-temperature'] = async () => {
+  const text = await get('https://data.giss.nasa.gov/gistemp/tabledata_v4/GLB.Ts+dSST.csv', 'text');
+  const rows = parseCSV(text.slice(text.indexOf('Year,'))), h = rows[0];
+  const monthly = [], annual = [];
+  for (const r of rows.slice(1)) {
+    const y = +r[0]; if (!y) continue;
+    for (let m = 1; m <= 12; m++) { const v = parseFloat(r[m]); if (Number.isFinite(v)) monthly.push([`${y}-${String(m).padStart(2, '0')}-15`, v]); }
+    const a = parseFloat(r[h.indexOf('J-D')]); if (Number.isFinite(a)) annual.push([`${y}-07-01`, a]);
+  }
+  return ts({ id: 'global-temperature', title: 'Global temperature', category: 'Environment', frequency: 'annual',
+    unit: { label: '°C above or below the 1951-1980 average', format: 'number', decimals: 2, suffix: '°C', signed: true },
+    description: 'Global average surface temperature over land and ocean compared with the 1951-1980 average.',
+    source: { publisher: 'NASA Goddard Institute for Space Studies', dataset: 'GISTEMP v4, Land-Ocean Temperature Index', url: 'https://data.giss.nasa.gov/gistemp/' },
+    howToRead: ['Zero is the 1951-1980 average, not "normal" in any deeper sense. The change over time is what matters.', 'Single months are noisy (El Niño years run hot); the annual average shows the trend.'],
+    caveats: ['Recent months are revised slightly as late station reports arrive.'], zeroLine: true, defaultSeries: ['ANNUAL'] },
+    [{ id: 'ANNUAL', name: 'Annual average', points: annual }]);
+};
+
+// ---------- EPA ----------
+builders['county-air'] = async () => {
+  const { unzipSync, strFromU8 } = await import('fflate');
+  // County names in EPA files -> FIPS via the Census county list.
+  const { recs } = await censusCountyFile();
+  const norm = s => String(s).toLowerCase().replace(/\./g, '').replace(/\s+(county|parish|borough|census area|municipality|city and borough)$/, '').replace(/^saint /, 'st ').trim();
+  const look = new Map(recs.map(r => [`${r.STNAME.toLowerCase()}|${norm(r.CTYNAME)}`, r.STATE + r.COUNTY]));
+  const lastFull = new Date().getUTCFullYear() - 1;
+  const years = [], vals = new Map();
+  for (let y = 2000; y <= lastFull; y++) {
+    let buf; try { const r = await fetch(`https://aqs.epa.gov/aqsweb/airdata/annual_aqi_by_county_${y}.zip`); if (!r.ok) continue; buf = new Uint8Array(await r.arrayBuffer()); } catch { continue; }
+    const files = unzipSync(buf); const name = Object.keys(files).find(n => n.endsWith('.csv')); if (!name) continue;
+    const rows = parseCSV(strFromU8(files[name])), h = rows[0], ix = k => h.indexOf(k);
+    years.push(y);
+    for (const r of rows.slice(1)) {
+      const id = look.get(`${r[ix('State')].toLowerCase()}|${norm(r[ix('County')])}`); if (!id) continue;
+      const days = +r[ix('Days with AQI')]; if (days < 120) continue; // too few monitored days to compare
+      const bad = ['Unhealthy for Sensitive Groups Days', 'Unhealthy Days', 'Very Unhealthy Days', 'Hazardous Days'].reduce((a, k) => a + (+r[ix(k)] || 0), 0);
+      if (!vals.has(id)) vals.set(id, new Map()); vals.get(id).set(y, bad);
+    }
+  }
+  const byId = new Map(recs.map(r => [r.STATE + r.COUNTY, r]));
+  const entities = [...vals.entries()].map(([id, m]) => { const r = byId.get(id); return { id, code: ABBR[r.STATE], name: `${r.CTYNAME}, ${ABBR[r.STATE]}`, short: r.CTYNAME, values: years.map(y => m.get(y) ?? null) }; });
+  return panel({ id: 'county-air', title: 'Days with unhealthy air by county', category: 'Environment', frequency: 'annual', geo: 'us-counties',
+    unit: { label: 'Days with unhealthy air (AQI over 100)', format: 'number', decimals: 0 },
+    description: 'Days each year when the Air Quality Index was unhealthy for sensitive groups or worse.',
+    source: { publisher: 'U.S. Environmental Protection Agency', dataset: 'Air Quality System, annual AQI by county', url: 'https://aqs.epa.gov/aqsweb/airdata/download_files.html' },
+    howToRead: ['Above 100 on the Air Quality Index, children, older adults and people with heart or lung disease should limit time outdoors.', 'Wildfire smoke drives many of the worst recent years in the West.'],
+    caveats: ['Only counties with air monitors appear, and only years with at least 120 monitored days. Most rural counties have no monitor, which is not the same as clean air.', COUNTY_CAVEAT], isRate: true },
+    years.map(y => `${y}-12-31`), entities);
+};
+
+// ---------- FDA ----------
+builders['recalls'] = async () => {
+  const counts = async (kind, cls) => {
+    const j = await get(`https://api.fda.gov/${kind}/enforcement.json?search=classification:%22${encodeURIComponent(cls)}%22&count=report_date`);
+    const m = new Map(); for (const r of j.results) { const k = `${r.time.slice(0, 4)}-${r.time.slice(4, 6)}-01`; m.set(k, (m.get(k) || 0) + r.count); } return m;
+  };
+  const out = [];
+  for (const [kind, title, noun] of [['food', 'Food recalls', 'food'], ['drug', 'Drug recalls', 'drug']]) {
+    const cls = ['Class I', 'Class II', 'Class III'], maps = [];
+    for (const c of cls) maps.push(await counts(kind, c));
+    const months = [...new Set(maps.flatMap(m => [...m.keys()]))].sort().filter(t => t >= '2013-01-01');
+    const thisMonth = new Date().toISOString().slice(0, 7) + '-01';
+    const ms = months.filter(t => t < thisMonth);
+    out.push(ts({ id: `${kind}-recalls`, title, category: 'Health', frequency: 'monthly',
+      unit: { label: `${title} reported per month`, format: 'number', decimals: 0 },
+      description: `${title} reported to the FDA each month, by how serious the risk is.`,
+      source: { publisher: 'U.S. Food and Drug Administration', dataset: `openFDA ${noun} enforcement reports`, url: `https://open.fda.gov/apis/${kind}/enforcement/` },
+      howToRead: ['Class I: reasonable chance of serious harm or death. Class II: temporary or reversible harm. Class III: unlikely to cause harm.', 'One recall can cover many products and lots, so counts measure recall actions, not the amount of product.'],
+      caveats: ['openFDA notes its data is not validated for medical decisions. Months reflect when FDA published the report, not when the problem started.'], defaultSeries: ['I'] },
+      cls.map((c, i) => ({ id: c.split(' ')[1], name: c, points: ms.map(t => [t, maps[i].get(t) || 0]) }))));
+  }
+  return out;
+};
+
+// ---------- Forests ----------
+builders['forest-cover'] = async () => {
+  const { times, entities } = await worldBank('AG.LND.FRST.ZS', 1990);
+  return panel({ id: 'forest-cover', title: 'Forest cover by country', category: 'World', frequency: 'annual', geo: 'world',
+    unit: { label: 'Forest area (% of land area)', format: 'pct', decimals: 1 },
+    description: 'Share of each country\'s land covered by forest.',
+    source: { publisher: 'World Bank', dataset: 'World Development Indicators (AG.LND.FRST.ZS), from UN FAO Global Forest Resources Assessment', url: 'https://data.worldbank.org/indicator/AG.LND.FRST.ZS' },
+    howToRead: ['Counts land with trees taller than 5 meters covering more than 10% of the area, including planted forests.'],
+    caveats: ['A country can lose old-growth forest while gaining plantations and show little net change.'], isRate: true }, times, entities);
 };
 
 // ---------- run ----------

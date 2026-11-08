@@ -63,7 +63,17 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 | CO2 emissions per person by country | Our World in Data (academic) | panel, world map | annual |
 | Population, growth since 2020, net domestic migration by county | Census (Vintage 2025) | panel, county map | annual |
 | Obesity, diabetes, depression, smoking, uninsured adults by county | CDC PLACES (model-based) | county map | annual |
-| Median household income and poverty by county | Census ACS 5-year | panel, county map | annual; turns on when a `CENSUS_API_KEY` secret is added (not yet exercised) |
+| Poverty rate and median household income by county, 2005-2024 | Census SAIPE (no key) | panel, county map | annual |
+| Births minus deaths, immigration by county | Census population estimates | panel, county map | annual |
+| Median age, share 65+ by county | Census population estimates | panel, county map | annual |
+| New homes permitted by state (per 1,000 residents and total), since 1980 | Census Building Permits Survey | panel, US map | annual |
+| New business applications by state | Census Business Formation Statistics | panel, US map | monthly |
+| Major disaster declarations per year, by type; running total by county since 1965 | FEMA OpenFEMA | time series; county map | daily source |
+| Natural hazard risk by county: overall, wildfire, hurricane, heat, inland flooding | FEMA National Risk Index (FEMA's ArcGIS service) | county map | periodic |
+| Global temperature since 1880 | NASA GISS GISTEMP v4 | time series | monthly |
+| Days with unhealthy air by county | EPA Air Quality System | panel, county map | annual |
+| Food and drug recalls by severity | FDA openFDA | time series | monthly |
+| Forest cover by country | World Bank / UN FAO | panel, world map | annual |
 | GDP by country, 1960 to now | World Bank | panel, world map | annual |
 | Life expectancy by country | World Bank / UN | panel, world map | annual |
 
@@ -122,6 +132,18 @@ Pick **Your state** and county maps zoom to that state's counties, rankings and 
 - Rankings leave out counties under 5,000 residents by default (changeable in the Chart step). Those counties still appear on the map, and a trust check says how many were skipped. Without it, 52-person Loving County, TX "leads the nation" in migration.
 - Imports recognize county FIPS codes, county names with a state column, and county names on a state portal (data.ny.gov files map to New York's counties automatically). Independent cities (St. Louis city, Baltimore city, most of Virginia's) are told apart from counties by their FIPS codes.
 - Connecticut replaced counties with planning regions in 2022; the county map still uses the old counties, so Connecticut shows as no data.
+
+## Pending access
+
+| Source | Status |
+|---|---|
+| FBI Crime Data Explorer | Needs a free api.data.gov key as the `API_DATA_GOV_KEY` repo secret; the builder will be written and tested against real responses once it exists |
+| MIT Election Lab county presidential returns 2000-2024 | Harvard Dataverse requires a guestbook form (name, email, use) before download; waiting on the owner's OK to submit it |
+| USDA (ERS county data, NASS) | ERS bulk files next; NASS Quick Stats needs its own free key |
+| USAID / foreign aid | USAID's programs moved to the State Department in 2025; ForeignAssistance.gov still publishes obligations by country and is the candidate source |
+| FCC broadband | Very large location-level files; needs pre-aggregation to county |
+
+Every federal publisher on data.gov (62 agencies) is listed in Sources → Federal with a search button, so agency data without a ready-made dataset is still reachable.
 
 ## Comparing datasets (overlays)
 
