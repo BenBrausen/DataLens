@@ -25,6 +25,8 @@ window.PS = window.PS || {};
   function fmt(v, unit = {}, opts = {}) {
     if (v == null || !Number.isFinite(v)) return 'n/a';
     const d = opts.decimals ?? unit.decimals ?? 1;
+    // Election margins: "D+4.4", "R+1.4", "Even".
+    if (unit.format === 'margin') return Math.abs(v) < 0.05 ? 'Even' : `${v > 0 ? 'D' : 'R'}+${withCommas(Math.abs(v), opts.short && Math.abs(v) >= 10 ? 0 : d)}`;
     // Signed units like temperature anomalies: "+1.18°C".
     if (unit.suffix) return (unit.signed && v > 0 ? '+' : v < 0 ? '-' : '') + withCommas(Math.abs(v), d) + unit.suffix;
     switch (unit.format) {
@@ -65,7 +67,7 @@ window.PS = window.PS || {};
     d = parseDate(d);
     const y = d.getUTCFullYear(), m = d.getUTCMonth();
     switch (freq) {
-      case 'annual': return String(y);
+      case 'annual': case 'quadrennial': return String(y);
       case 'quarterly': return `Q${Math.floor(m / 3) + 1} ${y}`;
       case 'monthly': return `${(long ? MONTHS_LONG : MONTHS)[m]} ${y}`;
       case 'real-time': return `${MONTHS[m]} ${d.getUTCDate()}, ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')} UTC`;

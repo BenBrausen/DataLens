@@ -72,6 +72,33 @@
     if (race && then.length && then[0].e.id !== top.e.id && fi !== li)
       headline = `${top.e.name} now ranks first in ${lbl} at ${v(top.v)}. In ${PS.fmtDate(ds._tms[fi], f)}, ${then[0].e.name} led.`;
     else headline = `${ds.scopeName ? `In ${ds.scopeName}, ` : ''}${top.e.name} ranks highest (${v(top.v)}) and ${bot.e.name} lowest (${v(bot.v)}) for ${lbl}, as of ${d(li)}.`;
+    // Elections: say how many places each side led AND how many votes those places hold,
+    // because a shaded map gives empty land the same weight as cities.
+    if (ds.election) {
+      const ents = ds.entities.filter(e => e.values[li] != null);
+      const dLed = ents.filter(e => e.values[li] > 0), rLed = ents.filter(e => e.values[li] < 0);
+      const votes = list => list.reduce((a, e) => a + (e.votes?.[li] || 0), 0), all = votes(ents) || 1;
+      const unitWord = ds.geo === 'us-counties' ? 'counties' : 'states', yr = new Date(ds._tms[li]).getUTCFullYear();
+      const where = ds.scopeName ? ` in ${ds.scopeName}` : '';
+      const nat = ds.national?.values[li];
+      headline = `In ${yr}${where}, the Republican candidate led in ${rLed.length.toLocaleString()} ${unitWord} holding ${Math.round(votes(rLed) / all * 100)}% of the votes cast; the Democratic candidate led in ${dLed.length.toLocaleString()} holding ${Math.round(votes(dLed) / all * 100)}%.`;
+      const fe = o.focus && ds.entities.find(e => e.id === o.focus);
+      if (fe && fe.values[li] != null) headline = `${fe.name} voted ${v(fe.values[li])} for president in ${yr}${nat != null ? `; the national popular vote was ${v(nat)}` : ''}.`;
+      const facts2 = [];
+      if (nat != null && !ds.scopeName) facts2.push({ k: 'nat', text: `National popular vote: ${v(nat)}.` });
+      if (fi !== li) {
+        const pi = idx[idx.length - 2];
+        const sh = ents.filter(e => e.values[pi] != null).map(e => ({ e, d: e.values[li] - e.values[pi] })).sort((a, b) => a.d - b.d);
+        if (sh.length) {
+          const toR = sh[0], toD = sh[sh.length - 1], prevYr = new Date(ds._tms[pi]).getUTCFullYear();
+          const moved = sh.filter(x => x.d < 0).length;
+          facts2.push({ k: 'shift', text: `Since ${prevYr}, ${moved.toLocaleString()} of ${sh.length.toLocaleString()} ${unitWord} shifted toward the Republican candidate and ${(sh.length - moved).toLocaleString()} toward the Democratic candidate.` });
+          if (toR.d < 0) facts2.push({ k: 'shiftR', text: `Biggest shift toward Republicans: ${toR.e.name}, ${Math.abs(toR.d).toFixed(1)} points.` });
+          if (toD.d > 0) facts2.push({ k: 'shiftD', text: `Biggest shift toward Democrats: ${toD.e.name}, ${toD.d.toFixed(1)} points.` });
+        }
+      }
+      return { headline, facts: [...facts2, { k: 'top', text: `Largest Democratic margins: ${now.slice(0, 3).map(x => `${x.e.name} (${v(x.v)})`).join(', ')}.` }, { k: 'bottom', text: `Largest Republican margins: ${now.slice(-3).reverse().map(x => `${x.e.name} (${v(x.v)})`).join(', ')}.` }], trend: 0 };
+    }
     // A chosen state leads the story.
     const fe = o.focus && ds.entities.find(e => e.id === o.focus);
     if (fe && fe.values[li] != null) {
@@ -144,8 +171,12 @@
     if (o.minPop > 0 && ds.kind === 'panel') {
       const skipped = ds.entities.filter(e => e.pop != null && e.pop < o.minPop).length;
       if (skipped) add('info', `Rankings skip ${skipped.toLocaleString()} small ${ds.geo === 'us-counties' ? 'counties' : 'places'}`, `Places with fewer than ${o.minPop.toLocaleString()} residents still appear on the map, but are left out of "highest" and "lowest", where a few people can swing a rate wildly.`, { type: 'set', key: 'minPop', value: 0, label: 'Rank every place' });
-    } else if (ds.geo === 'us-counties' && ds.isRate && !o.minPop) {
+    } else if (ds.geo === 'us-counties' && ds.isRate && !ds.election && !o.minPop) {
       add('warn', 'Tiny counties can top the rankings', 'Rates in counties with a few hundred people swing on a handful of residents.', { type: 'set', key: 'minPop', value: 5000, label: 'Skip counties under 5,000' });
+    }
+    if (ds.election) {
+      if (o.chart === 'choropleth') add('warn', 'Land area is not voters', 'Big, sparsely populated places dominate a shaded map. The takeaway reports each side\'s share of votes cast, not just places won.');
+      add('info', 'Official results, compiled', `${ds.source.publisher} compiles certified results from state election offices. Each state's certified canvass is the final authority.`);
     }
     // Source tier
     const TP = (PS.REGISTRY?.thirdParty || []).find(x => x.id === ds.sourceId);
@@ -157,7 +188,7 @@
     // Freshness
     if (ds.lastObservation) {
       const age = (Date.now() - +PS.parseDate(ds.lastObservation)) / DAY;
-      const allowed = { 'real-time': 2, daily: 7, weekly: 21, monthly: 75, quarterly: 200, annual: 730 }[ds.frequency] || 400;
+      const allowed = { 'real-time': 2, daily: 7, weekly: 21, monthly: 75, quarterly: 200, annual: 730, quadrennial: 4 * 365 + 120 }[ds.frequency] || 400;
       if (age > allowed) add('warn', 'Data may be out of date', `Latest observation is ${PS.fmtDate(ds.lastObservation, ds.frequency, true)}. Check the publisher for a newer release before publishing.`);
       else add('pass', 'Data is current', `Latest observation: ${PS.fmtDate(ds.lastObservation, ds.frequency, true)} (${ds.frequency} release).`);
     }

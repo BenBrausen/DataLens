@@ -81,6 +81,8 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 | Days with unhealthy air by county | EPA Air Quality System | panel, county map | annual |
 | Food and drug recalls by severity | FDA openFDA | time series | monthly |
 | Forest cover by country | World Bank / UN FAO | panel, world map | annual |
+| Presidential results by county and state, 2000-2024 | MIT Election Data + Science Lab (CC0), from state election offices | panel, county and state maps | every four years |
+| Violent crime, property crime and homicide rates by state, 1985 to last year | FBI Crime Data Explorer (needs the `API_DATA_GOV_KEY` secret; built in CI) | panel, US map | annual |
 | GDP by country, 1960 to now | World Bank | panel, world map | annual |
 | Life expectancy by country | World Bank / UN | panel, world map | annual |
 
@@ -144,13 +146,24 @@ Pick **Your state** and county maps zoom to that state's counties, rankings and 
 
 | Source | Status |
 |---|---|
-| FBI Crime Data Explorer | Needs a free api.data.gov key as the `API_DATA_GOV_KEY` repo secret; the builder will be written and tested against real responses once it exists |
-| MIT Election Lab county presidential returns 2000-2024 | Harvard Dataverse requires a guestbook form (name, email, use) before download; waiting on the owner's OK to submit it |
 | USDA (ERS county data, NASS) | ERS bulk files next; NASS Quick Stats needs its own free key |
 | USAID / foreign aid | USAID's programs moved to the State Department in 2025; ForeignAssistance.gov still publishes obligations by country and is the candidate source |
 | FCC broadband | Very large location-level files; needs pre-aggregation to county |
 
 Every federal publisher on data.gov (62 agencies) is listed in Sources → Federal with a search button, so agency data without a ready-made dataset is still reachable.
+
+## Elections
+
+Election results get extra safeguards:
+
+- **Takeaway counts voters, not just places.** It reports how many places each side led *and* the share of votes cast in them, for example: Republicans led 2,658 counties holding 51% of the votes cast; Democrats led 444 holding 49%. That corrects the sea-of-one-color effect of shaded maps.
+- **"Land area is not voters" trust check** on every election map.
+- **Margins in plain notation** ("D+4.4", "R+1.5"), on a red/blue two-sided scale with gray at even.
+- **Data cleaning:**
+  - Summary rows (total votes cast, undervotes, overvotes, spoiled ballots) are excluded. Counting them doubled the 2024 totals in SC, TX, WI and WV.
+  - Alaska's house districts are kept out of the county view.
+- **Verified against certified results:** national margins 2000-2024, PA, TX, WI, WV.
+- **One-time download.** The data is downloaded once through Harvard Dataverse's guestbook. Rebuild with `ELECTIONS_FILE=<path> node scripts/refresh-data.mjs elections`.
 
 ## Comparing datasets (overlays)
 

@@ -395,6 +395,81 @@
   "firstObservation": "1976-01-01"
  },
  {
+  "category": "Elections",
+  "frequency": "quadrennial",
+  "source": {
+   "publisher": "MIT Election Data + Science Lab",
+   "dataset": "County Presidential Election Returns 2000-2024 (official results from state election offices)",
+   "url": "https://doi.org/10.7910/DVN/VOQCHQ"
+  },
+  "unit": {
+   "label": "Vote margin (percentage points)",
+   "format": "margin",
+   "decimals": 1
+  },
+  "howToRead": [
+   "Margin = Democratic share minus Republican share of all votes cast. +10 means the Democratic candidate led by 10 points; −10 means the Republican candidate did.",
+   "Third-party and write-in votes count toward the total, so the two shares add to less than 100%."
+  ],
+  "zeroLine": true,
+  "election": true,
+  "id": "county-president",
+  "title": "Presidential election results by county",
+  "geo": "us-counties",
+  "description": "How each county voted for president, 2000 to 2024, as the margin between the Democratic and Republican candidates.",
+  "caveats": [
+   "A shaded map gives large, empty counties the same weight as big cities. The votes-cast fact and the bar view show where the voters are.",
+   "Alaska reports results by state house district, not county, so it shows as no data.",
+   "Certified results compiled by MIT Election Data + Science Lab; small differences from a state's own canvass are possible."
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:50:25.310Z",
+  "lastObservation": "2024-11-05",
+  "hasNational": true,
+  "topic": "elections",
+  "sourceId": "mit-election-lab",
+  "tier": "academic",
+  "nEntities": 3104,
+  "firstObservation": "2000-11-05"
+ },
+ {
+  "category": "Elections",
+  "frequency": "quadrennial",
+  "source": {
+   "publisher": "MIT Election Data + Science Lab",
+   "dataset": "County Presidential Election Returns 2000-2024 (official results from state election offices)",
+   "url": "https://doi.org/10.7910/DVN/VOQCHQ"
+  },
+  "unit": {
+   "label": "Vote margin (percentage points)",
+   "format": "margin",
+   "decimals": 1
+  },
+  "howToRead": [
+   "Margin = Democratic share minus Republican share of all votes cast. +10 means the Democratic candidate led by 10 points; −10 means the Republican candidate did.",
+   "Third-party and write-in votes count toward the total, so the two shares add to less than 100%."
+  ],
+  "zeroLine": true,
+  "election": true,
+  "id": "state-president",
+  "title": "Presidential election results by state",
+  "geo": "us-states",
+  "description": "Statewide margin between the Democratic and Republican presidential candidates, 2000 to 2024.",
+  "caveats": [
+   "The national popular vote and the Electoral College can differ: the winner of the most votes nationally lost the presidency in 2000 and 2016.",
+   "Certified results compiled by MIT Election Data + Science Lab."
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-08T16:50:25.310Z",
+  "lastObservation": "2024-11-05",
+  "hasNational": true,
+  "topic": "elections",
+  "sourceId": "mit-election-lab",
+  "tier": "academic",
+  "nEntities": 51,
+  "firstObservation": "2000-11-05"
+ },
+ {
   "category": "Energy",
   "frequency": "weekly",
   "source": {

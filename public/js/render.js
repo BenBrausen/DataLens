@@ -677,7 +677,7 @@
     // ranked lists
     const ranked = ds.entities.filter(PS.rankable(o)).map(e => ({ e, v: vals.get(String(e.id)) })).filter(r => r.v != null).sort((a, b) => b.v - a.v);
     const n = land ? 5 : 3;
-    const lists = [['Highest', ranked.slice(0, n)], ['Lowest', ranked.slice(-n).reverse()]];
+    const lists = [[ds.election ? 'Most Democratic' : 'Highest', ranked.slice(0, n)], [ds.election ? 'Most Republican' : 'Lowest', ranked.slice(-n).reverse()]];
     const drawList = (title, items, x, y, w) => {
       ctx.font = font(st, 700, 22 * S * st.ts); ctx.fillStyle = T.muted; spaced(ctx, 1.5 * S); ctx.fillText(title.toUpperCase(), x, y); spaced(ctx, 0);
       y += 36 * S;

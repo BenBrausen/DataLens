@@ -894,6 +894,112 @@ builders['forest-cover'] = async () => {
     caveats: ['A country can lose old-growth forest while gaining plantations and show little net change.'], isRate: true }, times, entities);
 };
 
+// ---------- Elections (MIT Election Data + Science Lab, CC0) ----------
+// Harvard Dataverse requires a guestbook response (name, email, institution,
+// position) for each download. Results change every four years, so CI does not
+// re-download: the builder runs only when ELECTIONS_FILE (a local copy) or the
+// DATAVERSE_GB_* variables are set, and otherwise keeps the committed snapshot.
+async function electionsFile() {
+  if (process.env.ELECTIONS_FILE) return fs.readFile(process.env.ELECTIONS_FILE, 'utf8');
+  const gb = ['NAME', 'EMAIL', 'INSTITUTION', 'POSITION'].map(k => process.env[`DATAVERSE_GB_${k}`]);
+  if (gb.some(v => !v)) return null;
+  const r = await fetch('https://dataverse.harvard.edu/api/access/datafile/13573089?format=original', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ guestbookResponse: { name: gb[0], email: gb[1], institution: gb[2], position: gb[3] } }) });
+  const j = await r.json();
+  if (!j.data?.signedUrl) throw new Error('Dataverse did not return a download link');
+  return get(j.data.signedUrl, 'text');
+}
+
+builders['elections'] = async () => {
+  const text = await electionsFile();
+  if (!text) { console.log('  (skipped elections: results change every four years; set ELECTIONS_FILE to rebuild)'); return []; }
+  const rows = parseCSV(text), h = rows[0], ix = k => h.indexOf(k);
+  // Per county and year: use TOTAL rows where a county reports them, otherwise add up vote modes.
+  const hasTotal = new Set(rows.slice(1).filter(r => r[ix('mode')] === 'TOTAL').map(r => `${r[ix('year')]}|${r[ix('state_po')]}|${r[ix('county_fips')]}|${r[ix('county_name')]}`));
+  const cty = new Map(), st = new Map();
+  const add = (m, k, party, v) => { if (!m.has(k)) m.set(k, { D: 0, R: 0, T: 0 }); const x = m.get(k); x.T += v; if (party === 'DEMOCRAT') x.D += v; if (party === 'REPUBLICAN') x.R += v; };
+  for (const r of rows.slice(1)) {
+    const year = r[ix('year')], spo = r[ix('state_po')], f = r[ix('county_fips')], nm = r[ix('county_name')], mode = r[ix('mode')];
+    if (hasTotal.has(`${year}|${spo}|${f}|${nm}`) && mode !== 'TOTAL') continue;
+    // Some 2024 state files (SC, TX, WI, WV) add summary rows that are not votes for a
+    // candidate; counting them would double totals and distort margins.
+    if (/^(TOTAL VOTES CAST|UNDERVOTES|OVERVOTES|SPOILED)$/i.test(r[ix('candidate')].trim())) continue;
+    const v = +r[ix('candidatevotes')] || 0, party = r[ix('party')];
+    add(st, `${year}|${spo}`, party, v);
+    // Alaska reports by state house district (codes 2001-2040), which would collide with
+    // real borough codes once padded; it stays in state totals only.
+    if (spo !== 'AK' && /^\d{4,5}$/.test(f)) add(cty, `${year}|${f.padStart(5, '0')}`, party, v);
+  }
+  const years = [...new Set(rows.slice(1).map(r => +r[ix('year')]))].sort((a, b) => a - b);
+  const margin = x => (x && x.T ? round((x.D - x.R) / x.T * 100, 1) : null);
+  let names = new Map();
+  try { names = new Map((await censusCountyFile()).recs.map(r => [r.STATE + r.COUNTY, [r.CTYNAME, ABBR[r.STATE]]])); } catch { }
+  const ids = [...new Set([...cty.keys()].map(k => k.split('|')[1]))].filter(id => names.has(id));
+  const nat = years.map(y => { const s = { D: 0, R: 0, T: 0 }; for (const [k, x] of st) if (k.startsWith(y + '|')) { s.D += x.D; s.R += x.R; s.T += x.T; } return s; });
+  const src = { publisher: 'MIT Election Data + Science Lab', dataset: 'County Presidential Election Returns 2000-2024 (official results from state election offices)', url: 'https://doi.org/10.7910/DVN/VOQCHQ' };
+  const unit = { label: 'Vote margin (percentage points)', format: 'margin', decimals: 1 };
+  const howToRead = ['Margin = Democratic share minus Republican share of all votes cast. +10 means the Democratic candidate led by 10 points; −10 means the Republican candidate did.', 'Third-party and write-in votes count toward the total, so the two shares add to less than 100%.'];
+  const base = { category: 'Elections', frequency: 'quadrennial', source: src, unit, howToRead, zeroLine: true, election: true };
+  const times = years.map(y => `${y}-11-05`);
+  return [
+    panel({ ...base, id: 'county-president', title: 'Presidential election results by county', geo: 'us-counties',
+      description: 'How each county voted for president, 2000 to 2024, as the margin between the Democratic and Republican candidates.',
+      caveats: ['A shaded map gives large, empty counties the same weight as big cities. The votes-cast fact and the bar view show where the voters are.', 'Alaska reports results by state house district, not county, so it shows as no data.', 'Certified results compiled by MIT Election Data + Science Lab; small differences from a state\'s own canvass are possible.'],
+      national: { name: 'United States', values: nat.map(margin) } }, times,
+      ids.map(id => { const [nm, ab] = names.get(id); const xs = years.map(y => cty.get(`${y}|${id}`)); return { id, code: ab, name: `${nm}, ${ab}`, short: nm, votes: xs.map(x => x?.T ?? null), values: xs.map(margin) }; })),
+    panel({ ...base, id: 'state-president', title: 'Presidential election results by state', geo: 'us-states',
+      description: 'Statewide margin between the Democratic and Republican presidential candidates, 2000 to 2024.',
+      caveats: ['The national popular vote and the Electoral College can differ: the winner of the most votes nationally lost the presidency in 2000 and 2016.', 'Certified results compiled by MIT Election Data + Science Lab.'],
+      national: { name: 'United States (popular vote)', values: nat.map(margin) } }, times,
+      STATES.map(([ab, fips, name]) => { const xs = years.map(y => st.get(`${y}|${ab}`)); return { id: fips, code: ab, name, votes: xs.map(x => x?.T ?? null), values: xs.map(margin) }; })),
+  ];
+};
+
+// ---------- FBI Crime Data Explorer (needs API_DATA_GOV_KEY; runs in CI) ----------
+// /summarized/{state|national}/{offense} returns monthly offenses per 100,000 people,
+// plus the share of the population covered by reporting agencies.
+async function fbiSummary(where, offense, from, to) {
+  const r = await fetch(`https://api.usa.gov/crime/fbi/cde/summarized/${where}/${offense}?from=01-${from}&to=12-${to}`, { headers: { 'X-Api-Key': process.env.API_DATA_GOV_KEY } });
+  if (!r.ok) throw new Error(`FBI ${where}/${offense}: HTTP ${r.status}`);
+  return r.json();
+}
+function fbiAnnual(j, label, years) {
+  const rates = j.offenses?.rates?.[`${label} Offenses`] || {}, cover = j.tooltips?.['Percent of Population Coverage']?.[label] || {};
+  return years.map(y => {
+    const months = Object.keys(rates).filter(k => k.endsWith('-' + y));
+    if (months.length < 12) return { v: null, c: null };
+    const cov = months.reduce((a, k) => a + (+cover[k] || 0), 0) / months.length;
+    return { v: round(months.reduce((a, k) => a + (+rates[k] || 0), 0), 1), c: round(cov, 1) };
+  });
+}
+builders['crime'] = async () => {
+  if (!process.env.API_DATA_GOV_KEY) { console.log('  (skipped crime: needs the API_DATA_GOV_KEY secret)'); return []; }
+  const last = new Date().getUTCFullYear() - 1, years = []; for (let y = 1985; y <= last; y++) years.push(y);
+  const MIN_COVER = 60;
+  const OFF = [['violent-crime', 'state-violent-crime', 'Violent crime rate by state', 'Violent crimes per 100,000 residents', 'Murder, rape, robbery and aggravated assault reported to police, per 100,000 residents.'],
+    ['property-crime', 'state-property-crime', 'Property crime rate by state', 'Property crimes per 100,000 residents', 'Burglary, larceny-theft and motor vehicle theft reported to police, per 100,000 residents.'],
+    ['homicide', 'state-homicide', 'Homicide rate by state', 'Murders per 100,000 residents', 'Murder and nonnegligent manslaughter reported to police, per 100,000 residents.']];
+  const out = [];
+  for (const [off, id, title, label, description] of OFF) {
+    const nat = fbiAnnual(await fbiSummary('national', off, 1985, last), 'United States', years);
+    let dropped = 0;
+    const entities = [];
+    for (const [ab, fips, name] of STATES) {
+      const a = fbiAnnual(await fbiSummary(`state/${ab}`, off, 1985, last), name, years);
+      entities.push({ id: fips, code: ab, name, coverage: a.map(x => x.c), values: a.map(x => { if (x.v != null && x.c != null && x.c < MIN_COVER) { dropped++; return null; } return x.v; }) });
+    }
+    console.log(`  ${id}: ${entities.filter(e => e.values.some(v => v != null)).length} states, ${dropped} state-years left blank for low reporting coverage`);
+    out.push(panel({ id, title, category: 'Public safety', frequency: 'annual', geo: 'us-states',
+      unit: { label, format: 'number', decimals: 1 }, description, reframes: OFF.map(x => x[1]),
+      lens: { 'violent-crime': 'Violent crime', 'property-crime': 'Property crime', homicide: 'Homicide' }[off],
+      source: { publisher: 'Federal Bureau of Investigation', dataset: 'Crime Data Explorer, Uniform Crime Reporting (summarized)', url: 'https://cde.ucr.cjis.gov/' },
+      howToRead: ['Counts crimes reported to police, not all crimes: many go unreported, especially property crimes and rape.', 'The FBI changed reporting systems in 2021 and many agencies did not submit that year, so 2021 is the least complete year.'],
+      caveats: [`A state-year is left blank when agencies covering less than ${MIN_COVER}% of its residents reported (${dropped} blanks).`, 'Definitions changed over time (for example, the FBI broadened its definition of rape in 2013), so long-term comparisons carry caveats.'],
+      isRate: true, national: { name: 'United States', values: nat.map(x => x.v) } }, years.map(y => `${y}-12-31`), entities));
+  }
+  return out;
+};
+
 // ---------- run ----------
 await fs.mkdir(OUT, { recursive: true });
 const only = process.argv.slice(2);

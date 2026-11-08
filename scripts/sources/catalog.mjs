@@ -27,6 +27,7 @@ export const TOPICS = [
   { id: 'energy', name: 'Energy', kw: ['energy', 'electric', 'oil', 'gas', 'solar', 'utility', 'fuel'] },
   { id: 'transportation', name: 'Transportation', kw: ['transport', 'traffic', 'vehicle', 'transit', 'road', 'highway', 'airport'] },
   { id: 'government', name: 'Government & budget', kw: ['budget', 'spending', 'debt', 'tax', 'revenue', 'payroll', 'contract', 'finance'] },
+  { id: 'elections', name: 'Elections', kw: ['election', 'vote', 'voter', 'ballot', 'turnout', 'precinct'] },
   { id: 'people', name: 'Population & demographics', kw: ['population', 'census', 'demographic', 'age', 'race', 'birth', 'migration'] },
   { id: 'world', name: 'World', kw: ['country', 'international', 'global', 'world'] },
 ];
@@ -43,6 +44,7 @@ export const FEDERAL = [
   { id: 'eia', name: 'U.S. Energy Information Administration', url: 'https://www.eia.gov/', topics: ['energy', 'prices'], catalogSlug: 'energy' },
   { id: 'fhfa', name: 'Federal Housing Finance Agency', url: 'https://www.fhfa.gov/data/hpi', topics: ['housing'], catalogSlug: 'fhfa' },
   { id: 'dol', name: 'U.S. Department of Labor', url: 'https://www.dol.gov/agencies/whd/minimum-wage/state', topics: ['economy'], catalogSlug: 'dol' },
+  { id: 'fbi', name: 'Federal Bureau of Investigation', url: 'https://cde.ucr.cjis.gov/', topics: ['safety'], catalogSlug: 'doj' },
   { id: 'fema', name: 'Federal Emergency Management Agency', url: 'https://www.fema.gov/about/openfema', topics: ['environment', 'government'], catalogSlug: 'dhs' },
   { id: 'nasa', name: 'NASA Goddard Institute for Space Studies', url: 'https://data.giss.nasa.gov/gistemp/', topics: ['environment'], catalogSlug: 'nasa' },
   { id: 'epa', name: 'U.S. Environmental Protection Agency', url: 'https://www.epa.gov/outdoor-air-quality-data', topics: ['environment', 'health'], catalogSlug: 'epa' },
@@ -72,6 +74,13 @@ export const THIRD_PARTY = [
     why: 'Harmonizes federal education data (NCES, IPEDS, Civil Rights Data Collection) into one documented API.',
     disclosure: 'Redistributes federal data; values match the underlying federal source.',
     topics: ['education'], access: 'api',
+  },
+  {
+    id: 'mit-election-lab', tier: 'academic', name: 'MIT Election Data + Science Lab', url: 'https://electionlab.mit.edu/',
+    org: 'Research lab at the Massachusetts Institute of Technology',
+    why: 'Compiles certified results from every state election office into one consistent, documented dataset; public domain (CC0).',
+    disclosure: 'A compilation of official results. Each state\'s certified canvass is the final authority.',
+    topics: ['elections'], access: 'dataverse',
   },
   {
     id: 'zillow', tier: 'industry', name: 'Zillow Research', url: 'https://www.zillow.com/research/data/',
@@ -151,6 +160,11 @@ export const DATASET_TAGS = {
   'food-recalls': { topic: 'health', source: 'fda' },
   'drug-recalls': { topic: 'health', source: 'fda' },
   'forest-cover': { topic: 'environment', source: 'worldbank' },
+  'county-president': { topic: 'elections', source: 'mit-election-lab' },
+  'state-violent-crime': { topic: 'safety', source: 'fbi' },
+  'state-property-crime': { topic: 'safety', source: 'fbi' },
+  'state-homicide': { topic: 'safety', source: 'fbi' },
+  'state-president': { topic: 'elections', source: 'mit-election-lab' },
   'county-poverty': { topic: 'economy', source: 'census' },
 };
 
