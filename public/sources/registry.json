@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-08T07:59:17.714Z",
+ "generated": "2026-11-08T15:04:43.772Z",
  "tiers": [
   {
    "id": "federal",
@@ -391,9 +391,7 @@
   },
   "mortgage-rate": {
    "topic": "housing",
-   "source": "fred",
-   "sourceName": "Freddie Mac",
-   "tier": "industry"
+   "source": "fred"
   },
   "gas-price": {
    "topic": "prices",
@@ -494,10 +492,10 @@
      "url": "https://open.alabama.gov/",
      "name": "Alabama open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "open.alabama.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -510,10 +508,10 @@
      "url": "https://data-soa-dnr.opendata.arcgis.com/",
      "name": "Alaska open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "arcgis",
      "host": "data-soa-dnr.opendata.arcgis.com",
-     "datasets": null,
-     "checked": null
+     "datasets": 144,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -526,10 +524,10 @@
      "url": "https://azgeo.az.gov/",
      "name": "Arizona open data",
      "scope": "specialized",
-     "platform": "unknown",
-     "host": "azgeo.az.gov",
-     "datasets": null,
-     "checked": null
+     "platform": "arcgis",
+     "host": "azgeo-data-hub-agic.hub.arcgis.com",
+     "datasets": 731,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -542,10 +540,10 @@
      "url": "https://gis.arkansas.gov/",
      "name": "Arkansas open data",
      "scope": "specialized",
-     "platform": "unknown",
-     "host": "gis.arkansas.gov",
-     "datasets": null,
-     "checked": null
+     "platform": "arcgis",
+     "host": "geodata.gis.arkansas.gov",
+     "datasets": 294,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -561,7 +559,7 @@
      "platform": "ckan",
      "host": "data.ca.gov",
      "datasets": 4696,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     },
     {
      "url": "https://bythenumbers.sco.ca.gov/",
@@ -570,7 +568,7 @@
      "platform": "socrata",
      "host": "bythenumbers.sco.ca.gov",
      "datasets": 101,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -586,7 +584,7 @@
      "platform": "socrata",
      "host": "data.colorado.gov",
      "datasets": 640,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -602,7 +600,7 @@
      "platform": "socrata",
      "host": "data.ct.gov",
      "datasets": 589,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -618,7 +616,7 @@
      "platform": "socrata",
      "host": "data.delaware.gov",
      "datasets": 180,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -669,10 +667,10 @@
      "url": "https://opendata.hawaii.gov/",
      "name": "Hawaii open data",
      "scope": "statewide",
-     "platform": "unknown",
+     "platform": "ckan",
      "host": "opendata.hawaii.gov",
-     "datasets": null,
-     "checked": null
+     "datasets": 963,
+     "checked": "2026-11-08T15:04:43.772Z"
     },
     {
      "url": "https://highways.hidot.hawaii.gov/",
@@ -681,7 +679,7 @@
      "platform": "socrata",
      "host": "highways.hidot.hawaii.gov",
      "datasets": 304,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -694,10 +692,10 @@
      "url": "https://data.gis.idaho.gov/",
      "name": "Idaho open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "data.gis.idaho.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -710,10 +708,10 @@
      "url": "https://data.illinois.gov/",
      "name": "Illinois open data",
      "scope": "statewide",
-     "platform": "unknown",
+     "platform": "website",
      "host": "data.illinois.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -726,10 +724,10 @@
      "url": "https://www.indianamap.org/",
      "name": "Indiana open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "arcgis",
      "host": "www.indianamap.org",
-     "datasets": null,
-     "checked": null
+     "datasets": 432,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -742,10 +740,10 @@
      "url": "https://data.iowa.gov/",
      "name": "Iowa open data",
      "scope": "statewide",
-     "platform": "unknown",
+     "platform": "website",
      "host": "data.iowa.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -758,10 +756,10 @@
      "url": "https://hub.kansasgis.org/",
      "name": "Kansas open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "arcgis",
      "host": "hub.kansasgis.org",
-     "datasets": null,
-     "checked": null
+     "datasets": 300,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -774,10 +772,10 @@
      "url": "https://kygeonet.ky.gov/",
      "name": "Kentucky open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "kygeonet.ky.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -790,10 +788,10 @@
      "url": "https://data-ladotd.opendata.arcgis.com/",
      "name": "Louisiana open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "data-ladotd.opendata.arcgis.com",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -806,10 +804,10 @@
      "url": "https://www.maine.gov/geolib/",
      "name": "Maine open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "www.maine.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -825,7 +823,7 @@
      "platform": "socrata",
      "host": "opendata.maryland.gov",
      "datasets": 1532,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -838,10 +836,10 @@
      "url": "https://www.mass.gov/orgs/massgis-bureau-of-geographic-information",
      "name": "Massachusetts open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "www.mass.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -857,7 +855,7 @@
      "platform": "socrata",
      "host": "data.michigan.gov",
      "datasets": 242,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -873,7 +871,7 @@
      "platform": "arcgis",
      "host": "gis.data.mn.gov",
      "datasets": 914,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -886,10 +884,10 @@
      "url": "https://www.gis.ms.gov/",
      "name": "Mississippi open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "arcgis",
      "host": "www.gis.ms.gov",
-     "datasets": null,
-     "checked": null
+     "datasets": 18,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -905,7 +903,7 @@
      "platform": "socrata",
      "host": "data.mo.gov",
      "datasets": 262,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -918,10 +916,10 @@
      "url": "https://data.mt.gov/",
      "name": "Montana open data",
      "scope": "statewide",
-     "platform": "unknown",
+     "platform": "website",
      "host": "data.mt.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -934,10 +932,10 @@
      "url": "https://www.ne.gov/government/open-data/",
      "name": "Nebraska open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "www.ne.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -950,10 +948,10 @@
      "url": "https://goed.nv.gov/",
      "name": "Nevada open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "goed.nv.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -966,10 +964,10 @@
      "url": "https://www.granit.unh.edu/",
      "name": "New Hampshire open data",
      "scope": "specialized",
-     "platform": "unknown",
-     "host": "www.granit.unh.edu",
-     "datasets": null,
-     "checked": null
+     "platform": "arcgis",
+     "host": "granit.unh.edu",
+     "datasets": 309,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -985,7 +983,7 @@
      "platform": "socrata",
      "host": "data.nj.gov",
      "datasets": 116,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1017,7 +1015,7 @@
      "platform": "socrata",
      "host": "data.ny.gov",
      "datasets": 1036,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1030,10 +1028,10 @@
      "url": "https://www.nconemap.gov/",
      "name": "North Carolina open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "arcgis",
      "host": "www.nconemap.gov",
-     "datasets": null,
-     "checked": null
+     "datasets": 254,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1046,10 +1044,10 @@
      "url": "https://www.gis.nd.gov/",
      "name": "North Dakota open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "www.gis.nd.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1062,10 +1060,10 @@
      "url": "https://data.ohio.gov/",
      "name": "Ohio open data",
      "scope": "statewide",
-     "platform": "unknown",
+     "platform": "website",
      "host": "data.ohio.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1078,10 +1076,10 @@
      "url": "https://data.ok.gov/",
      "name": "Oklahoma open data",
      "scope": "statewide",
-     "platform": "unknown",
+     "platform": "ckan",
      "host": "data.ok.gov",
-     "datasets": null,
-     "checked": null
+     "datasets": 398,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1097,7 +1095,7 @@
      "platform": "socrata",
      "host": "data.oregon.gov",
      "datasets": 540,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1113,7 +1111,7 @@
      "platform": "socrata",
      "host": "data.pa.gov",
      "datasets": 352,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1126,10 +1124,10 @@
      "url": "https://www.ri.gov/data/",
      "name": "Rhode Island open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "www.ri.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1142,10 +1140,10 @@
      "url": "https://www.sc.gov/data-and-transparency",
      "name": "South Carolina open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "www.sc.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1158,10 +1156,10 @@
      "url": "https://open.sd.gov/",
      "name": "South Dakota open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "open.sd.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1174,10 +1172,10 @@
      "url": "https://geodata.tn.gov/",
      "name": "Tennessee open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "arcgis",
      "host": "geodata.tn.gov",
-     "datasets": null,
-     "checked": null
+     "datasets": 93,
+     "checked": "2026-11-08T15:04:43.772Z"
     },
     {
      "url": "https://healthdata.tn.gov/",
@@ -1186,7 +1184,7 @@
      "platform": "socrata",
      "host": "healthdata.tn.gov",
      "datasets": 295,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1202,7 +1200,7 @@
      "platform": "socrata",
      "host": "data.texas.gov",
      "datasets": 830,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1215,10 +1213,10 @@
      "url": "https://gis.utah.gov/",
      "name": "Utah open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "gis.utah.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1234,7 +1232,7 @@
      "platform": "socrata",
      "host": "data.vermont.gov",
      "datasets": 172,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1247,10 +1245,10 @@
      "url": "https://data.virginia.gov/",
      "name": "Virginia open data",
      "scope": "statewide",
-     "platform": "unknown",
+     "platform": "ckan",
      "host": "data.virginia.gov",
-     "datasets": null,
-     "checked": null
+     "datasets": 32102,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1266,7 +1264,7 @@
      "platform": "socrata",
      "host": "data.wa.gov",
      "datasets": 1076,
-     "checked": "2026-11-08T07:59:17.714Z"
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1279,10 +1277,10 @@
      "url": "https://dep.wv.gov/Data/Pages/default.aspx",
      "name": "West Virginia open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "dep.wv.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1295,10 +1293,10 @@
      "url": "https://sagic.wi.gov/Pages/WIsconsin_GIS_Data.aspx",
      "name": "Wisconsin open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "website",
      "host": "sagic.wi.gov",
      "datasets": null,
-     "checked": null
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   },
@@ -1311,10 +1309,10 @@
      "url": "https://data.geospatialhub.org/",
      "name": "Wyoming open data",
      "scope": "specialized",
-     "platform": "unknown",
+     "platform": "arcgis",
      "host": "data.geospatialhub.org",
-     "datasets": null,
-     "checked": null
+     "datasets": 116,
+     "checked": "2026-11-08T15:04:43.772Z"
     }
    ]
   }
@@ -1336,7 +1334,7 @@
    "slug": "doi",
    "name": "Department of the Interior",
    "type": "Federal Government",
-   "datasets": 55001
+   "datasets": 55017
   },
   {
    "slug": "nasa",

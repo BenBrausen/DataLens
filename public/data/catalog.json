@@ -22,7 +22,7 @@
    "Postings on one website, not total U.S. job openings. The official measure is the BLS Job Openings and Labor Turnover Survey (JOLTS)."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T08:00:43.331Z",
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-10-30",
   "hasNational": false,
   "topic": "economy",
@@ -57,7 +57,7 @@
   ],
   "geo": "us-states",
   "kind": "panel",
-  "retrieved": "2026-11-08T08:00:43.331Z",
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2025-01-01",
   "hasNational": true,
   "topic": "economy",
@@ -93,7 +93,7 @@
   ],
   "geo": "us-states",
   "kind": "panel",
-  "retrieved": "2026-11-08T08:00:43.331Z",
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-01-01",
   "hasNational": true,
   "topic": "economy",
@@ -127,7 +127,7 @@
   ],
   "geo": "us-states",
   "kind": "panel",
-  "retrieved": "2026-11-08T08:00:43.331Z",
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2025-01-01",
   "hasNational": true,
   "topic": "economy",
@@ -161,7 +161,7 @@
    "The survey changed from phone to online interviews in 2024, which may affect comparisons with earlier years."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T08:00:43.331Z",
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-09-01",
   "hasNational": false,
   "topic": "economy",
@@ -199,11 +199,7 @@
   ],
   "zeroLine": true,
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-09-01",
   "hasNational": false,
   "topic": "prices",
@@ -240,11 +236,7 @@
    "UNRATE"
   ],
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-10-01",
   "hasNational": false,
   "topic": "economy",
@@ -279,11 +271,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-09-01",
   "hasNational": true,
   "topic": "economy",
@@ -321,11 +309,7 @@
    "Prices are in dollars of each year. A $3 gallon in 2008 cost more in today's money than a $3 gallon today."
   ],
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-11-02",
   "hasNational": false,
   "topic": "prices",
@@ -363,11 +347,7 @@
    "Adjusted with the all-items CPI computed by Plainsight; the source publishes nominal prices only."
   ],
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-09-28",
   "hasNational": false,
   "topic": "prices",
@@ -400,19 +380,14 @@
   "caveats": [
    "Small quakes are detected far more often near dense sensor networks (like the U.S.), so the map over-represents those regions at low magnitudes."
   ],
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-  "lastObservation": "2026-11-08T06:30:19.447Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
-  "lastObservation": "2026-11-08T07:17:31.580Z",
+  "retrieved": "2026-11-08T15:03:35.520Z",
+  "lastObservation": "2026-11-08T14:46:03.596Z",
   "hasNational": false,
   "topic": "environment",
   "sourceId": "usgs",
   "tier": "federal",
->>>>>>> Stashed changes
-  "nEvents": 2068,
-  "firstObservation": "2026-10-09T08:11:46.638Z"
+  "nEvents": 2080,
+  "firstObservation": "2026-10-09T15:05:39.020Z"
  },
  {
   "category": "Government",
@@ -443,11 +418,7 @@
    "A growing economy and inflation make nominal debt rise almost every year. Debt as a share of GDP is the measure economists use to judge whether it is getting harder to carry."
   ],
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-11-05",
   "hasNational": false,
   "topic": "government",
@@ -486,11 +457,7 @@
    "GDP collapsed briefly in 2020, which spiked the ratio even before new borrowing showed up."
   ],
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-04-01",
   "hasNational": false,
   "topic": "government",
@@ -528,11 +495,7 @@
    "Inflation adjustment computed by Plainsight with CPI-U."
   ],
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-09-30",
   "hasNational": false,
   "topic": "government",
@@ -572,11 +535,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2025-12-31",
   "hasNational": false,
   "topic": "health",
@@ -616,11 +575,7 @@
   ],
   "isCount": true,
   "kind": "panel",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2025-12-31",
   "hasNational": false,
   "topic": "health",
@@ -656,11 +611,7 @@
    "MORTGAGE30US"
   ],
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-11-05",
   "hasNational": false,
   "topic": "housing",
@@ -694,7 +645,7 @@
   ],
   "geo": "us-states",
   "kind": "panel",
-  "retrieved": "2026-11-08T08:00:43.331Z",
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-04-01",
   "hasNational": true,
   "topic": "housing",
@@ -732,11 +683,7 @@
    "Not adjusted for inflation, and the mix of homes being built changes over time (bigger homes push the median up)."
   ],
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-07-01",
   "hasNational": false,
   "topic": "housing",
@@ -774,11 +721,7 @@
    "Inflation adjustment computed by Plainsight using CPI-U."
   ],
   "kind": "timeseries",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-07-01",
   "hasNational": false,
   "topic": "housing",
@@ -811,7 +754,7 @@
    "Not adjusted for inflation."
   ],
   "kind": "panel",
-  "retrieved": "2026-11-08T08:00:43.331Z",
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2026-09-30",
   "hasNational": false,
   "topic": "housing",
@@ -845,11 +788,7 @@
    "Estimates are revised after each decennial census, so older numbers may change."
   ],
   "kind": "panel",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2025-01-01",
   "hasNational": true,
   "topic": "people",
@@ -883,7 +822,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-08T08:00:43.331Z",
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2024-12-31",
   "hasNational": false,
   "topic": "environment",
@@ -917,11 +856,7 @@
    "GDP measures the size of an economy, not how well off its people are; divide by population for that."
   ],
   "kind": "panel",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2025-12-31",
   "hasNational": false,
   "topic": "world",
@@ -955,11 +890,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-<<<<<<< Updated upstream
-  "retrieved": "2026-11-08T07:48:08.997Z",
-=======
-  "retrieved": "2026-11-08T08:00:43.331Z",
->>>>>>> Stashed changes
+  "retrieved": "2026-11-08T15:03:35.520Z",
   "lastObservation": "2024-12-31",
   "hasNational": false,
   "topic": "world",
