@@ -28,7 +28,7 @@
   ],
   "zeroLine": true,
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:14:56.913Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-09-01",
   "nSeries": 2,
   "firstObservation": "1948-01-01"
@@ -61,7 +61,7 @@
    "UNRATE"
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:14:56.913Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-10-01",
   "nSeries": 2,
   "firstObservation": "1948-01-01"
@@ -92,7 +92,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-08T07:16:08.153Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-09-01",
   "nEntities": 51,
   "firstObservation": "1976-01-01"
@@ -126,7 +126,7 @@
    "Prices are in dollars of each year. A $3 gallon in 2008 cost more in today's money than a $3 gallon today."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:15:26.223Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-11-02",
   "nSeries": 1,
   "firstObservation": "1990-08-20"
@@ -160,7 +160,7 @@
    "Adjusted with the all-items CPI computed by Plainsight; the source publishes nominal prices only."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:15:26.223Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-09-28",
   "nSeries": 1,
   "firstObservation": "1990-08-20"
@@ -189,10 +189,10 @@
   "caveats": [
    "Small quakes are detected far more often near dense sensor networks (like the U.S.), so the map over-represents those regions at low magnitudes."
   ],
-  "retrieved": "2026-11-08T07:14:56.913Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-11-08T06:30:19.447Z",
-  "nEvents": 2069,
-  "firstObservation": "2026-10-09T07:31:58.275Z"
+  "nEvents": 2068,
+  "firstObservation": "2026-10-09T07:56:17.393Z"
  },
  {
   "category": "Government",
@@ -223,7 +223,7 @@
    "A growing economy and inflation make nominal debt rise almost every year. Debt as a share of GDP is the measure economists use to judge whether it is getting harder to carry."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:15:26.223Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-11-05",
   "nSeries": 1,
   "firstObservation": "1993-04-30"
@@ -258,7 +258,7 @@
    "GDP collapsed briefly in 2020, which spiked the ratio even before new borrowing showed up."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:15:26.223Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-04-01",
   "nSeries": 1,
   "firstObservation": "1966-01-01"
@@ -292,7 +292,7 @@
    "Inflation adjustment computed by Plainsight with CPI-U."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:15:26.223Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-09-30",
   "nSeries": 1,
   "firstObservation": "1993-04-30"
@@ -328,7 +328,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-08T07:16:08.153Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2025-12-31",
   "nEntities": 51,
   "firstObservation": "2015-12-31"
@@ -364,7 +364,7 @@
   ],
   "isCount": true,
   "kind": "panel",
-  "retrieved": "2026-11-08T07:16:08.153Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2025-12-31",
   "nEntities": 51,
   "firstObservation": "2015-12-31"
@@ -396,7 +396,7 @@
    "MORTGAGE30US"
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:14:56.913Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-11-05",
   "nSeries": 2,
   "firstObservation": "1971-04-02"
@@ -430,7 +430,7 @@
    "Not adjusted for inflation, and the mix of homes being built changes over time (bigger homes push the median up)."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:15:26.223Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-07-01",
   "nSeries": 1,
   "firstObservation": "1963-01-01"
@@ -464,7 +464,7 @@
    "Inflation adjustment computed by Plainsight using CPI-U."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-08T07:15:26.223Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2026-07-01",
   "nSeries": 1,
   "firstObservation": "1963-01-01"
@@ -494,7 +494,7 @@
    "Estimates are revised after each decennial census, so older numbers may change."
   ],
   "kind": "panel",
-  "retrieved": "2026-11-08T07:16:08.153Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2025-01-01",
   "nEntities": 51,
   "firstObservation": "1900-01-01"
@@ -524,7 +524,7 @@
    "GDP measures the size of an economy, not how well off its people are; divide by population for that."
   ],
   "kind": "panel",
-  "retrieved": "2026-11-08T07:14:56.913Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2025-12-31",
   "nEntities": 214,
   "firstObservation": "1960-12-31"
@@ -554,7 +554,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-08T07:14:56.913Z",
+  "retrieved": "2026-11-08T07:46:37.602Z",
   "lastObservation": "2024-12-31",
   "nEntities": 217,
   "firstObservation": "1960-12-31"
