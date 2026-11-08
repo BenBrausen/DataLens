@@ -168,7 +168,7 @@
     draw(p) {
       const { ctx } = this, s = this.scene, st = this.st, o = s.o;
       if (o.static) p = 1;
-      this._axisNote = ['line', 'area'].includes(o.chart) && !o.zeroBase;
+      this._axisNote = ['line', 'area'].includes(o.chart) && !o.zeroBase && s.ds.refLine == null;
       if (!this.layout) this.computeLayout();
       const L = this.layout, T = st.T, S = st.S;
       ctx.save();
@@ -362,13 +362,19 @@
     y.range([bottom, top + 30 * S]);
     const x = d3.scaleUtc().domain([t0, t1]).range([left, right]);
     gridY(ctx, st, ticks, y, left, right, tf);
+    if (ds.refLine != null && ds.refLine >= y.domain()[0] && ds.refLine <= y.domain()[1]) {
+      ctx.save(); ctx.strokeStyle = T.muted; ctx.lineWidth = 2 * S; ctx.setLineDash([8 * S, 6 * S]);
+      ctx.beginPath(); ctx.moveTo(left, y(ds.refLine)); ctx.lineTo(right, y(ds.refLine)); ctx.stroke(); ctx.restore();
+      ctx.font = font(st, 600, 20 * S * st.ts); ctx.fillStyle = T.muted; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+      ctx.fillText(`${ds.refLine} = starting level`, left + 10 * S, y(ds.refLine) + 6 * S);
+    }
     // x ticks
     ctx.fillStyle = T.faint; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     const xt = x.ticks(Math.max(2, Math.floor((right - left) / (170 * S))));
     const yrs = (t1 - t0) / 31536e6;
     xt.forEach(t => ctx.fillText(yrs > 3 ? t.getUTCFullYear() : PS.fmtDate(t, 'monthly'), x(t), bottom + 12 * S));
     ctx.textAlign = 'left';
-    if (!o.zeroBase && y.domain()[0] > 0) {
+    if (!o.zeroBase && y.domain()[0] > 0 && ds.refLine == null) {
       ctx.strokeStyle = T.axis; ctx.lineWidth = 2 * S;
       ctx.beginPath(); ctx.moveTo(left - 10 * S, bottom + 4 * S); ctx.lineTo(left + 4 * S, bottom - 6 * S); ctx.moveTo(left - 10 * S, bottom + 12 * S); ctx.lineTo(left + 4 * S, bottom + 2 * S); ctx.stroke();
     }
@@ -691,6 +697,137 @@
       const ly = lgY + 74 * S, half = (C.w - 40 * S) / 2;
       drawList(lists[0][0], lists[0][1], C.x, ly, half);
       drawList(lists[1][0], lists[1][1], C.x + half + 40 * S, ly, half);
+    }
+  };
+
+
+  // Different units on one timeline: one panel per measure, each with its own scale,
+  // sharing the x-axis and the moving "now" line. Never two y-axes on one plot.
+  CHART_DRAW.stacked = function (ctx, C, st) {
+    const S = st.S, T = st.T, ds = st.ds, series = st.view.series;
+    const all = series.flatMap(s => s.pts);
+    const t0 = d3.min(all, p => p.t), t1 = d3.max(all, p => p.t), tq = t0 + (t1 - t0) * st.q;
+    const n = series.length, gap = 26 * S, xAxisH = 40 * S, headH = 40 * S;
+    const ph = (C.h - xAxisH - gap * (n - 1)) / n;
+    ctx.font = font(st, 400, 21 * S * st.ts);
+    const scales = series.map(s => {
+      const lo = d3.min(s.pts, p => p.v), hi = d3.max(s.pts, p => p.v), pad = (hi - lo) * 0.08 || 1;
+      return d3.scaleLinear().domain([s.unit.format === 'pct' || lo >= 0 ? Math.min(0, lo) : lo - pad, hi + pad]).nice(3);
+    });
+    const tfs = series.map(s => v => fmt(v, s.unit, { short: true, decimals: s.unit.format === 'pct' && Math.abs(v) >= 10 ? 0 : undefined }));
+    const left = C.x + Math.max(...scales.map((y, i) => Math.max(...y.ticks(3).map(t => ctx.measureText(tfs[i](t)).width)))) + 18 * S;
+    const right = C.x + C.w - 8 * S;
+    const x = d3.scaleUtc().domain([t0, t1]).range([left, right]);
+    series.forEach((s, i) => {
+      const top = C.y + i * (ph + gap), color = st.pal[i % st.pal.length];
+      ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+      ctx.fillStyle = color; roundRect(ctx, C.x, top + 6 * S, 26 * S, 12 * S, 6 * S); ctx.fill();
+      ctx.font = font(st, 700, 24 * S * st.ts); ctx.fillStyle = T.ink; ctx.fillText(s.name, C.x + 36 * S, top);
+      ctx.font = font(st, 400, 20 * S * st.ts); ctx.fillStyle = T.muted;
+      const nw = ctx.measureText(s.name).width;
+      ctx.font = font(st, 700, 24 * S * st.ts); const nw2 = ctx.measureText(s.name).width; ctx.font = font(st, 400, 20 * S * st.ts);
+      ctx.fillText(s.unit.label, C.x + 36 * S + nw2 + 14 * S, top + 4 * S);
+      const y = scales[i].range([top + ph, top + headH]);
+      gridY(ctx, st, y.ticks(3), y, left, right, tfs[i]);
+      const pts = s.pts.filter(p => p.t <= tq);
+      if (pts.length) {
+        const v = (() => { for (let k = 1; k < s.pts.length; k++) if (s.pts[k].t >= tq) { const a = s.pts[k - 1], b = s.pts[k]; return lerp(a.v, b.v, (tq - a.t) / (b.t - a.t || 1)); } return s.pts.at(-1).v; })();
+        const path = new Path2D(); pts.forEach((p, k) => (k ? path.lineTo(x(p.t), y(p.v)) : path.moveTo(x(p.t), y(p.v)))); path.lineTo(x(tq), y(v));
+        ctx.strokeStyle = color; ctx.lineWidth = st.lw * 0.85; ctx.lineJoin = 'round'; ctx.stroke(path);
+        ctx.fillStyle = color; ctx.beginPath(); ctx.arc(x(tq), y(v), st.lw * 1.3, 0, Math.PI * 2); ctx.fill();
+        pill(ctx, st, fmt(v, s.unit), x(tq), y(v) - 34 * S, { align: x(tq) > right - 150 * S ? 'right' : 'center', minX: left, maxX: right + 4 * S, size: 22 });
+      }
+    });
+    // shared "now" line and one x-axis
+    ctx.strokeStyle = T.axis; ctx.lineWidth = 1.5 * S; ctx.setLineDash([4 * S, 6 * S]);
+    ctx.beginPath(); ctx.moveTo(x(tq), C.y + headH); ctx.lineTo(x(tq), C.y + C.h - xAxisH); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = T.faint; ctx.font = font(st, 400, 21 * S * st.ts); ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    const yrs = (t1 - t0) / 31536e6;
+    x.ticks(Math.max(2, Math.floor((right - left) / (170 * S)))).forEach(t => ctx.fillText(yrs > 3 ? t.getUTCFullYear() : PS.fmtDate(t, 'monthly'), x(t), C.y + C.h - xAxisH + 10 * S));
+    ctx.textAlign = 'left';
+  };
+
+  // Two place-level measures: one dot per place, animated through the years they share.
+  CHART_DRAW.scatter = function (ctx, C, st) {
+    const S = st.S, T = st.T, ds = st.ds, o = st.o;
+    const rank = PS.rankable(o);
+    const pts = ds.points.filter(rank);
+    const n = ds.years.length, tau = st.q * (n - 1), i0 = Math.floor(tau), i1 = Math.min(n - 1, i0 + 1), f = ease.inOut(tau - i0);
+    const at = (arr) => { const a = arr[i0], b = arr[i1]; return a == null ? (f > 0.5 ? b : null) : b == null ? a : lerp(a, b, f); };
+    const allX = pts.flatMap(p => p.xs).filter(v => v != null), allY = pts.flatMap(p => p.ys).filter(v => v != null);
+    const q = (a, p) => { const b = [...a].sort((u, v) => u - v); return b[Math.min(b.length - 1, Math.max(0, Math.floor(b.length * p)))]; };
+    // Axis ranges are fixed across years (2nd-98th percentile + padding) so dots move, not axes.
+    const xd = [q(allX, 0.01), q(allX, 0.99)], yd = [q(allY, 0.01), q(allY, 0.99)];
+    const padX = (xd[1] - xd[0]) * 0.06, padY = (yd[1] - yd[0]) * 0.08;
+    const tfx = v => fmt(v, ds.x.unit, { short: true }), tfy = v => fmt(v, ds.y.unit, { short: true });
+    const mkScale = (log, d, pad) => (log ? d3.scaleLog().domain([d[0] / 1.4, d[1] * 1.4]).nice() : d3.scaleLinear().domain([d[0] - pad, d[1] + pad]).nice(5));
+    const logTicks = sc => sc.ticks().filter(t => Math.abs(Math.log10(t) - Math.round(Math.log10(t))) < 1e-9);
+    const yScale = mkScale(ds.logY, yd, padY);
+    const yTicks = ds.logY ? logTicks(yScale) : yScale.ticks(5);
+    ctx.font = font(st, 400, 21 * S * st.ts);
+    const left = C.x + Math.max(...yTicks.map(t => ctx.measureText(tfy(t)).width)) + 18 * S;
+    const right = C.x + C.w - 10 * S, top = C.y + 56 * S, bottom = C.y + C.h - 76 * S;
+    yScale.range([bottom, top]);
+    const xScale = mkScale(ds.logX, xd, padX).range([left, right]);
+    gridY(ctx, st, yTicks, yScale, left, right, tfy);
+    ctx.fillStyle = T.faint; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    (ds.logX ? logTicks(xScale) : xScale.ticks(Math.max(3, Math.floor((right - left) / (150 * S))))).forEach(t => {
+      ctx.strokeStyle = T.grid; ctx.lineWidth = 1.5 * S; if (o.grid !== 'none') { ctx.beginPath(); ctx.moveTo(xScale(t), top); ctx.lineTo(xScale(t), bottom); ctx.stroke(); }
+      ctx.fillText(tfx(t), xScale(t), bottom + 10 * S);
+    });
+    // axis titles (text ink, not series color)
+    ctx.font = font(st, 600, 22 * S * st.ts); ctx.fillStyle = T.muted;
+    ctx.fillText(`${ds.x.title}${ds.logX ? ' (log scale)' : ''} →`, (left + right) / 2, bottom + 42 * S);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText(`↑ ${ds.y.title}${ds.logY ? ' (log scale)' : ''}`, C.x, C.y + 16 * S);
+    const year = ds.years[Math.round(tau)];
+    if (n > 1) bigDate(ctx, st, String(year), right - 10 * S, bottom - 120 * S * st.ts, 110 * S * st.ts, 'right');
+    const cur = pts.map(p => ({ p, x: at(p.xs), y: at(p.ys) })).filter(d => d.x != null && d.y != null && (!ds.logX || d.x > 0) && (!ds.logY || d.y > 0));
+    // trend line + r, fitted on the scale being shown
+    const fx = v => (ds.logX ? Math.log10(v) : v), fy = v => (ds.logY ? Math.log10(v) : v), uy = v => (ds.logY ? 10 ** v : v);
+    const r = PS.pearson(cur.map(d => fx(d.x)), cur.map(d => fy(d.y)));
+    if (r != null && cur.length > 5) {
+      const mx = d3.mean(cur, d => fx(d.x)), my = d3.mean(cur, d => fy(d.y));
+      const slope = d3.sum(cur, d => (fx(d.x) - mx) * (fy(d.y) - my)) / d3.sum(cur, d => (fx(d.x) - mx) ** 2);
+      ctx.save(); ctx.beginPath(); ctx.rect(left, top, right - left, bottom - top); ctx.clip();
+      ctx.strokeStyle = T.ink; ctx.globalAlpha *= 0.55; ctx.lineWidth = 2.5 * S; ctx.setLineDash([10 * S, 7 * S]);
+      ctx.beginPath();
+      for (let k = 0; k <= 40; k++) { const xv = ds.logX ? 10 ** (Math.log10(xScale.domain()[0]) + (Math.log10(xScale.domain()[1]) - Math.log10(xScale.domain()[0])) * k / 40) : xScale.domain()[0] + (xScale.domain()[1] - xScale.domain()[0]) * k / 40; const Y = yScale(uy(my + slope * (fx(xv) - mx))); k ? ctx.lineTo(xScale(xv), Y) : ctx.moveTo(xScale(xv), Y); }
+      ctx.stroke(); ctx.restore();
+      pill(ctx, st, `r = ${r.toFixed(2)}`, left + 12 * S, top + 16 * S, { align: 'left', size: 22, bg: T.card, fg: T.ink });
+    }
+    const dotR = (ds.geo === 'us-counties' ? 3.2 : 7.5) * S;
+    for (const d of cur) {
+      const hl = o.highlight && d.p.id === o.highlight;
+      if (hl) continue;
+      ctx.fillStyle = rgba(st.pal[0], o.highlight ? 0.35 : 0.7);
+      ctx.beginPath(); ctx.arc(clamp(xScale(d.x), left, right), clamp(yScale(d.y), top, bottom), dotR, 0, Math.PI * 2); ctx.fill();
+    }
+    // labels: highlighted place always; biggest outliers once the animation settles
+    const labels = [];
+    const h = o.highlight && cur.find(d => d.p.id === o.highlight);
+    if (h) labels.push({ d: h, hl: true });
+    if ((st.statik || st.q > 0.92) && r != null && cur.length > 5) {
+      const mx = d3.mean(cur, d => fx(d.x)), my = d3.mean(cur, d => fy(d.y));
+      const slope = d3.sum(cur, d => (fx(d.x) - mx) * (fy(d.y) - my)) / d3.sum(cur, d => (fx(d.x) - mx) ** 2);
+      cur.map(d => ({ d, e: Math.abs(fy(d.y) - (my + slope * (fx(d.x) - mx))) })).sort((a, b) => b.e - a.e).slice(0, ds.geo === 'us-counties' ? 3 : 5)
+        .forEach(x => { if (!labels.some(l => l.d === x.d)) labels.push({ d: x.d }); });
+    }
+    ctx.font = font(st, 600, 21 * S * st.ts); ctx.textBaseline = 'middle';
+    const placed = [];
+    const hits = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+    for (const { d, hl } of labels) {
+      const X = clamp(xScale(d.x), left, right), Y = clamp(yScale(d.y), top, bottom);
+      if (hl) { ctx.fillStyle = st.accent; ctx.beginPath(); ctx.arc(X, Y, dotR * 1.5, 0, Math.PI * 2); ctx.fill(); ctx.strokeStyle = T.bg; ctx.lineWidth = 2 * S; ctx.stroke(); }
+      const w = ctx.measureText(d.p.name).width;
+      // Try right, left, above, below; skip a non-highlighted label that would overlap another.
+      const spots = [[X + 12 * S, Y], [X - w - 14 * S, Y], [X - w / 2, Y - 24 * S], [X - w / 2, Y + 24 * S]].filter(([lx]) => lx >= left - 4 && lx + w <= right + 4);
+      const spot = spots.find(([lx, ly]) => !placed.some(b => hits({ x: lx - 4 * S, y: ly - 13 * S, w: w + 8 * S, h: 26 * S }, b)));
+      if (!spot && !hl) continue;
+      const [lx, ly0] = spot || spots[0] || [X + 12 * S, Y];
+      placed.push({ x: lx - 4 * S, y: ly0 - 13 * S, w: w + 8 * S, h: 26 * S });
+      const lyy = ly0;
+      ctx.fillStyle = T.bg; ctx.globalAlpha *= 0.8; ctx.fillRect(lx - 3 * S, lyy - 13 * S, w + 6 * S, 26 * S); ctx.globalAlpha = st.aChart;
+      ctx.fillStyle = T.ink; ctx.fillText(d.p.name, lx, lyy);
     }
   };
 

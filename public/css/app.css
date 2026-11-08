@@ -202,3 +202,17 @@ details summary { cursor: pointer; font-weight: 600; font-size: 13px; padding: 8
 .state-cell.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
 .linkbtn { border: 0; background: none; color: var(--accent); padding: 0; text-decoration: underline; font-size: inherit; }
 .result .meta .badge { margin-left: 0; margin-right: 4px; }
+
+/* ---------- overlay / compare ---------- */
+.cmp-box { background: var(--surface-2); border-radius: var(--radius); padding: 10px; margin-bottom: 6px; }
+.cmp-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.cmp-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 4px 6px 4px 10px; font-size: 12px; font-weight: 600; }
+.cmp-chip.main { padding-right: 10px; border-color: var(--accent); }
+.cmp-chip button { border: 0; background: var(--surface-2); border-radius: 50%; width: 20px; height: 20px; font-size: 11px; line-height: 1; }
+.cmp-list { max-height: 360px; overflow-y: auto; }
+.cmp { display: block; width: 100%; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 10px; margin-bottom: 5px; }
+.cmp b { display: block; font-size: 12.5px; }
+.cmp span { display: block; font-size: 11.5px; color: var(--muted); }
+.cmp.ok:hover { border-color: var(--accent); }
+.cmp.no { opacity: .75; background: none; }
+.howto.fit { border-left: 3px solid var(--accent); }

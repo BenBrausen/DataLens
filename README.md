@@ -110,6 +110,25 @@ Pick **Your state** and county maps zoom to that state's counties, rankings and 
 - Imports recognize county FIPS codes, county names with a state column, and county names on a state portal (data.ny.gov files map to New York's counties automatically). Independent cities (St. Louis city, Baltimore city, most of Virginia's) are told apart from counties by their FIPS codes.
 - Connecticut replaced counties with planning regions in 2022; the county map still uses the old counties, so Connecticut shows as no data.
 
+## Comparing datasets (overlays)
+
+In the Chart step, **Compare with another dataset** lists every dataset as either compatible, with the methods it allows, or blocked, with the reason. The method follows from the data, and a second y-axis is never used:
+
+| Datasets | Method | Example |
+|---|---|---|
+| Same unit, similar scale | One shared axis | Unemployment rate vs. inflation rate |
+| Quantities in different units or at very different levels (all values positive) | Growth, indexed to 100 at the first shared date | New home prices vs. household income since 1984 |
+| Any two or three measures over time | Stacked panels, own scales, one shared timeline | Unemployment vs. consumer sentiment |
+| Two state, county or country datasets | Scatter, one dot per place, animated over shared years, with trend line and r | State income vs. home values |
+| Events, mismatched geographies, no shared dates, single snapshots without a timeline, two lenses of one dataset | Blocked, with the reason shown | Earthquakes vs. anything |
+
+Rates are never indexed (4% to 6% shown as "+50%" misleads). Very skewed measures (GDP) switch to a log scale, and r is computed on the scale shown. Every overlay gets a "How these fit together" explanation and computed facts, plus trust checks:
+
+- Scatters always carry "Correlation, not cause".
+- Indexed charts warn when they mix nominal and inflation-adjusted dollars, and note that the start date shapes the story.
+- Only the shared period is shown.
+- Every source is cited.
+
 ## Being the central data source
 
 This repo is built to be the one place everyone reads from:

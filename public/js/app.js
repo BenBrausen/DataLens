@@ -6,6 +6,7 @@
   const renderer = new PS.Renderer(canvas);
 
   const S = {
+    compareDs: new Map(), combo: null, comboKey: '', picker: null,
     catalog: [], ds: null, step: 'data', dataTab: 'topics', topic: 'all', sourceOpen: null,
     state: (() => { try { return localStorage.getItem('ps-state') || ''; } catch { return ''; } })(), playing: false, p: 1, t0: 0,
     analysis: null, audio: null, imported: null, search: { q: '', scope: 'all', org: null, orgName: '', results: [], busy: false, err: '', info: '' }, exporting: false, custom: [],
@@ -16,7 +17,7 @@
     accent: '', bg: '', bgGradient: false, radius: 6, lineWidth: 5, grid: 'light', textScale: 1, annotate: true, zeroBase: true,
     series: [], entities: [], topN: 10, highlight: '', sortAsc: false, rangeStart: null, rangeEnd: null, handle: '', brand: true,
     motion: 'steady', takeaway: true, takeawayText: '', captions: true, script: '', scriptEdited: false, voice: '', speakPreview: false,
-    kicker: '', title: '', subtitle: '', note: '', colorZero: false, focus: '', compareNational: true, titleEdited: false, minPop: 0, scope: '',
+    kicker: '', title: '', subtitle: '', note: '', colorZero: false, focus: '', compareNational: true, titleEdited: false, minPop: 0, scope: '', compare: [], combineMethod: '',
   };
   let o = { ...DEFAULTS };
 
@@ -35,6 +36,7 @@
     const range = ds.singleTime ? '' : yearOf(a) === yearOf(b) ? `, ${yearOf(a)}` : `, ${yearOf(o.rangeStart ?? a)}–${yearOf(o.rangeEnd ?? b)}`;
     return `${ds.unit.label}${range}`;
   }
+  const comboOpts = () => ({ ...o, focus: o.focus || stateInfo()?.fips || '' });
   const stateInfo = () => { const r = PS.STATE_LIST.find(x => x[0] === S.state); return r ? { code: r[0], fips: r[1], name: r[2] } : null; };
   function autoTitle(ds) {
     const st = stateInfo();
@@ -70,7 +72,30 @@
   // ---------- core update ----------
   function update({ relayout = true, panels = true } = {}) {
     if (!S.ds) return;
-    const ds = viewOf(S.ds);
+    let ds = viewOf(S.ds);
+    // Overlay: combine the main dataset with the ones chosen to compare.
+    S.combo = null; S.comboDs = null;
+    if (o.compare.length) {
+      const parts = [ds, ...o.compare.map(id => S.compareDs.get(id)).filter(Boolean).map(viewOf)];
+      const oo = comboOpts();
+      const cmp = PS.compatibility(parts.slice(0, -1), parts.at(-1), oo);
+      if (cmp.ok) {
+        const method = cmp.methods.find(m => m.id === o.combineMethod) || cmp.methods[0];
+        ds = PS.combine(parts, method.id, oo);
+        S.comboDs = ds;
+        S.combo = { methods: cmp.methods, method: method.id };
+        o.chart = { shared: 'line', indexed: 'line', stacked: 'stacked', scatter: 'scatter' }[method.id];
+        if (method.id === 'indexed') o.zeroBase = false;
+        if (S.comboKey !== ds.id) {
+          S.comboKey = ds.id;
+          if (!o.titleEdited) o.title = ds.title;
+          o.subtitle = method.id === 'scatter' ? `Each dot is a ${{ 'us-states': 'state', 'us-counties': 'county', world: 'country' }[ds.geo]}, ${ds.years[0]}${ds.years.length > 1 ? '–' + ds.years.at(-1) : ''}`
+            : method.id === 'indexed' ? `${ds.unit.label}`
+            : `${method.id === 'stacked' ? 'Shared timeline' : ds.unit.label}, ${yearOf(ds.window[0])}–${yearOf(ds.window[1])}`;
+          o.takeawayText = ''; o.scriptEdited = false;
+        }
+      } else { o.compare = []; toast(cmp.reason); }
+    } else S.comboKey = '';
     const T = PS.THEMES[o.theme];
     const pc = PS.checkPalette(palette(), o.bg || T.bg, colorsInUse());
     S.analysis = PS.analyze(ds, { ...o, paletteCheck: colorsInUse() > 1 ? pc : null });
@@ -138,7 +163,8 @@
     S.ds = ds;
     const charts = PS.chartsFor(ds).map(c => c.id);
     o.chart = charts.includes(o.chart) && keepStory ? o.chart : PS.defaultChart(ds);
-    Object.assign(o, { series: [], entities: [], highlight: '', rangeStart: null, rangeEnd: null, takeawayText: '', scriptEdited: false, titleEdited: false });
+    Object.assign(o, { series: [], entities: [], highlight: '', rangeStart: null, rangeEnd: null, takeawayText: '', scriptEdited: false, titleEdited: false, compare: [], combineMethod: '' });
+    S.picker = null;
     // A chosen state localizes every state-level dataset: highlighted on maps and
     // bars, and compared with the U.S. on line charts.
     const st = stateInfo();
@@ -336,6 +362,9 @@
     const t = e.target.closest('button, [data-ds]'); if (!t) return;
     if (t.dataset.tab) { S.dataTab = t.dataset.tab; renderStep(); return; }
     if (t.dataset.topic) { S.topic = t.dataset.topic; renderStep(); return; }
+    if (t.dataset.compare) { o.compare.push(t.dataset.compare); o.combineMethod = ''; S.picker = null; update(); renderStep(); return; }
+    if (t.dataset.uncompare) { o.compare = o.compare.filter(x => x !== t.dataset.uncompare); o.combineMethod = ''; if (!o.compare.length) { o.chart = PS.defaultChart(S.ds); o.title = autoTitle(S.ds); o.subtitle = autoSubtitle(S.ds); o.zeroBase = !S.ds.zeroLine; } update(); renderStep(); return; }
+    if (t.dataset.method) { o.combineMethod = t.dataset.method; S.comboKey = ''; update(); renderStep(); return; }
     if (t.dataset.src) { S.sourceOpen = S.sourceOpen === t.dataset.src ? null : t.dataset.src; renderStep(); return; }
     if (t.dataset.scope) { S.search.scope = t.dataset.scope; if (S.search.q || t.dataset.scope !== 'datagov') runSearch(); else renderStep(); return; }
     if (t.dataset.statebrowse) {
@@ -370,6 +399,8 @@
   });
 
   const ACTIONS = {
+    openCompare: () => openPicker(),
+    closeCompare: () => { S.picker = null; renderStep(); },
     portalBrowse: t => { Object.assign(S.search, { scope: 'state', q: t.dataset.q || '', org: null }); S.dataTab = 'search'; runSearch(); },
     orgSearch: t => { Object.assign(S.search, { scope: 'datagov', q: S.search.q || '', org: t.dataset.org, orgName: t.dataset.name }); S.dataTab = 'search'; runSearch(); },
     clearOrg: () => { Object.assign(S.search, { org: null, orgName: '' }); runSearch(); },
@@ -467,7 +498,16 @@
     if (!S.ds) return '<p class="muted">Pick data first.</p>';
     const ds = S.ds;
     const charts = PS.chartsFor(ds);
-    let html = `<h3>Chart type</h3><div class="chart-grid">${charts.map(c => `<button class="chart-opt ${o.chart === c.id ? 'active' : ''}" data-chart="${c.id}"><svg viewBox="0 0 24 24"><path d="${c.icon}"/></svg><b>${c.name}${PS.defaultChart(ds) === c.id ? ' <span class="badge">Best fit</span>' : ''}</b><span>${c.desc}</span></button>`).join('')}</div>`;
+    let html = compareHTML();
+    if (S.combo) {
+      const ICON = { shared: 'M3 17l5-6 4 3 7-9M3 19l5-3 4 1 7-5', indexed: 'M3 12h18M3 17l6-6 4 2 8-8', stacked: 'M3 9l5-3 4 2 8-4M3 20l5-4 4 2 8-5', scatter: 'M6 17a1 1 0 1 0 0 .1M10 12a1 1 0 1 0 0 .1M15 9a1 1 0 1 0 0 .1M18 5a1 1 0 1 0 0 .1' };
+      const DESC = { shared: 'Same unit and scale: one axis, read values directly', indexed: 'Different units: both start at 100, compare growth', stacked: 'Different units: own scales, shared timeline', scatter: 'One dot per place: is there a pattern?' };
+      return html + `<h3>How to combine</h3><div class="chart-grid">${S.combo.methods.map(m => `<button class="chart-opt ${S.combo.method === m.id ? 'active' : ''}" data-method="${m.id}"><svg viewBox="0 0 24 24"><path d="${ICON[m.id]}"/></svg><b>${esc(m.name)}</b><span>${DESC[m.id]}</span></button>`).join('')}</div>
+        <p class="muted">Only methods that keep the comparison honest are offered. Two y-axes on one chart are never used.</p>` +
+        (S.combo.method === 'scatter' ? field('Highlight one', select('highlight', [['', 'None'], ...ds.entities.map(e => [e.id, e.short || e.name]).sort((a, b) => a[1].localeCompare(b[1]))])) + (ds.entities?.some(e => e.pop != null) ? field('Leave out', `<select data-k="minPop" data-num>${[[0, 'Nothing'], [5000, 'Places under 5,000 people'], [50000, 'Places under 50,000 people']].map(([v, l]) => `<option value="${v}" ${o.minPop === v ? 'selected' : ''}>${l}</option>`).join('')}</select>`) : '') : '')
+        + '<h3>Motion</h3>' + field('Pacing', select('motion', [['steady', 'Steady (best for reading values)'], ['smooth', 'Smooth (eases in and out)']]));
+    }
+    html += `<h3>Chart type</h3><div class="chart-grid">${charts.map(c => `<button class="chart-opt ${o.chart === c.id ? 'active' : ''}" data-chart="${c.id}"><svg viewBox="0 0 24 24"><path d="${c.icon}"/></svg><b>${c.name}${PS.defaultChart(ds) === c.id ? ' <span class="badge">Best fit</span>' : ''}</b><span>${c.desc}</span></button>`).join('')}</div>`;
     html += '<h3>What to show</h3>';
     if (ds.kind === 'timeseries' && ds.series.length > 1 && ['line', 'area'].includes(o.chart)) {
       const sel = o.series.length ? o.series : (ds.defaultSeries || [ds.series[0].id]);
@@ -495,6 +535,30 @@
     html += '<h3>Motion</h3>' + field('Pacing', select('motion', [['steady', 'Steady (best for reading values)'], ['smooth', 'Smooth (eases in and out)']]));
     return html;
   };
+  function compareHTML() {
+    const chips = o.compare.map(id => { const c = S.catalog.find(x => x.id === id) || S.custom.find(x => x.id === id); return `<span class="cmp-chip">${esc(c?.title || id)}<button data-uncompare="${id}" aria-label="Remove">✕</button></span>`; }).join('');
+    let h = `<h3>Compare with another dataset</h3><div class="cmp-box"><div class="cmp-chips"><span class="cmp-chip main">${esc(S.ds.title)}</span>${chips}</div>`;
+    if (!S.picker) h += `<button class="btn block" data-act="openCompare">+ Add a dataset to compare</button>`;
+    else if (S.picker === 'loading') h += '<p class="muted">Checking which datasets fit…</p>';
+    else {
+      const ok = S.picker.filter(x => x.ok), no = S.picker.filter(x => !x.ok);
+      h += `<div class="cmp-list"><p class="muted">Works with your data</p>${ok.map(x => `<button class="cmp ok" data-compare="${x.id}"><b>${esc(x.title)}</b><span>${esc(x.methods.map(m => m.name).join(' · '))}</span></button>`).join('') || '<p class="muted">Nothing else fits this dataset.</p>'}
+        ${no.length ? `<details><summary>Can't be combined (${no.length})</summary>${no.map(x => `<div class="cmp no"><b>${esc(x.title)}</b><span>${esc(x.reason)}</span></div>`).join('')}</details>` : ''}
+        <button class="btn block" data-act="closeCompare">Close</button></div>`;
+    }
+    return h + '</div>';
+  }
+  async function openPicker() {
+    S.picker = 'loading'; renderStep();
+    const ids = [...S.catalog.map(c => c.id), ...S.custom.map(c => c.id)];
+    const loaded = await Promise.all(ids.map(id => (S.custom.find(c => c.id === id) ? Promise.resolve(S.custom.find(c => c.id === id)) : PS.loadDataset(id).catch(() => null))));
+    loaded.forEach(d => d && S.compareDs.set(d.id, d));
+    const parts = [viewOf(S.ds), ...o.compare.map(id => viewOf(S.compareDs.get(id)))];
+    const oo = comboOpts();
+    S.picker = loaded.filter(d => d && !parts.some(p => p.id === d.id)).map(d => ({ id: d.id, title: d.title, ...PS.compatibility(parts, viewOf(d), oo) }))
+      .sort((a, b) => (b.ok - a.ok) || a.title.localeCompare(b.title));
+    renderStep();
+  }
   AFTER.chart = () => {
     const set = () => {
       const rs = $('#rs').value, re = $('#re').value;
@@ -615,6 +679,7 @@
     const warn = a.checks.filter(c => c.level === 'warn').length, pass = a.checks.filter(c => c.level === 'pass').length;
     const table = dataTable();
     $('#insight').innerHTML = `<h2>What this shows</h2><p class="headline">${esc(a.headline)}</p>
+      ${a.howTo ? `<div class="howto fit"><b>How these fit together</b>${esc(a.howTo)}</div>` : ''}
       <ul class="facts">${a.facts.map(f => `<li>${esc(f.text)}</li>`).join('')}</ul>
       ${ds.howToRead?.length ? `<div class="howto"><b>How to read it</b>${ds.howToRead.map(h => esc(h)).join(' ')}</div>` : ''}
       <h2>Trust check</h2><div class="trust-score"><b>${pass}</b> passed · <b>${warn}</b> to review</div>
@@ -631,6 +696,17 @@
   $('#insight').addEventListener('click', e => { const t = e.target.closest('[data-act]'); if (t) ACTIONS[t.dataset.act]?.(t); });
 
   function dataTable() {
+    // Overlays: show the combined numbers, not just the first dataset's.
+    const cd = S.comboDs;
+    if (cd?.kind === 'scatter') {
+      const yi = cd.years.length - 1;
+      const rows = cd.points.filter(p => p.xs[yi] != null && p.ys[yi] != null).sort((a, b) => b.ys[yi] - a.ys[yi]);
+      return `<table class="data-table"><tr><th>${esc({ 'us-states': 'State', 'us-counties': 'County', world: 'Country' }[cd.geo] || 'Place')} (${cd.years[yi]})</th><th>${esc(cd.x.title)}</th><th>${esc(cd.y.title)}</th></tr>${rows.map(p => `<tr><td>${esc(p.name)}</td><td>${esc(PS.fmt(p.xs[yi], cd.x.unit))}</td><td>${esc(PS.fmt(p.ys[yi], cd.y.unit))}</td></tr>`).join('')}</table>`;
+    }
+    if (cd?.combo) {
+      const fq = cd.frequency === 'weekly' || cd.frequency === 'daily' ? 'monthly' : cd.frequency;
+      return cd.series.map(sr => `<p class="muted" style="margin:8px 0 2px"><b>${esc(sr.name)}</b></p><table class="data-table"><tr><th>Date</th><th>${esc(sr.unit.label)}</th>${cd.refLine != null ? '<th>Index</th>' : ''}</tr>${sr.raw.slice(-8).reverse().map((p, i, arr) => { const ix = sr.pts[sr.pts.length - 1 - i]; return `<tr><td>${esc(PS.fmtDate(p.t, fq))}</td><td>${esc(PS.fmt(p.v, sr.unit))}</td>${cd.refLine != null ? `<td>${Math.round(ix.v)}</td>` : ''}</tr>`; }).join('')}</table>`).join('');
+    }
     const ds = S.ds, v = S.analysis.view, u = ds.unit;
     let rows = [];
     if (ds.kind === 'timeseries') rows = v.series[0].pts.slice(-15).reverse().map(p => [PS.fmtDate(p.t, ds.frequency), PS.fmt(p.v, u)]);

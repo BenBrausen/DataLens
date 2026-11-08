@@ -131,6 +131,7 @@
   const HYPE = /\b(skyrocket\w*|soar\w*|plummet\w*|explod\w*|collaps\w*|crash\w*|surg\w*|spik\w*|crisis|record[- ]breaking|unprecedented|massive|huge)\b/i;
 
   PS.analyze = function (ds, o) {
+    if (ds.combo) return PS.analyzeCombo(ds, o);
     const view = PS.windowed(ds, o);
     const r = ds.kind === 'timeseries' ? tsFacts(ds, view) : ds.kind === 'panel' ? panelFacts(ds, view, o) : eventFacts(ds, view);
     const checks = [];
