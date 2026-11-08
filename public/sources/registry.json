@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-08T15:31:10.949Z",
+ "generated": "2026-11-08T15:45:42.577Z",
  "tiers": [
   {
    "id": "federal",
@@ -535,7 +535,7 @@
      "platform": "website",
      "host": "open.alabama.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=ecupH7bxameyeamw",
@@ -545,7 +545,7 @@
      "host": "hub.arcgis.com",
      "orgId": "ecupH7bxameyeamw",
      "datasets": 226,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -561,7 +561,7 @@
      "platform": "arcgis",
      "host": "data-soa-dnr.opendata.arcgis.com",
      "datasets": 144,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -577,7 +577,7 @@
      "platform": "arcgis",
      "host": "azgeo-data-hub-agic.hub.arcgis.com",
      "datasets": 731,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -593,7 +593,7 @@
      "platform": "arcgis",
      "host": "geodata.gis.arkansas.gov",
      "datasets": 294,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -609,7 +609,7 @@
      "platform": "ckan",
      "host": "data.ca.gov",
      "datasets": 4696,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://bythenumbers.sco.ca.gov/",
@@ -618,7 +618,7 @@
      "platform": "socrata",
      "host": "bythenumbers.sco.ca.gov",
      "datasets": 101,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -634,7 +634,7 @@
      "platform": "socrata",
      "host": "data.colorado.gov",
      "datasets": 640,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -650,7 +650,7 @@
      "platform": "socrata",
      "host": "data.ct.gov",
      "datasets": 589,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -666,7 +666,7 @@
      "platform": "socrata",
      "host": "data.delaware.gov",
      "datasets": 180,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -683,7 +683,7 @@
      "host": "hub.arcgis.com",
      "orgId": "neT9SoYxizqTHZPH",
      "datasets": 5509,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -709,7 +709,7 @@
      "host": "hub.arcgis.com",
      "orgId": "nRHtyn3uE1kyzoYc",
      "datasets": 1416,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=O1JpcwDW8sjYuddV",
@@ -719,7 +719,7 @@
      "host": "hub.arcgis.com",
      "orgId": "O1JpcwDW8sjYuddV",
      "datasets": 1316,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=z6TmTIyYXEYhuNM0",
@@ -729,7 +729,7 @@
      "host": "hub.arcgis.com",
      "orgId": "z6TmTIyYXEYhuNM0",
      "datasets": 1125,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -755,7 +755,7 @@
      "host": "hub.arcgis.com",
      "orgId": "6RaeG1zfsIoM9Lze",
      "datasets": 531,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=Za9Nk6CPIPbvR1t7",
@@ -765,7 +765,7 @@
      "host": "hub.arcgis.com",
      "orgId": "Za9Nk6CPIPbvR1t7",
      "datasets": 198,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=Gqyymy5JISeLzyNM",
@@ -775,7 +775,7 @@
      "host": "hub.arcgis.com",
      "orgId": "Gqyymy5JISeLzyNM",
      "datasets": 183,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -791,7 +791,7 @@
      "platform": "ckan",
      "host": "opendata.hawaii.gov",
      "datasets": 963,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://highways.hidot.hawaii.gov/",
@@ -800,7 +800,7 @@
      "platform": "socrata",
      "host": "highways.hidot.hawaii.gov",
      "datasets": 304,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -816,7 +816,7 @@
      "platform": "website",
      "host": "data.gis.idaho.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=CNPdEkvnGl65jCX8",
@@ -826,7 +826,7 @@
      "host": "hub.arcgis.com",
      "orgId": "CNPdEkvnGl65jCX8",
      "datasets": 1252,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=Qqv4dYPC8Vv8e3c3",
@@ -836,7 +836,7 @@
      "host": "hub.arcgis.com",
      "orgId": "Qqv4dYPC8Vv8e3c3",
      "datasets": 347,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=iRCkLgFRU45VAYn3",
@@ -846,7 +846,7 @@
      "host": "hub.arcgis.com",
      "orgId": "iRCkLgFRU45VAYn3",
      "datasets": 258,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -862,7 +862,7 @@
      "platform": "website",
      "host": "data.illinois.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=aIrBD8yn1TDTEXoz",
@@ -872,7 +872,7 @@
      "host": "hub.arcgis.com",
      "orgId": "aIrBD8yn1TDTEXoz",
      "datasets": 221,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=b9DHj1BjfdLLFv11",
@@ -882,7 +882,7 @@
      "host": "hub.arcgis.com",
      "orgId": "b9DHj1BjfdLLFv11",
      "datasets": 187,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -898,7 +898,7 @@
      "platform": "arcgis",
      "host": "www.indianamap.org",
      "datasets": 432,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -914,7 +914,7 @@
      "platform": "website",
      "host": "data.iowa.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=vPD5PVLI6sfkZ5E4",
@@ -924,7 +924,7 @@
      "host": "hub.arcgis.com",
      "orgId": "vPD5PVLI6sfkZ5E4",
      "datasets": 269,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=8lRhdTsQyJpO52F1",
@@ -934,7 +934,7 @@
      "host": "hub.arcgis.com",
      "orgId": "8lRhdTsQyJpO52F1",
      "datasets": 290,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=r6iFVcMJeA4kB4GC",
@@ -944,7 +944,7 @@
      "host": "hub.arcgis.com",
      "orgId": "r6iFVcMJeA4kB4GC",
      "datasets": 263,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -960,7 +960,7 @@
      "platform": "arcgis",
      "host": "hub.kansasgis.org",
      "datasets": 300,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -976,7 +976,7 @@
      "platform": "website",
      "host": "kygeonet.ky.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://opendata-kygeonet.opendata.arcgis.com/",
@@ -986,7 +986,7 @@
      "host": "hub.arcgis.com",
      "orgId": "ghsX9CKghMvyYjBU",
      "datasets": 485,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1002,7 +1002,7 @@
      "platform": "website",
      "host": "data-ladotd.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=PLiuXYMBpMK5h36e",
@@ -1012,7 +1012,7 @@
      "host": "hub.arcgis.com",
      "orgId": "PLiuXYMBpMK5h36e",
      "datasets": 248,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1028,7 +1028,7 @@
      "platform": "website",
      "host": "www.maine.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=RbMX0mRVOFNTdLzd",
@@ -1038,7 +1038,7 @@
      "host": "hub.arcgis.com",
      "orgId": "RbMX0mRVOFNTdLzd",
      "datasets": 1177,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1054,7 +1054,7 @@
      "platform": "socrata",
      "host": "opendata.maryland.gov",
      "datasets": 1532,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1070,7 +1070,7 @@
      "platform": "website",
      "host": "www.mass.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://open-data-massgis.hub.arcgis.com/",
@@ -1080,7 +1080,7 @@
      "host": "hub.arcgis.com",
      "orgId": "hGdibHYSPO59RG1h",
      "datasets": 601,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1096,7 +1096,7 @@
      "platform": "socrata",
      "host": "data.michigan.gov",
      "datasets": 242,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1112,7 +1112,7 @@
      "platform": "arcgis",
      "host": "gis.data.mn.gov",
      "datasets": 914,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1128,7 +1128,7 @@
      "platform": "arcgis",
      "host": "www.gis.ms.gov",
      "datasets": 18,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1144,7 +1144,7 @@
      "platform": "socrata",
      "host": "data.mo.gov",
      "datasets": 262,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1160,7 +1160,7 @@
      "platform": "website",
      "host": "data.mt.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=qnjIrwR8z5Izc0ij",
@@ -1170,7 +1170,7 @@
      "host": "hub.arcgis.com",
      "orgId": "qnjIrwR8z5Izc0ij",
      "datasets": 587,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=DRQySz3VhPgOv7Bo",
@@ -1180,7 +1180,7 @@
      "host": "hub.arcgis.com",
      "orgId": "DRQySz3VhPgOv7Bo",
      "datasets": 291,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=dKlvxNSUvl36IGMp",
@@ -1190,7 +1190,7 @@
      "host": "hub.arcgis.com",
      "orgId": "dKlvxNSUvl36IGMp",
      "datasets": 274,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1206,7 +1206,7 @@
      "platform": "website",
      "host": "www.ne.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=Sj9eBhzWwOMzQCfI",
@@ -1216,7 +1216,7 @@
      "host": "hub.arcgis.com",
      "orgId": "Sj9eBhzWwOMzQCfI",
      "datasets": 156,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1232,7 +1232,7 @@
      "platform": "website",
      "host": "goed.nv.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=RyxlXSfFi87rAosq",
@@ -1242,7 +1242,7 @@
      "host": "hub.arcgis.com",
      "orgId": "RyxlXSfFi87rAosq",
      "datasets": 389,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=9Y4hSlLf13E9S0Eo",
@@ -1252,7 +1252,7 @@
      "host": "hub.arcgis.com",
      "orgId": "9Y4hSlLf13E9S0Eo",
      "datasets": 71,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=hKjkLA70e5yLFrt0",
@@ -1262,7 +1262,7 @@
      "host": "hub.arcgis.com",
      "orgId": "hKjkLA70e5yLFrt0",
      "datasets": 34,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1278,7 +1278,7 @@
      "platform": "arcgis",
      "host": "granit.unh.edu",
      "datasets": 309,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1294,7 +1294,7 @@
      "platform": "socrata",
      "host": "data.nj.gov",
      "datasets": 116,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1320,7 +1320,7 @@
      "host": "hub.arcgis.com",
      "orgId": "qXZbWTdPDbTjl7Dy",
      "datasets": 87,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1336,7 +1336,7 @@
      "platform": "socrata",
      "host": "data.ny.gov",
      "datasets": 1036,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1352,7 +1352,7 @@
      "platform": "arcgis",
      "host": "www.nconemap.gov",
      "datasets": 254,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1368,7 +1368,7 @@
      "platform": "website",
      "host": "www.gis.nd.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=GOcSXpzwBHyk2nog",
@@ -1378,7 +1378,7 @@
      "host": "hub.arcgis.com",
      "orgId": "GOcSXpzwBHyk2nog",
      "datasets": 205,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1394,7 +1394,7 @@
      "platform": "website",
      "host": "data.ohio.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=1AlElnGrgBM62OSj",
@@ -1404,7 +1404,7 @@
      "host": "hub.arcgis.com",
      "orgId": "1AlElnGrgBM62OSj",
      "datasets": 549,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=ajRlmtxbNBjZggOT",
@@ -1414,7 +1414,7 @@
      "host": "hub.arcgis.com",
      "orgId": "ajRlmtxbNBjZggOT",
      "datasets": 128,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=MlJ0G8iWUyC7jAmu",
@@ -1424,7 +1424,7 @@
      "host": "hub.arcgis.com",
      "orgId": "MlJ0G8iWUyC7jAmu",
      "datasets": 87,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1440,7 +1440,7 @@
      "platform": "ckan",
      "host": "data.ok.gov",
      "datasets": 398,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1456,7 +1456,7 @@
      "platform": "socrata",
      "host": "data.oregon.gov",
      "datasets": 540,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1472,7 +1472,7 @@
      "platform": "socrata",
      "host": "data.pa.gov",
      "datasets": 352,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1488,7 +1488,7 @@
      "platform": "website",
      "host": "www.ri.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=EOvMKOFaeiXUzBcH",
@@ -1498,7 +1498,7 @@
      "host": "hub.arcgis.com",
      "orgId": "EOvMKOFaeiXUzBcH",
      "datasets": 42,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=7arM4WYbUOtKu3Zq",
@@ -1508,7 +1508,7 @@
      "host": "hub.arcgis.com",
      "orgId": "7arM4WYbUOtKu3Zq",
      "datasets": 40,
-     "checked": "2026-11-08T15:18:43.671Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1524,7 +1524,7 @@
      "platform": "website",
      "host": "www.sc.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=VaY7cY9pvUYUP1Lf",
@@ -1534,7 +1534,7 @@
      "host": "hub.arcgis.com",
      "orgId": "VaY7cY9pvUYUP1Lf",
      "datasets": 891,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=acgZYxoN5Oj8pDLa",
@@ -1544,7 +1544,7 @@
      "host": "hub.arcgis.com",
      "orgId": "acgZYxoN5Oj8pDLa",
      "datasets": 258,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=OMDIQXm11z4wcK26",
@@ -1554,7 +1554,7 @@
      "host": "hub.arcgis.com",
      "orgId": "OMDIQXm11z4wcK26",
      "datasets": 87,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1570,7 +1570,7 @@
      "platform": "website",
      "host": "open.sd.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1586,7 +1586,7 @@
      "platform": "arcgis",
      "host": "geodata.tn.gov",
      "datasets": 93,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://healthdata.tn.gov/",
@@ -1595,7 +1595,7 @@
      "platform": "socrata",
      "host": "healthdata.tn.gov",
      "datasets": 295,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1611,7 +1611,7 @@
      "platform": "socrata",
      "host": "data.texas.gov",
      "datasets": 830,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1627,7 +1627,7 @@
      "platform": "website",
      "host": "gis.utah.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=KaHXE9OkiB9e63uE",
@@ -1637,7 +1637,7 @@
      "host": "hub.arcgis.com",
      "orgId": "KaHXE9OkiB9e63uE",
      "datasets": 288,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://opendata.gis.utah.gov/",
@@ -1647,7 +1647,7 @@
      "host": "hub.arcgis.com",
      "orgId": "99lidPhWCzftIe9K",
      "datasets": 863,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1663,7 +1663,7 @@
      "platform": "socrata",
      "host": "data.vermont.gov",
      "datasets": 172,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1679,7 +1679,7 @@
      "platform": "ckan",
      "host": "data.virginia.gov",
      "datasets": 32102,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1695,7 +1695,7 @@
      "platform": "socrata",
      "host": "data.wa.gov",
      "datasets": 1076,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1711,7 +1711,7 @@
      "platform": "website",
      "host": "dep.wv.gov",
      "datasets": null,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=3iZGO9lgMHNG1V3R",
@@ -1721,7 +1721,7 @@
      "host": "hub.arcgis.com",
      "orgId": "3iZGO9lgMHNG1V3R",
      "datasets": 227,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1747,7 +1747,7 @@
      "host": "hub.arcgis.com",
      "orgId": "Ul9AyFFeFTjf08DW",
      "datasets": 414,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=0pgGLzT0Nh7FVjon",
@@ -1757,7 +1757,7 @@
      "host": "hub.arcgis.com",
      "orgId": "0pgGLzT0Nh7FVjon",
      "datasets": 151,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=o4NJgD3NfeHnWy06",
@@ -1767,7 +1767,7 @@
      "host": "hub.arcgis.com",
      "orgId": "o4NJgD3NfeHnWy06",
      "datasets": 74,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   },
@@ -1783,7 +1783,7 @@
      "platform": "arcgis",
      "host": "data.geospatialhub.org",
      "datasets": 116,
-     "checked": "2026-11-08T15:31:10.949Z"
+     "checked": "2026-11-08T15:45:42.577Z"
     }
    ]
   }
