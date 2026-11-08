@@ -994,7 +994,7 @@ builders['crime'] = async () => {
       lens: { 'violent-crime': 'Violent crime', 'property-crime': 'Property crime', homicide: 'Homicide' }[off],
       source: { publisher: 'Federal Bureau of Investigation', dataset: 'Crime Data Explorer, Uniform Crime Reporting (summarized)', url: 'https://cde.ucr.cjis.gov/' },
       howToRead: ['Counts crimes reported to police, not all crimes: many go unreported, especially property crimes and rape.', 'The FBI changed reporting systems in 2021 and many agencies did not submit that year, so 2021 is the least complete year.'],
-      caveats: [`A state-year is left blank when agencies covering less than ${MIN_COVER}% of its residents reported (${dropped} blanks).`, 'Definitions changed over time (for example, the FBI broadened its definition of rape in 2013), so long-term comparisons carry caveats.'],
+      caveats: [`A state-year is left blank when agencies covering less than ${MIN_COVER}% of its residents reported (${dropped} blanks).`, 'Rates are computed from the agencies that reported. The FBI\'s official national estimates fill in for non-reporting agencies and run 1-6% lower in some years (1991: about 758 violent crimes per 100,000 vs. 798 here). Cite "FBI Crime Data Explorer, reported agencies" when using these.', 'Definitions changed over time (for example, the FBI broadened its definition of rape in 2013), so long-term comparisons carry caveats.'],
       isRate: true, national: { name: 'United States', values: nat.map(x => x.v) } }, years.map(y => `${y}-12-31`), entities));
   }
   return out;
