@@ -186,17 +186,28 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 ## Sharing
 
 - **Sizes**
-  - 9:16 for TikTok, Reels and Shorts
+  - 9:16 for TikTok, Instagram and Facebook Reels and Stories, and YouTube Shorts
   - 4:5 feed for Facebook, LinkedIn and Instagram
   - 1:1 for LinkedIn, X and Threads
-  - 16:9
+  - 16:9 for YouTube, slides, web and broadcast
+  - 3:2 for blogs, newsletters and reports
   - 1.91:1 link preview (1200×628) for LinkedIn, Facebook and X
   - 2:3 for Pinterest
+- **9:16 safe area:** content stays out of the union of every vertical platform's overlays (organic posts): top 13% for tabs and the Stories profile and progress bar, right 14% for the like, comment and share buttons, bottom 25% for the caption, username, sound and reply bar. Stills get the same margins, since Stories and TikTok photo posts are covered too. The "Safe zones" toggle under the preview labels each area. Paid ads add a CTA button and need more bottom room (about 35%).
 - **LinkedIn carousel:** a 4-page PDF document post. The pages are the chart, what the data shows, how to read it, and sources & method.
 - **Post text:** a version for each platform (LinkedIn, Facebook, X, Instagram, TikTok), with hashtags by topic, plus alt text.
 - **Captions file:** `.srt` captions for video, timed to match the burned-in captions. LinkedIn and Facebook accept them as uploads.
 - **PNG metadata:** exports carry title, description, source, source URL and the share link as embedded text. Platforms strip this on upload, so it is for provenance, not reach.
 - **Share to apps:** on phones and Safari, the system share sheet sends the file and text straight to installed apps. Elsewhere, the post text is copied and the platform's composer opens.
+
+## Presentations, reports and websites
+
+- **PowerPoint (.pptx):** a 16:9 deck. Slide 1 is the chart exactly as exported (title, source line and stamps included). The rest are editable: what the data shows, how to read it, and sources and method. Every slide's speaker notes carry the takeaway, facts, cautions and sources, so the context travels with the presenter. Opens in PowerPoint, Keynote and Google Slides. Exported MP4s can be dropped onto a slide for the animated version.
+- **One-page brief (PDF):** US Letter, real selectable text: the chart at 3:2, what it shows, how to read it, what to keep in mind, and the source with a link. Text is measured first and the chart shrinks if needed, so it always fits on one page.
+- **Data (CSV):** every number behind the current chart (respecting the chosen range, focus and overlays), with the title, source, URL and retrieval date as `#` lines on top.
+- **Embed:** an `<iframe>` of the share link with `?embed=1`. It shows only the chart and player, plus a live-data line and an "Open in Plainsight" link. It rebuilds from the latest data on every visit, and if the creator's text no longer matches a newer release, it says so on the embed. Phone sizes embed as 16:9.
+
+All of these go through the same claim check as images and video.
 
 ## Comparing datasets (overlays)
 

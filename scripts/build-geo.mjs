@@ -27,4 +27,5 @@ fs.writeFileSync('public/js/geo-counties.js', `window.PS_GEO_COUNTIES=${JSON.str
 fs.copyFileSync('node_modules/d3/dist/d3.min.js', 'public/vendor/d3.min.js');
 fs.copyFileSync('node_modules/topojson-client/dist/topojson-client.min.js', 'public/vendor/topojson-client.min.js');
 fs.copyFileSync('node_modules/jspdf/dist/jspdf.umd.min.js', 'public/vendor/jspdf.umd.min.js');
+fs.copyFileSync('node_modules/pptxgenjs/dist/pptxgen.bundle.js', 'public/vendor/pptxgen.bundle.js');
 console.log('geo-data.js', (out.length / 1024).toFixed(0) + 'KB');

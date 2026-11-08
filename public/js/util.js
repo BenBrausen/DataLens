@@ -179,11 +179,22 @@ window.PS = window.PS || {};
   // ---------- platforms ----------
   // safe: fraction insets {t,r,b,l} that keep content clear of platform UI overlays.
   PS.PLATFORMS = {
-    vertical: { name: 'TikTok / Reels / Shorts', ratio: '9:16', w: 1080, h: 1920, dur: 20, safe: { t: 0.09, r: 0.12, b: 0.19, l: 0.06 } },
+    // 9:16 safe area is the union of TikTok, Instagram/Facebook Reels and Stories, and
+    // YouTube Shorts overlays (organic posts): top tabs and the Stories profile bar,
+    // the right-side action buttons, and the caption, username, sound and reply bar.
+    // Applies to stills too, since Stories and TikTok photo posts get the same overlays.
+    vertical: { name: 'TikTok, Reels, Shorts, Stories', ratio: '9:16', w: 1080, h: 1920, dur: 20, uiOverlay: true,
+      safe: { t: 0.13, r: 0.14, b: 0.25, l: 0.06 },
+      zones: [
+        { side: 't', label: 'Tabs, profile and progress bar (Stories)' },
+        { side: 'r', label: 'Like, comment, share buttons' },
+        { side: 'b', label: 'Caption, username, sound, reply bar' },
+      ] },
     feed: { name: 'Feed: Facebook, LinkedIn, Instagram', ratio: '4:5', w: 1080, h: 1350, dur: 15, safe: { t: 0.05, r: 0.06, b: 0.05, l: 0.06 } },
     square: { name: 'Square: LinkedIn, X, Threads', ratio: '1:1', w: 1080, h: 1080, dur: 15, safe: { t: 0.05, r: 0.05, b: 0.05, l: 0.05 } },
-    landscape: { name: 'YouTube / web / broadcast', ratio: '16:9', w: 1920, h: 1080, dur: 30, safe: { t: 0.06, r: 0.05, b: 0.06, l: 0.05 } },
+    landscape: { name: 'YouTube, slides, web, broadcast', ratio: '16:9', w: 1920, h: 1080, dur: 30, safe: { t: 0.06, r: 0.05, b: 0.06, l: 0.05 } },
     link: { name: 'Link preview: LinkedIn, Facebook, X', ratio: '1.91:1', w: 1200, h: 628, dur: 15, safe: { t: 0.05, r: 0.04, b: 0.05, l: 0.04 } },
+    report: { name: 'Blog, newsletter, report', ratio: '3:2', w: 1800, h: 1200, dur: 15, safe: { t: 0.05, r: 0.05, b: 0.05, l: 0.05 } },
     pin: { name: 'Pinterest', ratio: '2:3', w: 1000, h: 1500, dur: 15, safe: { t: 0.05, r: 0.06, b: 0.08, l: 0.06 } },
   };
 

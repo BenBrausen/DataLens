@@ -79,7 +79,7 @@
   };
 
   // ---------- LinkedIn carousel (PDF document post) ----------
-  const loadScript = src => new Promise((res, rej) => { if (window.jspdf) return res(); const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('Could not load the PDF library.')); document.head.appendChild(s); });
+  const loadScript = (src, global = 'jspdf') => new Promise((res, rej) => { if (window[global]) return res(); const s = document.createElement('script'); s.src = src; s.onload = res; s.onerror = () => rej(new Error('Could not load the export library. Check your connection and try again.')); document.head.appendChild(s); });
   // Text-only slide drawn in the chart's own look.
   function textSlide(st, W, H, heading, items, footer) {
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const ctx = cv.getContext('2d'); const T = st.T, S = W / 1080;
@@ -118,6 +118,135 @@
     pages.forEach((p, i) => { if (i) doc.addPage([W, H], 'portrait'); doc.addImage(p, 'JPEG', 0, 0, W, H); });
     doc.setProperties({ title: o.title, subject: analysis.headline, author: o.handle || 'Plainsight', keywords: `${ds.source.publisher}, open data`, creator: 'Plainsight' });
     return doc.output('blob');
+  };
+
+  // ---------- presentation and report exports ----------
+  // Shared text for slides, briefs and notes, so every format says the same thing.
+  function storyParts(ds, analysis, o, link) {
+    const src = `${sourceText(ds)}${ds.source.via ? ' (via ' + ds.source.via + ')' : ''}`;
+    return {
+      title: o.title || ds.title,
+      takeaway: o.takeawayText || analysis.headline,
+      facts: (analysis.facts || []).slice(0, 5).map(f => f.text),
+      read: [...(ds.howToRead || []), analysis.howTo].filter(Boolean).slice(0, 3),
+      care: (analysis.checks || []).filter(c => c.level === 'warn' || c.title === 'Context').slice(0, 4).map(c => `${c.title}: ${c.detail}`),
+      caveats: (ds.caveats || []).filter(c => !(analysis.checks || []).some(k => k.detail && (k.detail.includes(c) || c.includes(k.detail)))).slice(0, 3),
+      source: src, url: ds.source.url || '', retrieved: PS.fmtRetrieved(ds.retrieved),
+      link: link || '', unverified: !!ds.source.unverified,
+    };
+  }
+  // jsPDF's built-in fonts cover Latin-1 only; map the rest so nothing renders as junk.
+  const latin = t => String(t ?? '').replace(/[–—−]/g, '-').replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/…/g, '...')
+    .replace(/•/g, '-').replace(/→/g, '->').replace(/[₀-₉]/g, c => String(c.charCodeAt(0) - 0x2080)).replace(/ /g, ' ').replace(/[^\x00-\xFF]/g, '');
+  const hex = c => (/^#?([0-9a-f]{6})$/i.exec(String(c).trim()) || [, '2A78D6'])[1].toUpperCase();
+
+  // PowerPoint: the chart full-bleed, then editable text slides; speaker notes carry the
+  // takeaway, facts and sources so a presenter can't lose the context.
+  PS.exportPptx = async ({ chartPng, ds, analysis, o, link, st, vendorBase = '' }) => {
+    await loadScript(`${vendorBase}vendor/pptxgen.bundle.js`, 'PptxGenJS');
+    const k = storyParts(ds, analysis, o, link), accent = hex(st?.accent), ink = '1A1A1A', muted = '5B6470', face = 'Arial';
+    const pptx = new window.PptxGenJS();
+    pptx.layout = 'LAYOUT_WIDE'; // 13.333 x 7.5 in, 16:9
+    pptx.title = k.title; pptx.subject = k.takeaway; pptx.author = o.handle || 'Plainsight'; pptx.company = 'Made with Plainsight';
+    const notes = [k.takeaway, '', ...k.facts.map(f => '- ' + f), '', ...k.read, ...(k.care.length ? ['', 'Keep in mind:', ...k.care.map(c => '- ' + c)] : []), '',
+      `Source: ${k.source}. Retrieved ${k.retrieved}.`, k.url, k.link ? `Rebuild this chart from the official data: ${k.link}` : ''].filter(x => x != null).join('\n');
+    const foot = (slide, text) => slide.addText(text, { x: 0.6, y: 6.75, w: 12.1, h: 0.45, fontFace: face, fontSize: 11, color: muted, valign: 'bottom' });
+    const head = (slide, text) => {
+      slide.addShape(pptx.ShapeType.rect, { x: 0.6, y: 0.62, w: 0.09, h: 0.5, fill: { color: accent }, line: { color: accent } });
+      slide.addText(text, { x: 0.85, y: 0.5, w: 11.9, h: 0.75, fontFace: face, fontSize: 30, bold: true, color: ink, valign: 'middle' });
+    };
+    const srcLine = `Source: ${k.source}. Retrieved ${k.retrieved}.`;
+    // 1. The chart, exactly as exported (title, source line and stamps included).
+    const s1 = pptx.addSlide(); s1.background = { color: 'FFFFFF' };
+    s1.addImage({ data: chartPng.replace(/^data:/, ''), x: 0, y: 0, w: 13.333, h: 7.5, altText: PS.altText(ds, analysis, o) });
+    s1.addNotes(notes);
+    // 2. What the data shows (editable).
+    const s2 = pptx.addSlide(); head(s2, 'What the data shows');
+    s2.addText(k.takeaway, { x: 0.85, y: 1.45, w: 11.9, h: 1.3, fontFace: face, fontSize: 24, bold: true, color: ink, valign: 'top' });
+    if (k.facts.length) s2.addText(k.facts.map(f => ({ text: f, options: { bullet: { indent: 18 }, breakLine: true, paraSpaceAfter: 10 } })), { x: 0.85, y: 2.9, w: 11.9, h: 3.7, fontFace: face, fontSize: 18, color: ink, valign: 'top' });
+    foot(s2, srcLine); s2.addNotes(notes);
+    // 3. How to read it, only when there is something to say.
+    if (k.read.length || k.care.length) {
+      const s3 = pptx.addSlide(); head(s3, 'How to read it');
+      const items = [...k.read.map(t => ({ text: t, options: { breakLine: true, paraSpaceAfter: 12 } })), ...k.care.map(t => ({ text: t, options: { bullet: { indent: 18 }, breakLine: true, color: muted, fontSize: 15, paraSpaceAfter: 8 } }))];
+      s3.addText(items, { x: 0.85, y: 1.45, w: 11.9, h: 5.2, fontFace: face, fontSize: 18, color: ink, valign: 'top' });
+      foot(s3, srcLine); s3.addNotes(notes);
+    }
+    // 4. Sources and method.
+    const s4 = pptx.addSlide(); head(s4, 'Sources and method');
+    const rows = [{ text: k.unverified ? `Data provided by the presenter (${ds.source.dataset}); not verified by Plainsight.` : `${k.source}. Retrieved ${k.retrieved}.`, options: { breakLine: true, paraSpaceAfter: 10 } }];
+    if (k.url) rows.push({ text: k.url, options: { hyperlink: { url: k.url }, color: accent, fontSize: 15, breakLine: true, paraSpaceAfter: 14 } });
+    k.caveats.forEach(c => rows.push({ text: c, options: { bullet: { indent: 18 }, color: muted, fontSize: 15, breakLine: true, paraSpaceAfter: 8 } }));
+    rows.push({ text: 'Every number in this deck comes from the source data. Nothing is estimated by AI.', options: { breakLine: true, paraSpaceAfter: 10 } });
+    if (k.link) rows.push({ text: 'Rebuild this chart from the official data', options: { hyperlink: { url: k.link }, color: accent, fontSize: 15, breakLine: true } });
+    s4.addText(rows, { x: 0.85, y: 1.45, w: 11.9, h: 5.2, fontFace: face, fontSize: 18, color: ink, valign: 'top' });
+    foot(s4, o.handle ? `${o.handle} · Made with Plainsight` : 'Made with Plainsight'); s4.addNotes(notes);
+    return pptx.write({ outputType: 'blob' });
+  };
+
+  // One-page brief (US Letter PDF) with real, selectable text: for reports, newsrooms, handouts.
+  PS.exportBrief = async ({ chartPng, chartW, chartH, ds, analysis, o, link, st, vendorBase = '' }) => {
+    await loadScript(`${vendorBase}vendor/jspdf.umd.min.js`);
+    const k = storyParts(ds, analysis, o, link);
+    const doc = new window.jspdf.jsPDF({ unit: 'pt', format: 'letter' });
+    const W = 612, H = 792, M = 50, CW = W - M * 2, acc = hex(st?.accent), rgb = [0, 2, 4].map(i => parseInt(acc.slice(i, i + 2), 16));
+    // Lay out twice: measure the text first, then size the chart so everything fits one page.
+    let y = M, dry = true;
+    const BOTTOM = H - 56;
+    const para = (text, { size = 10.5, style = 'normal', color = [26, 26, 26], gap = 6, indent = 0, bullet = false } = {}) => {
+      doc.setFont('helvetica', style); doc.setFontSize(size); doc.setTextColor(...color);
+      const lines = doc.splitTextToSize(latin(text), CW - indent - (bullet ? 12 : 0)), lh = size * 1.32;
+      if (!dry) {
+        if (bullet) { doc.setFillColor(...rgb); doc.circle(M + indent + 3, y + size * 0.62, 2, 'F'); }
+        doc.text(lines, M + indent + (bullet ? 12 : 0), y, { baseline: 'top' });
+      }
+      y += lines.length * lh + gap;
+    };
+    const heading = text => { y += 6; if (!dry) { doc.setFillColor(...rgb); doc.rect(M, y + 1, 3, 11, 'F'); } para(text.toUpperCase(), { size: 9.5, style: 'bold', color: [91, 100, 112], indent: 10, gap: 6 }); };
+    const body = () => {
+      heading('What the data shows');
+      para(k.takeaway, { size: 13, style: 'bold', gap: 8 });
+      k.facts.forEach(f => para(f, { bullet: true, gap: 4 }));
+      if (k.read.length) { heading('How to read it'); k.read.forEach(t => para(t)); }
+      if (k.care.length) { heading('Keep in mind'); k.care.forEach(t => para(t, { bullet: true, size: 9.5, color: [70, 76, 84], gap: 3 })); }
+      heading('Source');
+      para(k.unverified ? `Data provided by the creator (${ds.source.dataset}); not verified by Plainsight.` : `${k.source}. Retrieved ${k.retrieved}.`, { size: 9.5 });
+      if (k.url) { if (!dry) { doc.setTextColor(...rgb); doc.setFontSize(9.5); doc.textWithLink(latin(k.url).slice(0, 110), M, y, { url: k.url, baseline: 'top' }); } y += 16; }
+    };
+    y = 0; body(); const textH = y;
+    // Chart takes the full width unless that would push the text off the page (min 55% width).
+    let iw = CW, ih = CW * chartH / chartW;
+    const room = BOTTOM - M - 18 - textH;
+    if (ih > room) { ih = Math.max(room, CW * 0.55 * chartH / chartW); iw = ih * chartW / chartH; }
+    dry = false; y = M;
+    const ix = M + (CW - iw) / 2;
+    doc.addImage(chartPng, 'PNG', ix, y, iw, ih, undefined, 'FAST'); doc.setDrawColor(225, 228, 232); doc.rect(ix, y, iw, ih); y += ih + 18;
+    body();
+    // Caveats only if they fit: the brief is meant to stay one page.
+    for (const c of k.caveats) { doc.setFontSize(9); if (y + doc.splitTextToSize(latin(c), CW).length * 9 * 1.32 > BOTTOM) break; para(c, { size: 9, color: [91, 100, 112], gap: 3 }); }
+    // Footer on every page.
+    const n = doc.getNumberOfPages();
+    for (let i = 1; i <= n; i++) {
+      doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(120, 126, 134);
+      doc.text(latin(`${o.handle ? o.handle + ' · ' : ''}Made with Plainsight · ${new Date().toISOString().slice(0, 10)}${n > 1 ? ` · ${i}/${n}` : ''}`), M, H - 34);
+      if (k.link) { doc.setTextColor(...rgb); doc.textWithLink('Rebuild this chart from the official data', W - M - doc.getTextWidth('Rebuild this chart from the official data'), H - 34, { url: k.link }); }
+    }
+    doc.setProperties({ title: k.title, subject: k.takeaway, author: o.handle || 'Plainsight', keywords: `${ds.source.publisher}, open data`, creator: 'Plainsight' });
+    return doc.output('blob');
+  };
+
+  // CSV of exactly what the chart shows, with the source on top so it travels with the numbers.
+  PS.toCsv = (head, rows, ds) => {
+    const q = v => { const t = v == null ? '' : String(v); return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
+    const meta = [['# ' + (ds.title || '')], [`# Source: ${sourceText(ds)}${ds.source.url ? ' ' + ds.source.url : ''}`], [`# Retrieved: ${PS.fmtRetrieved(ds.retrieved)}`], ...(ds.source.unverified ? [['# Uploaded by the creator; not verified by Plainsight']] : [])];
+    return '﻿' + [...meta, head, ...rows].map(r => r.map(q).join(',')).join('\r\n') + '\r\n';
+  };
+
+  // Embed: same share link, chart-only view, re-checked against the latest data on every load.
+  PS.embedCode = (link, P, title) => {
+    if (!link) return null;
+    const url = link.replace('#', (link.includes('?') ? '&' : '?') + 'embed=1#');
+    return `<iframe src="${url}" title="${String(title || 'Chart').replace(/"/g, '&quot;')}" style="width:100%;aspect-ratio:${P.w}/${P.h + Math.round(P.w * 0.06)};border:0" loading="lazy" allowfullscreen></iframe>`;
   };
 
   // ---------- share to installed apps / composers ----------

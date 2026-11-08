@@ -124,7 +124,9 @@
       if (ch.length) {
         ch.sort((a, b) => b.d - a.d);
         const up = ch[0], dn = ch[ch.length - 1];
-        facts.push({ k: 'mover', text: `Biggest rise since ${PS.fmtDate(ds._tms[fi], f)}: ${up.e.name}, ${PS.fmtChange(up.a, up.b, u, { noRel: ds.zeroLine })}.` });
+        // When nothing rose, "biggest rise" would name a decline; say what actually happened.
+        if (up.d > 0) facts.push({ k: 'mover', text: `Biggest rise since ${PS.fmtDate(ds._tms[fi], f)}: ${up.e.name}, ${PS.fmtChange(up.a, up.b, u, { noRel: ds.zeroLine })}.` });
+        else facts.push({ k: 'mover', text: `None rose since ${PS.fmtDate(ds._tms[fi], f)}. Smallest ${up.d === 0 ? 'change' : 'drop'}: ${up.e.name}, ${PS.fmtChange(up.a, up.b, u, { noRel: ds.zeroLine })}.` });
         if (dn.d < 0) facts.push({ k: 'faller', text: `Biggest drop: ${dn.e.name}, ${PS.fmtChange(dn.a, dn.b, u, { noRel: ds.zeroLine })}.` });
         const medA = ch.map(x => x.a).sort((a, b) => a - b)[Math.floor(ch.length / 2)], medB = ch.map(x => x.b).sort((a, b) => a - b)[Math.floor(ch.length / 2)];
         trend = Math.sign(medB - medA);

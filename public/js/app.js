@@ -490,6 +490,21 @@
       } catch (e) { toast(e.message); }
       o.platform = prevP; o.format = prevF; renderPlatforms(); update({ panels: false }); renderStep();
     },
+    pptx: async t => exportDoc(t, 'landscape', 'Building slides…', async png => {
+      const blob = await PS.exportPptx({ chartPng: png, ds: S.comboDs || S.ds, analysis: S.analysis, o: { ...o, title: o.title || S.ds.title }, link: PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts()), st: renderer.st });
+      return [blob, `${PS.slug(o.title)}-slides.pptx`, 'application/vnd.openxmlformats-officedocument.presentationml.presentation', 'Slides saved. Opens in PowerPoint, Keynote and Google Slides; sources are in the speaker notes.'];
+    }),
+    brief: async t => exportDoc(t, 'report', 'Building brief…', async (png, P) => {
+      const blob = await PS.exportBrief({ chartPng: png, chartW: P.w, chartH: P.h, ds: S.comboDs || S.ds, analysis: S.analysis, o: { ...o, title: o.title || S.ds.title }, link: PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts()), st: renderer.st });
+      return [blob, `${PS.slug(o.title)}-brief.pdf`, 'application/pdf', 'One-page brief saved.'];
+    }),
+    csv: async () => {
+      if (gate()) return;
+      const { head, rows } = csvRows(), ds = S.comboDs || S.ds;
+      await PS.download(new Blob([PS.toCsv(head, rows, { ...ds, title: o.title || S.ds.title })], { type: 'text/csv' }), `${PS.slug(o.title)}-data.csv`);
+      toast(`Data saved: ${rows.length.toLocaleString()} rows, with the source on top.`);
+    },
+    copyEmbed: async () => { const v = $('#embedCode')?.value; if (!v) return; try { await navigator.clipboard.writeText(v); toast('Embed code copied.'); } catch { $('#embedCode').select(); } },
     srt: async () => { if (gate()) return; await PS.download(new Blob([PS.srt(o.script, o.duration)], { type: 'text/plain' }), `${PS.slug(o.title)}.srt`); toast('Captions file saved. Upload it with the video on LinkedIn or Facebook.'); },
     shareApps: async () => {
       if (gate() || !S.lastExport) return;
@@ -720,6 +735,44 @@
     });
   };
 
+  // Render the final frame at another size (for slides and briefs), then restore the user's size.
+  async function exportDoc(t, platform, busy, build) {
+    if (gate()) return;
+    const label = t.textContent; t.disabled = true; t.textContent = busy;
+    const prevP = o.platform, prevF = o.format, prevSafe = o.showSafe;
+    o.platform = platform; o.format = 'image'; o.showSafe = false; update({ panels: false });
+    try {
+      renderer.draw(1);
+      const [blob, name, type, msg] = await build(renderer.canvas.toDataURL('image/png'), PS.PLATFORMS[platform]);
+      S.lastExport = { blob, name, type };
+      await PS.download(blob, name); toast(msg);
+    } catch (e) { toast(e.message || 'Export failed.'); }
+    o.platform = prevP; o.format = prevF; o.showSafe = prevSafe; renderPlatforms(); update({ panels: false });
+    t.disabled = false; t.textContent = label; renderStep();
+  }
+  // Every row behind the current chart (respecting range, focus and overlays).
+  function csvRows() {
+    const iso = t => { const d = new Date(t); return isNaN(d) ? String(t) : d.toISOString().slice(0, 10); };
+    const cd = S.comboDs;
+    if (cd?.kind === 'scatter') {
+      const head = ['Place', 'Year', `${cd.x.title} (${cd.x.unit.label})`, `${cd.y.title} (${cd.y.unit.label})`], rows = [];
+      cd.points.forEach(p => cd.years.forEach((yr, i) => { if (p.xs[i] != null || p.ys[i] != null) rows.push([p.name, yr, p.xs[i], p.ys[i]]); }));
+      return { head, rows };
+    }
+    if (cd?.combo) {
+      const rows = [];
+      cd.series.forEach(sr => sr.raw.forEach((p, i) => rows.push([sr.name, iso(p.t), p.v, ...(cd.refLine != null ? [sr.pts[i] ? +sr.pts[i].v.toFixed(2) : ''] : []), sr.unit.label])));
+      return { head: ['Series', 'Date', 'Value', ...(cd.refLine != null ? ['Index'] : []), 'Unit'], rows };
+    }
+    const ds = S.ds, v = S.analysis.view, u = ds.unit.label;
+    if (ds.kind === 'timeseries') return { head: ['Series', 'Date', `Value (${u})`], rows: v.series.flatMap(sr => sr.pts.map(p => [sr.name, iso(p.t), p.v])) };
+    if (ds.kind === 'panel') {
+      const idx = v.idx || ds.times.map((_, i) => i);
+      return { head: ['Code', 'Name', ...idx.map(i => iso(ds.times[i]))], rows: ds.entities.map(e => [e.code ?? e.id ?? '', e.name, ...idx.map(i => e.values[i])]) };
+    }
+    return { head: ['Time', 'Location', 'Latitude', 'Longitude', `Value (${u})`], rows: (v.events || ds.events).map(e => [e.t, e.label, e.lat, e.lon, e.value]) };
+  }
+
   // ---------- step: export ----------
   function integrityBox() {
     const b = S.integrity?.blocks || [];
@@ -737,6 +790,9 @@
     const caps = PS.postCaptions(ds.combo ? { ...ds, topic: S.ds.topic } : { ...S.ds, topic: S.ds.topic }, S.analysis, { ...o, title: o.title || S.ds.title }, link);
     const capTab = S.capTab || 'linkedin';
     const dis = blocked() ? 'disabled' : '';
+    // Websites want landscape: a phone-shaped size embeds as 16:9.
+    const embedP = ['vertical', 'pin', 'feed'].includes(o.platform) ? 'landscape' : o.platform;
+    const embed = PS.embedCode(PS.shareLink(S.ds.id, { ...o, platform: embedP }, S.state, DEFAULTS, autoOpts()), PS.PLATFORMS[embedP], o.title || S.ds.title);
     return integrityBox() + `<h3>Format</h3><div class="tabs">${[['video', 'Video'], ['image', 'Image']].map(([k, l]) => `<button data-fmt="${k}" class="${o.format === k ? 'active' : ''}">${l}</button>`).join('')}</div>
       <h3>Size</h3><div class="chips">${Object.entries(PS.PLATFORMS).map(([id, p]) => `<button class="chip ${o.platform === id ? 'active' : ''}" data-platform-x="${id}">${p.ratio} · ${esc(p.name)}</button>`).join('')}</div>
       <p class="muted">${P.w}×${P.h}px. Content stays inside the platform's safe area; toggle "Safe zones" under the preview to see it.</p>
@@ -748,6 +804,16 @@
       <button class="btn ${o.format === 'image' ? 'primary' : ''} block" data-act="png" style="margin-top:6px" ${dis}>Export PNG (final frame, with source details embedded)</button>
       <button class="btn block" data-act="carousel" style="margin-top:6px" ${dis}>LinkedIn carousel (4-page PDF)</button>
       ${o.format === 'video' && o.captions ? `<button class="btn block" data-act="srt" style="margin-top:6px" ${dis}>Captions file (.srt) for LinkedIn and Facebook</button>` : ''}
+      <h3>Presentations and reports</h3>
+      <div class="export-grid">
+        <button class="btn" data-act="pptx" ${dis}>PowerPoint slides<small>Chart + editable takeaway, sources in speaker notes</small></button>
+        <button class="btn" data-act="brief" ${dis}>One-page brief (PDF)<small>Chart, what it shows, how to read it, sources</small></button>
+        <button class="btn" data-act="csv" ${dis}>Data (CSV)<small>Every number behind this chart, source on top</small></button>
+      </div>
+      <p class="muted">Slides render at 16:9 and the brief at 3:2, whatever size is selected above. Exported videos drop straight into PowerPoint and Keynote too.</p>
+      <h3>Embed on a website</h3>
+      ${embed ? `<textarea id="embedCode" readonly style="min-height:80px;font-family:var(--mono, monospace);font-size:12px">${esc(embed)}</textarea><button class="btn block" data-act="copyEmbed" ${dis}>Copy embed code</button>
+      <p class="muted">Paste into any site or CMS. ${embedP !== o.platform ? 'Embeds use 16:9 for web pages. ' : ''}The embed rebuilds from the latest official data on every visit, so it stays current, and it flags itself if your text no longer matches a newer release.</p>` : '<p class="muted">Uploaded data can\'t be embedded; export an image instead.</p>'}
       <h3>Share</h3>
       ${S.lastExport ? `<p class="muted">Ready to share: ${esc(S.lastExport.name)}</p>` : '<p class="muted">Export a video or image first, then share it here.</p>'}
       <button class="btn primary block" data-act="shareApps" ${S.lastExport && !blocked() ? '' : 'disabled'}>Share to apps (LinkedIn, Facebook, Instagram…)</button>
@@ -822,7 +888,17 @@
   };
   try { const t = localStorage.getItem('ps-ui-theme'); if (t) document.documentElement.dataset.theme = t; } catch { }
 
+  // Sticky offsets follow the topbar's real height (it grows with the iOS safe area).
+  const topbar = document.querySelector('.topbar');
+  if (topbar) {
+    const setTopH = () => document.documentElement.style.setProperty('--topbar-h', topbar.getBoundingClientRect().height + 'px');
+    setTopH();
+    if (window.ResizeObserver) new ResizeObserver(setTopH).observe(topbar);
+  }
+
   // ---------- boot ----------
+  const EMBED = new URLSearchParams(location.search).get('embed') === '1';
+  if (EMBED) document.body.classList.add('embed');
   (async function boot() {
     renderPlatforms();
     S.catalog = await PS.loadCatalog();
@@ -837,7 +913,16 @@
       Object.assign(o, shared.o);
       for (const id of o.compare || []) { try { S.compareDs.set(id, await PS.loadDataset(id)); } catch { } }
       renderPlatforms(); update(); renderStep();
-      toast('Rebuilt from the official data.');
+      if (!EMBED) toast('Rebuilt from the official data.');
+    }
+    if (EMBED) {
+      const ds = S.comboDs || S.ds, full = location.href.replace(/[?&]embed=1/, '');
+      const stale = S.integrity?.blocks.length;
+      const bar = document.createElement('div'); bar.className = 'embed-bar';
+      bar.innerHTML = `${stale ? `<span class="embed-warn">Text on this chart was written for an earlier data release and no longer matches the latest numbers.</span>` : ''}
+        <span>Live data: ${esc(ds.source.publisher)}, retrieved ${esc(PS.fmtRetrieved(ds.retrieved))}</span><a href="${esc(full)}" target="_blank" rel="noopener">Open in Plainsight ↗</a>`;
+      document.querySelector('.stage').appendChild(bar);
+      play();
     }
     document.fonts.ready.then(() => { renderer.layout = null; update({ panels: false }); });
     if (window.speechSynthesis) speechSynthesis.onvoiceschanged = () => S.step === 'story' && renderStep();

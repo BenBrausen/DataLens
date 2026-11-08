@@ -111,7 +111,7 @@
 
     computeLayout() {
       const { ctx } = this, { platform: P, o, ds } = this.scene, st = this.st, S = st.S, ts = st.ts;
-      const W = P.w, H = P.h, sf = o.static ? { t: 0.05, r: 0.06, b: 0.04, l: 0.06 } : P.safe;
+      const W = P.w, H = P.h, sf = o.static && !P.uiOverlay ? { t: 0.05, r: 0.06, b: 0.04, l: 0.06 } : P.safe;
       const land = W > H * 1.2;
       const R = { x: W * sf.l, y: H * sf.t, w: W * (1 - sf.l - sf.r), h: H * (1 - sf.t - sf.b) };
       const L = { W, H, R, land };
@@ -278,15 +278,32 @@
 
     drawSafe() {
       const { ctx } = this, L = this.layout, P = this.scene.platform, S = this.st.S;
+      const { W, H } = L, s = (this.scene.o.static && !P.uiOverlay) ? { t: L.R.y / H, r: 1 - (L.R.x + L.R.w) / W, b: 1 - (L.R.y + L.R.h) / H, l: L.R.x / W } : P.safe;
+      const rect = { t: [0, 0, W, H * s.t], b: [0, H * (1 - s.b), W, H * s.b], l: [0, H * s.t, W * s.l, H * (1 - s.t - s.b)], r: [W * (1 - s.r), H * s.t, W * s.r, H * (1 - s.t - s.b)] };
       ctx.save();
-      ctx.fillStyle = 'rgba(255,0,90,0.12)';
-      const { W, H } = L, s = P.safe;
-      ctx.fillRect(0, 0, W, H * s.t); ctx.fillRect(0, H * (1 - s.b), W, H * s.b);
-      ctx.fillRect(0, H * s.t, W * s.l, H * (1 - s.t - s.b)); ctx.fillRect(W * (1 - s.r), H * s.t, W * s.r, H * (1 - s.t - s.b));
-      ctx.strokeStyle = 'rgba(255,0,90,0.7)'; ctx.setLineDash([12 * S, 8 * S]); ctx.lineWidth = 3 * S;
+      ctx.fillStyle = 'rgba(255,0,90,0.14)';
+      Object.values(rect).forEach(r => ctx.fillRect(...r));
+      ctx.strokeStyle = 'rgba(255,0,90,0.75)'; ctx.setLineDash([12 * S, 8 * S]); ctx.lineWidth = 3 * S;
       ctx.strokeRect(L.R.x, L.R.y, L.R.w, L.R.h);
-      ctx.fillStyle = 'rgba(255,0,90,0.9)'; ctx.font = `600 ${20 * S}px Inter, sans-serif`; ctx.textBaseline = 'top';
-      ctx.fillText('Platform UI covers shaded areas', L.R.x + 8 * S, H * (1 - s.b) + 10 * S);
+      ctx.setLineDash([]);
+      const fs = 20 * S; ctx.font = `700 ${fs}px Inter, sans-serif`; ctx.textBaseline = 'middle';
+      const tag = (text, x, y, align = 'left') => {
+        const w = ctx.measureText(text).width + fs, h = fs * 1.6, x0 = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
+        ctx.fillStyle = 'rgba(255,0,90,0.92)'; roundRect(ctx, x0, y - h / 2, w, h, h / 2); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.fillText(text, x0 + w / 2, y);
+      };
+      const zones = P.zones || [{ side: 'b', label: 'Edges may be cropped or covered' }];
+      for (const z of zones) {
+        if (z.side === 't') tag(z.label, W / 2, H * s.t / 2 + fs * 0.6, 'center');
+        if (z.side === 'b') tag(z.label, W / 2, H * (1 - s.b / 2), 'center');
+        if (z.side === 'r') {
+          // Mimic the button stack so it is obvious what sits there.
+          const cx = W * (1 - s.r / 2), r = Math.min(W * s.r * 0.3, 34 * S);
+          ctx.fillStyle = 'rgba(255,0,90,0.55)';
+          for (let i = 0; i < 5; i++) { ctx.beginPath(); ctx.arc(cx, H * 0.48 + i * r * 3.4, r, 0, Math.PI * 2); ctx.fill(); }
+          ctx.save(); ctx.translate(cx, H * 0.33); ctx.rotate(-Math.PI / 2); tag(z.label, 0, 0, 'center'); ctx.restore();
+        }
+      }
       ctx.restore();
     }
   }
