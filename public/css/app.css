@@ -248,3 +248,17 @@ body.embed .transport { padding: 2px 10px 2px 2px; border: 0; background: none; 
 .embed-bar { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; font-size: 11.5px; color: var(--muted); padding: 0 8px 6px; }
 .embed-bar a { color: var(--accent); text-decoration: none; font-weight: 600; }
 .embed-warn { flex-basis: 100%; color: var(--bad); font-weight: 600; }
+
+/* ---------- popular questions & ready-made search ---------- */
+.pop-grid { display: grid; grid-template-columns: 1fr; gap: 6px; }
+.pop { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.pop:hover { border-color: var(--accent); }
+.pop.active { border-color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.pop b { font-size: 14px; line-height: 1.3; }
+.pop-val { font-size: 13px; font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+.pop-src { font-size: 11.5px; color: var(--muted); }
+.search-filters { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.search-filters .chips { margin: 0; }
+.search-filters select { flex: 1; min-width: 0; }
+.local-count { margin: 4px 0 6px; }
+@media (min-width: 761px) and (max-width: 1180px) { .pop-grid { grid-template-columns: 1fr; } }

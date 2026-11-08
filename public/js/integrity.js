@@ -98,7 +98,11 @@
       const fix = key === 'takeawayText' ? { act: 'clearTakeaway', label: 'Use the computed takeaway' } : key === 'title' ? { act: 'resetTitle', label: 'Use the suggested title' }
         : key === 'script' ? { act: 'regenScript', label: 'Use the computed script' } : key === 'subtitle' ? { act: 'resetSubtitle', label: 'Use the suggested subtitle' } : { act: 'clearField', field: key, label: `Clear the ${label.toLowerCase()}` };
       for (const sentence of String(text).split(/(?<=[.!?])\s+/)) {
-        const main = placeSeries(ds, sentence) || mainAll, win = main ? inWindow(main.pts, o) : [];
+        // "Deficit" talks about the size of a negative balance: a bigger deficit is a lower value.
+        const flip = ds.unit?.signWords && new RegExp(ds.unit.signWords.neg, 'i').test(sentence) && !new RegExp(ds.unit.signWords.pos, 'i').test(sentence);
+        const neg = sr => sr && { ...sr, pts: sr.pts.map(p => ({ ...p, v: -p.v })) };
+        const main = (flip ? neg : x => x)(placeSeries(ds, sentence) || mainAll), win = main ? inWindow(main.pts, o) : [];
+        const fullS = flip ? neg(full) : full;
         // 1. numbers that appear nowhere in the data or its facts
         for (const n of numbersIn(sentence)) {
           if (!matches(n, allowed)) blocks.push({ field: key, title: `${label}: "${n.text}" isn't in the data`, detail: `No value or computed figure in this dataset matches ${n.text}. Use a number from the data or the facts panel.`, fix });
@@ -106,7 +110,7 @@
             // "Now" may lag one release, so the latest two observations both count.
             const last = win.at(-1), prev = win.at(-2) || last;
             const sameKind = unit.format === 'pct' ? ['%', 'percent', ''].includes(n.unit) : true;
-            if (sameKind && !matches(n, [last.v, scaled(last.v, unit), prev.v, scaled(prev.v, unit)])) blocks.push({ field: key, title: `${label}: the latest value isn't ${n.text}`, detail: `"${sentence.trim()}" reads as a current figure, but the latest value is ${fmt(last.v)} (${PS.fmtDate(last.t, ds.frequency === 'annual' ? 'annual' : 'monthly')}).`, fix });
+            if (sameKind && !matches(n, [last.v, scaled(last.v, unit), prev.v, scaled(prev.v, unit)])) blocks.push({ field: key, title: `${label}: the latest value isn't ${n.text}`, detail: `"${sentence.trim()}" reads as a current figure, but the latest value is ${fmt(last.v)} (${PS.fmtDate(last.t, ['annual', 'fiscal'].includes(ds.frequency) ? ds.frequency : 'monthly')}).`, fix });
           }
         }
         if (!main || win.length < 2) continue;
@@ -125,11 +129,13 @@
         if (mult) {
           const sc = sinceChange(sentence, main.pts); const a = sc ? sc.from : win[0], b = sc ? sc.to : win.at(-1);
           const r = b.v / a.v, need = { doubl: [1.8, Infinity], tripl: [2.7, Infinity], quadrupl: [3.6, Infinity], halv: [-Infinity, 0.56] }[mult[1].toLowerCase()];
-          if (a.v > 0 && !(r >= need[0] && r <= need[1])) blocks.push({ field: key, title: `${label}: "${mult[0]}" doesn't fit the data`, detail: `${fmt(a.v)} to ${fmt(b.v)} is ${r >= 1 ? `${r.toFixed(2)} times` : `${Math.round(r * 100)}% of`} the starting value.`, fix });
+          // A multiple of zero or a negative start (a surplus, for deficits) is meaningless.
+          if (a.v <= 0) blocks.push({ field: key, title: `${label}: "${mult[0]}" doesn't fit the data`, detail: `The starting value, ${flip ? (a.v < 0 ? `a ${ds.unit.signWords.pos} of ${fmt(-a.v)}` : 'zero') : fmt(a.v)}${sc ? ` in ${sc.year}` : ''}, can't be ${mult[0].toLowerCase()}.`, fix });
+          else if (!(r >= need[0] && r <= need[1])) blocks.push({ field: key, title: `${label}: "${mult[0]}" doesn't fit the data`, detail: `${fmt(a.v)} to ${fmt(b.v)} is ${r >= 1 ? `${r.toFixed(2)} times` : `${Math.round(r * 100)}% of`} the starting value.`, fix });
         }
         // 4. records, judged on the full history, not a cropped window
-        if (RECORD.test(sentence) && full?.pts.length > 2) {
-          const pts = full.pts, last = pts.at(-1), hi = pts.reduce((m, p) => (p.v > m.v ? p : m)), lo = pts.reduce((m, p) => (p.v < m.v ? p : m));
+        if (RECORD.test(sentence) && fullS?.pts.length > 2) {
+          const pts = fullS.pts, last = pts.at(-1), hi = pts.reduce((m, p) => (p.v > m.v ? p : m)), lo = pts.reduce((m, p) => (p.v < m.v ? p : m));
           const wantLow = RECORD_LOW.test(sentence) || (DOWN.test(sentence) && !UP.test(sentence));
           const ok = wantLow ? last.v <= lo.v : last.v >= hi.v;
           if (!ok) { const rec = wantLow ? lo : hi; blocks.push({ field: key, title: `${label}: not a record`, detail: `The record ${wantLow ? 'low' : 'high'} is ${fmt(rec.v)} in ${PS.fmtDate(rec.t, 'annual')}; the latest is ${fmt(last.v)}.`, fix }); }

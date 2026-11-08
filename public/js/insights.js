@@ -23,7 +23,56 @@
     return { events: ds.events.filter(e => e.tm >= lo && e.tm <= hi) };
   };
 
+  // Budget balances: below zero is a deficit. Say "a $1.99T deficit", never "-$1.99T",
+  // and treat a bigger deficit as bigger, not as a fall.
+  function balanceFacts(ds, view) {
+    const pts = view.series[0].pts, u = ds.unit, sw = u.signWords, f = ds.frequency;
+    const last = pts.at(-1), first = pts[0], d = t => PS.fmtDate(t, f, true);
+    const amt = x => PS.fmt(Math.abs(x), u) + (sw.of || '');
+    const bal = x => (x < 0 ? `a ${sw.neg} of ${amt(x)}` : x > 0 ? `a ${sw.pos} of ${amt(x)}` : 'a balanced budget');
+    const when = sw.trailing ? `over the 12 months through ${d(last.t)}` : `${f === 'fiscal' ? 'in' : 'in'} ${d(last.t)}`;
+    const yearAgo = pts.reduce((b, p) => (Math.abs(p.t - (last.t - 365 * DAY)) < Math.abs(b.t - (last.t - 365 * DAY)) ? p : b), first);
+    let cmp = '';
+    if (yearAgo !== last && yearAgo.v < 0 && last.v < 0) cmp = `, ${-last.v > -yearAgo.v ? 'up' : 'down'} from ${amt(yearAgo.v)} a year earlier`;
+    else if (yearAgo !== last && Math.sign(yearAgo.v) !== Math.sign(last.v)) cmp = `, after ${bal(yearAgo.v).replace(/^a /, 'a ')} a year earlier`;
+    const headline = `${sw.subject} ran ${bal(last.v)} ${when}${cmp}.`;
+    const at = t => (sw.trailing ? `the 12 months through ${d(t)}` : d(t));
+    const facts = [{ k: 'latest', text: `Latest: ${bal(last.v).replace(/^a /, '')} (${at(last.t)}).` }];
+    const worst = pts.reduce((m, p) => (p.v < m.v ? p : m)), best = pts.reduce((m, p) => (p.v > m.v ? p : m));
+    if (worst.v < 0 && worst !== last) facts.push({ k: 'trough', text: `Largest ${sw.neg}: ${amt(worst.v)} in ${at(worst.t)}.` });
+    const lastSurplus = [...pts].reverse().find(p => p.v > 0);
+    if (lastSurplus && last.v < 0) facts.push({ k: 'peak', text: `Last ${sw.pos}: ${amt(lastSurplus.v)} in ${at(lastSurplus.t)}.` });
+    else if (best.v > 0 && best !== last) facts.push({ k: 'peak', text: `Largest ${sw.pos}: ${amt(best.v)} in ${at(best.t)}.` });
+    const unit = f === 'fiscal' || f === 'annual' ? 'years' : f === 'quarterly' ? 'quarters' : 'months';
+    const nDef = pts.filter(p => p.v < 0).length;
+    if (!sw.trailing) facts.push({ k: 'count', text: `${sw.neg[0].toUpperCase() + sw.neg.slice(1)}s in ${nDef} of ${pts.length} ${unit} since ${yr(first.t)}.` });
+    if (last.v < 0 && pts.length > 24) {
+      const bigger = pts.filter(p => p.v < last.v).length;
+      facts.push({ k: 'pctile', text: bigger ? `Only ${bigger} of ${pts.length} ${unit} since ${yr(first.t)} had a larger ${sw.neg}.` : `The largest ${sw.neg} since ${yr(first.t)}.` });
+    }
+    const avg = pts.reduce((a, p) => a + p.v, 0) / pts.length;
+    if (u.format === 'pct') facts.push({ k: 'avg', text: `Average since ${yr(first.t)}: ${bal(avg).replace(/^a /, '')}.` });
+    return { headline, facts, trend: Math.sign(last.v - first.v), stats: { first, last, peak: best, trough: worst, avg } };
+  }
+  // Two lines whose gap is the story (spending vs. revenue): describe both and the gap.
+  function gapFacts(ds, view) {
+    const g = ds.gap, A = view.series.find(s => s.id === g.a), B = view.series.find(s => s.id === g.b), u = ds.unit, f = ds.frequency, d = t => PS.fmtDate(t, f, true), v = x => PS.fmt(x, u);
+    const bMap = new Map(B.pts.map(p => [p.t, p.v])), both = A.pts.filter(p => bMap.has(p.t)).map(p => ({ t: p.t, a: p.v, b: bMap.get(p.t) }));
+    const last = both.at(-1), gap = last.a - last.b;
+    const headline = `In ${d(last.t)}, ${g.aName} was ${v(last.a)}${g.of || ''} and ${g.bName} ${v(last.b)}: ${gap > 0 ? `a ${g.posWord} of ${v(gap)}${g.of || ''}` : gap < 0 ? `a ${g.negWord} of ${v(-gap)}${g.of || ''}` : 'balanced'}.`;
+    const facts = [];
+    const avgA = both.reduce((s, p) => s + p.a, 0) / both.length, avgB = both.reduce((s, p) => s + p.b, 0) / both.length;
+    facts.push({ k: 'avg', text: `Averages since ${yr(both[0].t)}: ${g.aName} ${v(avgA)}, ${g.bName} ${v(avgB)}.` });
+    const pkA = both.reduce((m, p) => (p.a > m.a ? p : m)); facts.push({ k: 'peak', text: `Highest ${g.aName}: ${v(pkA.a)} in ${d(pkA.t)}.` });
+    const pkB = both.reduce((m, p) => (p.b > m.b ? p : m)); facts.push({ k: 'peak2', text: `Highest ${g.bName}: ${v(pkB.b)} in ${d(pkB.t)}.` });
+    const lastNeg = [...both].reverse().find(p => p.a < p.b);
+    facts.push({ k: 'count', text: lastNeg ? `${g.bName[0].toUpperCase() + g.bName.slice(1)} last exceeded ${g.aName} in ${d(lastNeg.t)}.` : `${g.aName[0].toUpperCase() + g.aName.slice(1)} exceeded ${g.bName} in every year shown.` });
+    return { headline, facts, trend: Math.sign(gap), stats: { first: { t: both[0].t, v: both[0].a }, last: { t: last.t, v: last.a }, peak: { t: pkA.t, v: pkA.a }, trough: { t: last.t, v: last.a }, avg: avgA } };
+  }
+
   function tsFacts(ds, view) {
+    if (ds.unit.signWords && !ds.combo) return balanceFacts(ds, view);
+    if (ds.gap && !ds.combo && view.series.some(s => s.id === ds.gap.a) && view.series.some(s => s.id === ds.gap.b)) return gapFacts(ds, view);
     const s = view.series[0], pts = s.pts, u = ds.unit, f = ds.frequency;
     const first = pts[0], last = pts[pts.length - 1];
     let peak = first, trough = first, sum = 0;
@@ -45,8 +94,8 @@
     facts.push({ k: 'change', text: `Since ${d(first.t)}: ${PS.fmtChange(first.v, last.v, u)}.` });
     if (peak.t !== last.t) facts.push({ k: 'peak', text: `Peak: ${v(peak.v)} ${at} ${d(peak.t)}.` });
     if (trough.t !== last.t) facts.push({ k: 'trough', text: `Low: ${v(trough.v)} ${at} ${d(trough.t)}.` });
-    if (last.t - first.t > 2 * 365 * DAY && yearAgo !== last) facts.push({ k: 'yoy', text: `One year earlier it was ${v(yearAgo.v)} (${PS.fmtChange(yearAgo.v, last.v, u)}).` });
-    if (pts.length > 24) facts.push({ k: 'pctile', text: `The latest reading is higher than ${Math.round(below * 100)}% of all ${f === 'weekly' ? 'weeks' : f === 'quarterly' ? 'quarters' : f === 'annual' ? 'years' : 'months'} since ${startY}.` });
+    if (last.t - first.t > 2 * 365 * DAY && yearAgo !== last) facts.push({ k: 'yoy', text: `One year earlier it was ${v(yearAgo.v)} (${PS.fmtChange(yearAgo.v, last.v, u).replace(' (', ', ').replace(/\)$/, '')}).` });
+    if (pts.length > 24) facts.push({ k: 'pctile', text: `The latest reading is higher than ${Math.round(below * 100)}% of all ${f === 'weekly' ? 'weeks' : f === 'quarterly' ? 'quarters' : f === 'annual' || f === 'fiscal' ? 'years' : 'months'} since ${startY}.` });
     if (view.series[1]) {
       const s2 = view.series[1], l2 = s2.pts.at(-1);
       facts.push({ k: 'compare', text: `${s2.name}: ${v(l2.v)} in ${d(l2.t)}.` });
@@ -191,7 +240,7 @@
     // Freshness
     if (ds.lastObservation) {
       const age = (Date.now() - +PS.parseDate(ds.lastObservation)) / DAY;
-      const allowed = { 'real-time': 2, daily: 7, weekly: 21, monthly: 75, quarterly: 200, annual: 730, quadrennial: 4 * 365 + 120 }[ds.frequency] || 400;
+      const allowed = { 'real-time': 2, daily: 7, weekly: 21, monthly: 75, quarterly: 200, annual: 730, fiscal: 730, quadrennial: 4 * 365 + 120 }[ds.frequency] || 400;
       if (age > allowed) add('warn', 'Data may be out of date', `Latest observation is ${PS.fmtDate(ds.lastObservation, ds.frequency, true)}. Check the publisher for a newer release before publishing.`);
       else add('pass', 'Data is current', `Latest observation: ${PS.fmtDate(ds.lastObservation, ds.frequency, true)} (${ds.frequency} release).`);
     }

@@ -34,8 +34,8 @@ window.PS = window.PS || {};
       case 'usd':
         if (Math.abs(v) >= 1e5 && opts.short) return '$' + compact(v, 1);
         return (v < 0 ? '-$' : '$') + withCommas(Math.abs(v), Math.abs(v) >= 1000 ? 0 : d);
-      case 'usdT': return '$' + withCommas(v, opts.short ? 1 : d) + 'T';
-      case 'usdB': return '$' + compact(v, opts.short ? 1 : 2);
+      case 'usdT': return (v < 0 ? '-$' : '$') + withCommas(Math.abs(v), opts.short ? 1 : d) + 'T';
+      case 'usdB': return (v < 0 ? '-$' : '$') + compact(Math.abs(v), opts.short ? 1 : 2);
       default:
         if (opts.short && Math.abs(v) >= 1e4) return compact(v, 1);
         return withCommas(v, Math.abs(v) >= 1000 ? 0 : d);
@@ -48,7 +48,9 @@ window.PS = window.PS || {};
     if (unit.format === 'pct') return `${sign}${withCommas(Math.abs(diff), unit.decimals ?? 1)} pts`;
     // A percent change of a rate that can cross zero (migration, growth) means nothing.
     const rel = a !== 0 && !opts.noRel && !(a < 0 || b < 0) ? (diff / Math.abs(a)) * 100 : null;
-    return `${sign}${fmt(Math.abs(diff), { ...unit, signed: false }, { short: true })}${rel != null ? ` (${sign}${withCommas(Math.abs(rel), Math.abs(rel) >= 100 ? 0 : 1)}%)` : ''}`;
+    // Past +1,000% a multiple reads better: "(247x)" rather than "(+24,507%)".
+    const relTxt = rel == null ? '' : rel >= 1000 ? ` (${withCommas(b / a, b / a >= 100 ? 0 : 1)}x)` : ` (${sign}${withCommas(Math.abs(rel), Math.abs(rel) >= 100 ? 0 : 1)}%)`;
+    return `${sign}${fmt(Math.abs(diff), { ...unit, signed: false }, { short: true })}${relTxt}`;
   }
 
   // ---------- dates ----------
@@ -68,6 +70,7 @@ window.PS = window.PS || {};
     const y = d.getUTCFullYear(), m = d.getUTCMonth();
     switch (freq) {
       case 'annual': case 'quadrennial': return String(y);
+      case 'fiscal': return `FY${y}`; // U.S. federal fiscal year, labeled by the year it ends
       case 'quarterly': return `Q${Math.floor(m / 3) + 1} ${y}`;
       case 'monthly': return `${(long ? MONTHS_LONG : MONTHS)[m]} ${y}`;
       case 'real-time': return `${MONTHS[m]} ${d.getUTCDate()}, ${String(d.getUTCHours()).padStart(2, '0')}:${String(d.getUTCMinutes()).padStart(2, '0')} UTC`;

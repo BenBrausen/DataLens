@@ -24,6 +24,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-10-30",
+  "latest": {
+   "t": "2026-10-30",
+   "v": 103.79
+  },
+  "released": null,
   "hasNational": false,
   "topic": "economy",
   "sourceId": "indeed",
@@ -64,6 +69,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2024-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "economy",
   "sourceId": "census",
@@ -99,6 +106,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-01-01",
+  "latest": {
+   "t": "2025-01-01",
+   "v": 87460,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "economy",
   "sourceId": "census",
@@ -135,6 +148,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-01-01",
+  "latest": {
+   "t": "2026-01-01",
+   "v": 7.25,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "economy",
   "sourceId": "dol",
@@ -169,6 +188,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-09-01",
+  "latest": {
+   "t": "2026-09-01",
+   "v": 156.5,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "economy",
   "sourceId": "census",
@@ -203,6 +228,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-01-01",
+  "latest": {
+   "t": "2025-01-01",
+   "v": 76994,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "economy",
   "sourceId": "bea",
@@ -243,6 +274,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2024-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "economy",
   "sourceId": "census",
@@ -277,6 +310,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-09-01",
+  "latest": {
+   "t": "2026-09-01",
+   "v": 48.1
+  },
+  "released": null,
   "hasNational": false,
   "topic": "economy",
   "sourceId": "umich",
@@ -315,6 +353,12 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-09-01",
+  "latest": {
+   "t": "2026-09-01",
+   "v": 4.02,
+   "series": "All items"
+  },
+  "released": null,
   "hasNational": false,
   "topic": "prices",
   "sourceId": "bls",
@@ -352,6 +396,12 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-10-01",
+  "latest": {
+   "t": "2026-10-01",
+   "v": 4.1,
+   "series": "Unemployment rate (U-3)"
+  },
+  "released": null,
   "hasNational": false,
   "topic": "economy",
   "sourceId": "bls",
@@ -387,6 +437,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-09-01",
+  "latest": {
+   "t": "2026-09-01",
+   "v": 4.2,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "economy",
   "sourceId": "bls",
@@ -425,6 +481,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T16:50:25.310Z",
   "lastObservation": "2024-11-05",
+  "latest": {
+   "t": "2024-11-05",
+   "v": -1.5,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "elections",
   "sourceId": "mit-election-lab",
@@ -462,6 +524,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T16:50:25.310Z",
   "lastObservation": "2024-11-05",
+  "latest": {
+   "t": "2024-11-05",
+   "v": -1.5,
+   "series": "United States (popular vote)"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "elections",
   "sourceId": "mit-election-lab",
@@ -500,6 +568,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-11-02",
+  "latest": {
+   "t": "2026-11-02",
+   "v": 4.153
+  },
+  "released": null,
   "hasNational": false,
   "topic": "prices",
   "sourceId": "eia",
@@ -538,6 +611,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-09-28",
+  "latest": {
+   "t": "2026-09-28",
+   "v": 4.47
+  },
+  "released": null,
   "hasNational": false,
   "topic": "prices",
   "sourceId": "eia",
@@ -574,6 +652,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T17:54:32.943Z",
   "lastObservation": "2025-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "epa",
@@ -607,6 +687,8 @@
   ],
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-11-08T20:16:30.347Z",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "usgs",
@@ -643,6 +725,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "fema",
@@ -682,6 +766,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-07-01",
+  "latest": {
+   "t": "2025-07-01",
+   "v": 1.18
+  },
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "nasa",
@@ -726,6 +815,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-01-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "fema",
@@ -770,6 +861,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-01-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "fema",
@@ -814,6 +907,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-01-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "fema",
@@ -850,6 +945,12 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": {
+   "t": "2025-12-31",
+   "v": 45,
+   "series": "All major disasters"
+  },
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "fema",
@@ -894,6 +995,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-01-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "fema",
@@ -938,12 +1041,316 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-01-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "fema",
   "tier": "federal",
   "nEntities": 3144,
   "firstObservation": "2026-01-01"
+ },
+ {
+  "id": "federal-budget-gdp",
+  "title": "Federal revenue vs. spending",
+  "category": "Government",
+  "frequency": "fiscal",
+  "unit": {
+   "label": "% of GDP, fiscal year",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Total federal receipts and total federal outlays, each as a share of GDP. The gap between them is the deficit.",
+  "source": {
+   "publisher": "U.S. Office of Management and Budget",
+   "via": "FRED, Federal Reserve Bank of St. Louis",
+   "dataset": "Federal Receipts (FYFRGDA188S) and Outlays (FYONGDA188S) as Percent of GDP",
+   "url": "https://fred.stlouisfed.org/series/FYONGDA188S"
+  },
+  "howToRead": [
+   "When the spending line is above the revenue line, the government ran a deficit that year; the distance between them is its size.",
+   "Fiscal years run October through September and are named for the year they end: FY2026 is Oct 2025 to Sep 2026."
+  ],
+  "caveats": [
+   "Revenue falls and spending rises automatically in recessions (lower tax receipts, more unemployment benefits), so gaps widen in downturns regardless of policy."
+  ],
+  "defaultSeries": [
+   "FYONGDA188S",
+   "FYFRGDA188S"
+  ],
+  "gap": {
+   "a": "FYONGDA188S",
+   "b": "FYFRGDA188S",
+   "aName": "federal spending",
+   "bName": "revenue",
+   "of": " of GDP",
+   "posWord": "deficit",
+   "negWord": "surplus"
+  },
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T21:10:49.178Z",
+  "lastObservation": "2025-09-30",
+  "latest": {
+   "t": "2025-09-30",
+   "v": 22.71445,
+   "series": "Spending (outlays)"
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "government",
+  "sourceId": "omb",
+  "tier": "federal",
+  "nSeries": 2,
+  "firstObservation": "1929-09-30"
+ },
+ {
+  "id": "federal-interest",
+  "title": "Interest on the national debt",
+  "category": "Government",
+  "lens": "Nominal dollars",
+  "frequency": "quarterly",
+  "reframes": [
+   "federal-interest",
+   "federal-interest-gdp"
+  ],
+  "unit": {
+   "label": "Federal interest payments, annual rate",
+   "format": "usdT",
+   "decimals": 2
+  },
+  "description": "What the federal government pays in interest on its debt, at a seasonally adjusted annual rate.",
+  "source": {
+   "publisher": "U.S. Bureau of Economic Analysis",
+   "dataset": "Federal government current expenditures: Interest payments (A091RC1Q027SBEA)",
+   "url": "https://fred.stlouisfed.org/series/A091RC1Q027SBEA",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "Quarterly figures are expressed as a yearly pace, so each point is roughly what a full year would cost at that rate.",
+   "Interest grows when the debt grows and when the rates the Treasury pays on new borrowing rise."
+  ],
+  "caveats": [
+   "National-accounts measure from BEA; Treasury budget figures for net interest differ somewhat in definition and timing.",
+   "In dollars of each year; the share-of-GDP view adjusts for the size of the economy."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T21:10:49.178Z",
+  "lastObservation": "2026-07-01",
+  "latest": {
+   "t": "2026-07-01",
+   "v": 1.3288
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "government",
+  "sourceId": "bea",
+  "tier": "federal",
+  "nSeries": 1,
+  "firstObservation": "1947-01-01"
+ },
+ {
+  "id": "federal-interest-gdp",
+  "title": "Interest on the national debt as a share of GDP",
+  "category": "Government",
+  "lens": "Share of the economy",
+  "frequency": "fiscal",
+  "reframes": [
+   "federal-interest",
+   "federal-interest-gdp"
+  ],
+  "unit": {
+   "label": "Net interest outlays as % of GDP",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Federal net interest outlays divided by GDP, by fiscal year.",
+  "source": {
+   "publisher": "U.S. Office of Management and Budget",
+   "via": "FRED, Federal Reserve Bank of St. Louis",
+   "dataset": "Federal Outlays: Interest as Percent of GDP (FYOIGDA188S)",
+   "url": "https://fred.stlouisfed.org/series/FYOIGDA188S"
+  },
+  "howToRead": [
+   "Shows how much of the economy goes to paying interest on federal debt.",
+   "Fiscal years run October through September and are named for the year they end: FY2026 is Oct 2025 to Sep 2026."
+  ],
+  "caveats": [
+   "Updated once a year, after the fiscal year closes."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T21:10:49.178Z",
+  "lastObservation": "2025-09-30",
+  "latest": {
+   "t": "2025-09-30",
+   "v": 3.93896
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "government",
+  "sourceId": "omb",
+  "tier": "federal",
+  "nSeries": 1,
+  "firstObservation": "1940-09-30"
+ },
+ {
+  "category": "Government",
+  "reframes": [
+   "federal-deficit",
+   "federal-deficit-gdp",
+   "federal-deficit-12mo"
+  ],
+  "zeroLine": true,
+  "id": "federal-deficit",
+  "title": "U.S. federal budget deficit",
+  "lens": "Nominal dollars",
+  "frequency": "fiscal",
+  "unit": {
+   "label": "Surplus or deficit (-), fiscal year",
+   "format": "usdT",
+   "decimals": 2,
+   "signWords": {
+    "neg": "deficit",
+    "pos": "surplus",
+    "subject": "The federal government"
+   }
+  },
+  "description": "Federal surplus or deficit for each fiscal year: total receipts minus total outlays.",
+  "source": {
+   "publisher": "U.S. Office of Management and Budget",
+   "via": "FRED, Federal Reserve Bank of St. Louis",
+   "dataset": "Federal Surplus or Deficit (FYFSD)",
+   "url": "https://fred.stlouisfed.org/series/FYFSD"
+  },
+  "howToRead": [
+   "Below zero is a deficit (the government spent more than it collected); above zero is a surplus.",
+   "Fiscal years run October through September and are named for the year they end: FY2026 is Oct 2025 to Sep 2026.",
+   "The deficit is one year of borrowing; the national debt is the running total of past deficits (plus other borrowing)."
+  ],
+  "caveats": [
+   "In dollars of each year, so recent deficits look larger partly because prices and the economy are bigger. The share-of-GDP view corrects for that."
+  ],
+  "defaultChart": "columns",
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T21:10:49.178Z",
+  "lastObservation": "2026-09-30",
+  "latest": {
+   "t": "2026-09-30",
+   "v": -1.9925
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "government",
+  "sourceId": "omb",
+  "tier": "federal",
+  "nSeries": 1,
+  "firstObservation": "1901-09-30"
+ },
+ {
+  "category": "Government",
+  "reframes": [
+   "federal-deficit",
+   "federal-deficit-gdp",
+   "federal-deficit-12mo"
+  ],
+  "zeroLine": true,
+  "id": "federal-deficit-gdp",
+  "title": "U.S. federal budget deficit as a share of GDP",
+  "lens": "Share of the economy",
+  "frequency": "fiscal",
+  "unit": {
+   "label": "Surplus or deficit (-) as % of GDP",
+   "format": "pct",
+   "decimals": 1,
+   "signWords": {
+    "neg": "deficit",
+    "pos": "surplus",
+    "subject": "The federal government",
+    "of": " of GDP"
+   }
+  },
+  "description": "Federal surplus or deficit divided by the size of the economy, by fiscal year.",
+  "source": {
+   "publisher": "U.S. Office of Management and Budget",
+   "via": "FRED, Federal Reserve Bank of St. Louis",
+   "dataset": "Federal Surplus or Deficit as Percent of GDP (FYFSGDA188S)",
+   "url": "https://fred.stlouisfed.org/series/FYFSGDA188S"
+  },
+  "howToRead": [
+   "Below zero is a deficit (the government spent more than it collected); above zero is a surplus.",
+   "Fiscal years run October through September and are named for the year they end: FY2026 is Oct 2025 to Sep 2026.",
+   "This is how economists compare deficits across decades: a $1 trillion deficit means far less in a $30 trillion economy than in a $10 trillion one."
+  ],
+  "caveats": [
+   "Updated once a year, after the fiscal year closes and GDP for it is estimated, so it lags the dollar figures."
+  ],
+  "defaultChart": "columns",
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T21:10:49.178Z",
+  "lastObservation": "2025-09-30",
+  "latest": {
+   "t": "2025-09-30",
+   "v": -5.7527
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "government",
+  "sourceId": "omb",
+  "tier": "federal",
+  "nSeries": 1,
+  "firstObservation": "1929-09-30"
+ },
+ {
+  "category": "Government",
+  "reframes": [
+   "federal-deficit",
+   "federal-deficit-gdp",
+   "federal-deficit-12mo"
+  ],
+  "zeroLine": true,
+  "id": "federal-deficit-12mo",
+  "title": "U.S. federal budget deficit, last 12 months",
+  "lens": "Rolling 12 months",
+  "frequency": "monthly",
+  "unit": {
+   "label": "Surplus or deficit (-), trailing 12 months",
+   "format": "usdT",
+   "decimals": 2,
+   "signWords": {
+    "neg": "deficit",
+    "pos": "surplus",
+    "subject": "The federal government",
+    "trailing": true
+   }
+  },
+  "description": "Federal surplus or deficit over the 12 months ending each month, from the Monthly Treasury Statement.",
+  "source": {
+   "publisher": "U.S. Department of the Treasury",
+   "dataset": "Monthly Treasury Statement, Federal Surplus or Deficit (MTSDS133FMS), 12-month sum computed by Plainsight",
+   "url": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "howToRead": [
+   "Below zero is a deficit (the government spent more than it collected); above zero is a surplus.",
+   "Each point adds up the latest 12 months, so it updates monthly without the big swings single months show around tax deadlines.",
+   "The deficit is one year of borrowing; the national debt is the running total of past deficits (plus other borrowing)."
+  ],
+  "caveats": [
+   "Shifts in payment timing (when a due date falls on a weekend) can move a month between fiscal years and nudge the 12-month total."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-08T21:10:49.178Z",
+  "lastObservation": "2026-09-01",
+  "latest": {
+   "t": "2026-09-01",
+   "v": -1.9925
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "government",
+  "sourceId": "treasury",
+  "tier": "federal",
+  "nSeries": 1,
+  "firstObservation": "1981-09-01"
  },
  {
   "category": "Government",
@@ -976,6 +1383,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-11-05",
+  "latest": {
+   "t": "2026-11-05",
+   "v": 40.5561
+  },
+  "released": null,
   "hasNational": false,
   "topic": "government",
   "sourceId": "treasury",
@@ -1015,6 +1427,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-04-01",
+  "latest": {
+   "t": "2026-04-01",
+   "v": 121.18773
+  },
+  "released": null,
   "hasNational": false,
   "topic": "government",
   "sourceId": "treasury",
@@ -1053,6 +1470,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-09-30",
+  "latest": {
+   "t": "2026-09-30",
+   "v": 40.17
+  },
+  "released": null,
   "hasNational": false,
   "topic": "government",
   "sourceId": "treasury",
@@ -1089,6 +1511,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2023-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "health",
   "sourceId": "cdc",
@@ -1125,6 +1549,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2023-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "health",
   "sourceId": "cdc",
@@ -1161,6 +1587,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2023-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "health",
   "sourceId": "cdc",
@@ -1197,6 +1625,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2023-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "health",
   "sourceId": "cdc",
@@ -1237,6 +1667,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "health",
   "sourceId": "cdc",
@@ -1277,6 +1709,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "health",
   "sourceId": "cdc",
@@ -1313,6 +1747,12 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-10-01",
+  "latest": {
+   "t": "2026-10-01",
+   "v": 3,
+   "series": "Class I"
+  },
+  "released": null,
   "hasNational": false,
   "topic": "health",
   "sourceId": "fda",
@@ -1349,6 +1789,12 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-10-01",
+  "latest": {
+   "t": "2026-10-01",
+   "v": 26,
+   "series": "Class I"
+  },
+  "released": null,
   "hasNational": false,
   "topic": "health",
   "sourceId": "fda",
@@ -1385,6 +1831,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2023-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "health",
   "sourceId": "cdc",
@@ -1421,6 +1869,12 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-11-05",
+  "latest": {
+   "t": "2026-11-05",
+   "v": 7.18,
+   "series": "30-year fixed"
+  },
+  "released": null,
   "hasNational": false,
   "topic": "housing",
   "sourceId": "fred",
@@ -1455,6 +1909,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-04-01",
+  "latest": {
+   "t": "2026-04-01",
+   "v": 719.87,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "housing",
   "sourceId": "fhfa",
@@ -1493,6 +1953,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-07-01",
+  "latest": {
+   "t": "2026-07-01",
+   "v": 393300
+  },
+  "released": null,
   "hasNational": false,
   "topic": "housing",
   "sourceId": "census",
@@ -1531,6 +1996,11 @@
   "kind": "timeseries",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-07-01",
+  "latest": {
+   "t": "2026-07-01",
+   "v": 397418.38
+  },
+  "released": null,
   "hasNational": false,
   "topic": "housing",
   "sourceId": "census",
@@ -1570,6 +2040,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "housing",
   "sourceId": "census",
@@ -1609,6 +2081,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": {
+   "t": "2025-12-31",
+   "v": 4.19,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "housing",
   "sourceId": "census",
@@ -1642,6 +2120,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2026-09-30",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "housing",
   "sourceId": "zillow",
@@ -1685,6 +2165,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-07-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "people",
   "sourceId": "census",
@@ -1729,6 +2211,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-07-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "people",
   "sourceId": "census",
@@ -1768,6 +2252,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-07-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "people",
   "sourceId": "census",
@@ -1808,6 +2294,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-07-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "people",
   "sourceId": "census",
@@ -1842,6 +2330,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-01-01",
+  "latest": {
+   "t": "2025-01-01",
+   "v": 341784857,
+   "series": "United States (50 states + DC)"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "people",
   "sourceId": "census",
@@ -1884,6 +2378,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-07-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "people",
   "sourceId": "census",
@@ -1923,6 +2419,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-07-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "people",
   "sourceId": "census",
@@ -1965,6 +2463,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-07-01",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "people",
   "sourceId": "census",
@@ -2008,6 +2508,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": {
+   "t": "2025-12-31",
+   "v": 4.4,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "safety",
   "sourceId": "fbi",
@@ -2051,6 +2557,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": {
+   "t": "2025-12-31",
+   "v": 1552.3,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "safety",
   "sourceId": "fbi",
@@ -2094,6 +2606,12 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": {
+   "t": "2025-12-31",
+   "v": 329.6,
+   "series": "United States"
+  },
+  "released": null,
   "hasNational": true,
   "topic": "safety",
   "sourceId": "fbi",
@@ -2128,6 +2646,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2024-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "owid",
@@ -2162,6 +2682,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2024-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "worldbank",
@@ -2196,6 +2718,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2025-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "world",
   "sourceId": "worldbank",
@@ -2230,6 +2754,8 @@
   "kind": "panel",
   "retrieved": "2026-11-08T20:59:17.152Z",
   "lastObservation": "2024-12-31",
+  "latest": null,
+  "released": null,
   "hasNational": false,
   "topic": "world",
   "sourceId": "worldbank",

@@ -25,7 +25,7 @@
   PS.chartsFor = ds => Object.entries(PS.CHARTS)
     .filter(([id, c]) => c.kinds.includes(ds.kind) && (!c.geo || ds.geo) && !(ds.singleTime && ['line', 'barrace'].includes(id)))
     .map(([id, c]) => ({ id, ...c }));
-  PS.defaultChart = ds => PS.RECOMMENDED[ds.id] || (ds.kind === 'events' ? (ds.geo ? 'bubblemap' : 'columns') : ds.kind === 'panel' ? (ds.geo ? 'choropleth' : ds.singleTime ? 'bars' : 'barrace') : 'line');
+  PS.defaultChart = ds => PS.RECOMMENDED[ds.id] || ds.defaultChart || (ds.kind === 'events' ? (ds.geo ? 'bubblemap' : 'columns') : ds.kind === 'panel' ? (ds.geo ? 'choropleth' : ds.singleTime ? 'bars' : 'barrace') : 'line');
 
   // ---------- loading ----------
   const cache = new Map();

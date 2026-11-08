@@ -39,6 +39,7 @@ export const FEDERAL = [
   { id: 'census', name: 'U.S. Census Bureau', url: 'https://www.census.gov/', topics: ['people', 'economy', 'housing'], catalogSlug: 'census' },
   { id: 'bea', name: 'Bureau of Economic Analysis', url: 'https://www.bea.gov/', topics: ['economy'] },
   { id: 'treasury', name: 'U.S. Department of the Treasury', url: 'https://fiscaldata.treasury.gov/', topics: ['government'], catalogSlug: 'treasury' },
+  { id: 'omb', name: 'Office of Management and Budget', url: 'https://www.whitehouse.gov/omb/information-resources/budget/historical-tables/', topics: ['government'] },
   { id: 'cdc', name: 'CDC National Center for Health Statistics', url: 'https://www.cdc.gov/nchs/', topics: ['health'], catalogSlug: 'hhs' },
   { id: 'usgs', name: 'U.S. Geological Survey', url: 'https://www.usgs.gov/', topics: ['environment'], catalogSlug: 'doi' },
   { id: 'eia', name: 'U.S. Energy Information Administration', url: 'https://www.eia.gov/', topics: ['energy', 'prices'], catalogSlug: 'energy' },
@@ -117,6 +118,12 @@ export const DATASET_TAGS = {
   'federal-debt': { topic: 'government', source: 'treasury' },
   'federal-debt-gdp': { topic: 'government', source: 'treasury' },
   'federal-debt-real': { topic: 'government', source: 'treasury' },
+  'federal-deficit': { topic: 'government', source: 'omb' },
+  'federal-deficit-gdp': { topic: 'government', source: 'omb' },
+  'federal-deficit-12mo': { topic: 'government', source: 'treasury' },
+  'federal-budget-gdp': { topic: 'government', source: 'omb' },
+  'federal-interest': { topic: 'government', source: 'bea' },
+  'federal-interest-gdp': { topic: 'government', source: 'omb' },
   'state-unemployment': { topic: 'economy', source: 'bls' },
   'state-population': { topic: 'people', source: 'census' },
   'overdose-deaths': { topic: 'health', source: 'cdc' },
@@ -267,4 +274,25 @@ export const FEDERAL_CANDIDATES = [
   { name: 'NCES IPEDS', status: 'care', note: 'Institution-level; useful but needs a college-level chart, not a map.' },
   { name: 'US Election Assistance Commission', status: 'care', note: 'Election administration data. Elections need extra editorial safeguards before adding.' },
   { name: 'US Census TIGER Line', status: 'reference', note: 'Boundaries, not statistics. The app already ships county and state boundaries.' },
+];
+
+// "Popular" picks for people who don't know what to look for: the questions people
+// actually ask, each answered by one ready-made dataset. Order is display order.
+export const FEATURED = [
+  { id: 'federal-debt', q: 'How big is the national debt?' },
+  { id: 'federal-deficit', q: 'How much more does Washington spend than it collects?' },
+  { id: 'federal-interest', q: 'What does the debt cost in interest?' },
+  { id: 'us-inflation', q: 'Are prices still rising?' },
+  { id: 'us-unemployment', q: 'How strong is the job market?' },
+  { id: 'gas-price-real', q: 'Is gas really more expensive than ever?' },
+  { id: 'mortgage-rate', q: 'Where are mortgage rates now?' },
+  { id: 'state-home-values', q: 'What does a typical home cost in your state?' },
+  { id: 'state-violent-crime', q: 'Is violent crime rising or falling?' },
+  { id: 'overdose-deaths', q: 'Is the overdose crisis easing?' },
+  { id: 'county-president', q: 'How did your county vote?' },
+  { id: 'county-migration', q: 'Where are Americans moving?' },
+  { id: 'global-temperature', q: 'How much has the planet warmed?' },
+  { id: 'county-risk', q: 'What disasters threaten your county?' },
+  { id: 'earthquakes', q: 'Where did the earth shake this month?' },
+  { id: 'life-expectancy', q: 'Where do people live longest?' },
 ];

@@ -429,18 +429,22 @@
     // peak annotation for the primary series
     if (o.annotate && series[0]) {
       const s = series[0];
-      const pk = s.pts.reduce((a, b) => (b.v > a.v ? b : a));
+      // Budget balances: the notable extreme is the largest deficit (lowest value), labeled below the point.
+      const sw = !ds.combo && ds.unit.signWords;
+      const pk = s.pts.reduce((a, b) => (sw ? b.v < a.v : b.v > a.v) ? b : a);
       if (pk.t <= tq && pk.t < s.pts.at(-1).t - (t1 - t0) * 0.02) {
         const a = st.statik ? 1 : seg(tq, pk.t, pk.t + (t1 - t0) * 0.04);
         ctx.save(); ctx.globalAlpha *= a;
         const px = x(pk.t), py = y(pk.v);
         ctx.strokeStyle = T.muted; ctx.lineWidth = 2 * S;
         ctx.beginPath(); ctx.arc(px, py, 9 * S, 0, Math.PI * 2); ctx.stroke();
-        const label = `Peak ${fmt(pk.v, ds.unit)} · ${PS.fmtDate(pk.t, ds.frequency === 'weekly' ? 'monthly' : ds.frequency)}`;
+        const when = PS.fmtDate(pk.t, ds.frequency === 'weekly' ? 'monthly' : ds.frequency);
+        const label = sw ? `Largest ${sw.neg} ${fmt(Math.abs(pk.v), ds.unit)}${sw.of || ''} · ${when}` : `Peak ${fmt(pk.v, ds.unit)} · ${when}`;
         ctx.font = font(st, 600, 22 * S * st.ts);
         const lw = ctx.measureText(label).width;
-        const lx = clamp(px - lw / 2, left, right - lw), ly = Math.max(y.range()[1] - 26 * S, py - 46 * S);
-        ctx.beginPath(); ctx.moveTo(px, py - 10 * S); ctx.lineTo(px, ly + 26 * S); ctx.stroke();
+        const lx = clamp(px - lw / 2, left, right - lw);
+        const ly = sw ? Math.min(y.range()[0] - 26 * S, py + 20 * S) : Math.max(y.range()[1] - 26 * S, py - 46 * S);
+        ctx.beginPath(); if (sw) { ctx.moveTo(px, py + 10 * S); ctx.lineTo(px, ly); } else { ctx.moveTo(px, py - 10 * S); ctx.lineTo(px, ly + 26 * S); } ctx.stroke();
         ctx.fillStyle = T.ink; ctx.textBaseline = 'top'; ctx.fillText(label, lx, ly);
         ctx.restore();
       }
@@ -520,7 +524,7 @@
       bars = [...by.entries()].sort((a, b) => a[0] - b[0]).map(([k, v]) => ({ k, label: String(k), v }));
       // Long records (NASA's starts in 1880) keep every year; bars just get thinner.
       if (bars.length > 160) bars = bars.slice(-160);
-      label = ds.frequency === 'annual' ? '' : 'Annual average';
+      label = ds.frequency === 'annual' || ds.frequency === 'fiscal' ? '' : 'Annual average';
     }
     const n = bars.length;
     const tf = v => fmt(v, ds.kind === 'events' ? { format: 'number', decimals: 0 } : ds.unit, { short: true });

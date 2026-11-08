@@ -259,6 +259,74 @@ builders['federal-debt'] = async () => {
   ];
 };
 
+// Deficit, revenue vs. spending, and interest. Fiscal years run Oct 1 to Sep 30 and
+// are labeled by the year they end (FY2026 = Oct 2025 to Sep 2026).
+builders['federal-deficit'] = async () => {
+  const d = await fred(['FYFSD', 'FYFSGDA188S', 'MTSDS133FMS', 'FYFRGDA188S', 'FYONGDA188S', 'A091RC1Q027SBEA', 'FYOIGDA188S', 'CPIAUCSL']);
+  const fy = pts => pts.map(([t, v]) => [`${t.slice(0, 4)}-09-30`, v]); // label each fiscal year by its end date
+  const annual = fy(d.FYFSD).map(([t, v]) => [t, round(v / 1e6, 4)]); // millions -> trillions
+  // Rolling 12-month deficit from the Monthly Treasury Statement: current every month,
+  // not just once a year, and free of the month-to-month swings around tax dates.
+  const m = d.MTSDS133FMS, roll = [];
+  for (let i = 11; i < m.length; i++) roll.push([m[i][0], round(m.slice(i - 11, i + 1).reduce((a, x) => a + x[1], 0) / 1e6, 4)]);
+  // Cross-check: the 12 months ending September must equal the fiscal-year total.
+  const lastFy = annual.at(-1), sep = roll.find(r => r[0] === `${lastFy[0].slice(0, 4)}-09-01`);
+  if (sep && Math.abs(sep[1] - lastFy[1]) > 0.02) console.warn(`  (deficit cross-check: MTS ${sep[1]}T vs OMB ${lastFy[1]}T)`);
+  const fiscalSrc = { publisher: 'U.S. Office of Management and Budget', via: 'FRED, Federal Reserve Bank of St. Louis' };
+  const base = { category: 'Government', reframes: ['federal-deficit', 'federal-deficit-gdp', 'federal-deficit-12mo'], zeroLine: true };
+  const signHow = 'Below zero is a deficit (the government spent more than it collected); above zero is a surplus.';
+  const fyHow = 'Fiscal years run October through September and are named for the year they end: FY2026 is Oct 2025 to Sep 2026.';
+  const debtLink = 'The deficit is one year of borrowing; the national debt is the running total of past deficits (plus other borrowing).';
+  return [
+    ts({ ...base, id: 'federal-deficit', title: 'U.S. federal budget deficit', lens: 'Nominal dollars', frequency: 'fiscal',
+      unit: { label: 'Surplus or deficit (-), fiscal year', format: 'usdT', decimals: 2, signWords: { neg: 'deficit', pos: 'surplus', subject: 'The federal government' } },
+      description: 'Federal surplus or deficit for each fiscal year: total receipts minus total outlays.',
+      source: { ...fiscalSrc, dataset: 'Federal Surplus or Deficit (FYFSD)', url: fredUrl('FYFSD') },
+      howToRead: [signHow, fyHow, debtLink],
+      caveats: ['In dollars of each year, so recent deficits look larger partly because prices and the economy are bigger. The share-of-GDP view corrects for that.'],
+      defaultChart: 'columns' },
+      [{ id: 'FYFSD', name: 'Surplus or deficit', points: annual }]),
+    ts({ ...base, id: 'federal-deficit-gdp', title: 'U.S. federal budget deficit as a share of GDP', lens: 'Share of the economy', frequency: 'fiscal',
+      unit: { label: 'Surplus or deficit (-) as % of GDP', format: 'pct', decimals: 1, signWords: { neg: 'deficit', pos: 'surplus', subject: 'The federal government', of: ' of GDP' } },
+      description: 'Federal surplus or deficit divided by the size of the economy, by fiscal year.',
+      source: { ...fiscalSrc, dataset: 'Federal Surplus or Deficit as Percent of GDP (FYFSGDA188S)', url: fredUrl('FYFSGDA188S') },
+      howToRead: [signHow, fyHow, 'This is how economists compare deficits across decades: a $1 trillion deficit means far less in a $30 trillion economy than in a $10 trillion one.'],
+      caveats: ['Updated once a year, after the fiscal year closes and GDP for it is estimated, so it lags the dollar figures.'],
+      defaultChart: 'columns' },
+      [{ id: 'FYFSGDA188S', name: 'Surplus or deficit, % of GDP', points: fy(d.FYFSGDA188S) }]),
+    ts({ ...base, id: 'federal-deficit-12mo', title: 'U.S. federal budget deficit, last 12 months', lens: 'Rolling 12 months', frequency: 'monthly',
+      unit: { label: 'Surplus or deficit (-), trailing 12 months', format: 'usdT', decimals: 2, signWords: { neg: 'deficit', pos: 'surplus', subject: 'The federal government', trailing: true } },
+      description: 'Federal surplus or deficit over the 12 months ending each month, from the Monthly Treasury Statement.',
+      source: { publisher: 'U.S. Department of the Treasury', dataset: 'Monthly Treasury Statement, Federal Surplus or Deficit (MTSDS133FMS), 12-month sum computed by Plainsight', url: 'https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/', via: 'FRED, Federal Reserve Bank of St. Louis' },
+      howToRead: [signHow, 'Each point adds up the latest 12 months, so it updates monthly without the big swings single months show around tax deadlines.', debtLink],
+      caveats: ['Shifts in payment timing (when a due date falls on a weekend) can move a month between fiscal years and nudge the 12-month total.'] },
+      [{ id: 'MTS12', name: 'Surplus or deficit, last 12 months', points: roll }]),
+    ts({ id: 'federal-budget-gdp', title: 'Federal revenue vs. spending', category: 'Government', frequency: 'fiscal',
+      unit: { label: '% of GDP, fiscal year', format: 'pct', decimals: 1 },
+      description: 'Total federal receipts and total federal outlays, each as a share of GDP. The gap between them is the deficit.',
+      source: { ...fiscalSrc, dataset: 'Federal Receipts (FYFRGDA188S) and Outlays (FYONGDA188S) as Percent of GDP', url: fredUrl('FYONGDA188S') },
+      howToRead: ['When the spending line is above the revenue line, the government ran a deficit that year; the distance between them is its size.', fyHow],
+      caveats: ['Revenue falls and spending rises automatically in recessions (lower tax receipts, more unemployment benefits), so gaps widen in downturns regardless of policy.'],
+      defaultSeries: ['FYONGDA188S', 'FYFRGDA188S'],
+      gap: { a: 'FYONGDA188S', b: 'FYFRGDA188S', aName: 'federal spending', bName: 'revenue', of: ' of GDP', posWord: 'deficit', negWord: 'surplus' } },
+      [{ id: 'FYONGDA188S', name: 'Spending (outlays)', points: fy(d.FYONGDA188S) }, { id: 'FYFRGDA188S', name: 'Revenue (receipts)', points: fy(d.FYFRGDA188S) }]),
+    ts({ id: 'federal-interest', title: 'Interest on the national debt', category: 'Government', lens: 'Nominal dollars', frequency: 'quarterly', reframes: ['federal-interest', 'federal-interest-gdp'],
+      unit: { label: 'Federal interest payments, annual rate', format: 'usdT', decimals: 2 },
+      description: 'What the federal government pays in interest on its debt, at a seasonally adjusted annual rate.',
+      source: { publisher: 'U.S. Bureau of Economic Analysis', dataset: 'Federal government current expenditures: Interest payments (A091RC1Q027SBEA)', url: fredUrl('A091RC1Q027SBEA'), via: 'FRED, Federal Reserve Bank of St. Louis' },
+      howToRead: ['Quarterly figures are expressed as a yearly pace, so each point is roughly what a full year would cost at that rate.', 'Interest grows when the debt grows and when the rates the Treasury pays on new borrowing rise.'],
+      caveats: ['National-accounts measure from BEA; Treasury budget figures for net interest differ somewhat in definition and timing.', 'In dollars of each year; the share-of-GDP view adjusts for the size of the economy.'] },
+      [{ id: 'A091RC1Q027SBEA', name: 'Interest payments', points: d.A091RC1Q027SBEA.map(([t, v]) => [t, round(v / 1000, 4)]) }]),
+    ts({ id: 'federal-interest-gdp', title: 'Interest on the national debt as a share of GDP', category: 'Government', lens: 'Share of the economy', frequency: 'fiscal', reframes: ['federal-interest', 'federal-interest-gdp'],
+      unit: { label: 'Net interest outlays as % of GDP', format: 'pct', decimals: 1 },
+      description: 'Federal net interest outlays divided by GDP, by fiscal year.',
+      source: { ...fiscalSrc, dataset: 'Federal Outlays: Interest as Percent of GDP (FYOIGDA188S)', url: fredUrl('FYOIGDA188S') },
+      howToRead: ['Shows how much of the economy goes to paying interest on federal debt.', fyHow],
+      caveats: ['Updated once a year, after the fiscal year closes.'] },
+      [{ id: 'FYOIGDA188S', name: 'Net interest, % of GDP', points: fy(d.FYOIGDA188S) }]),
+  ];
+};
+
 builders['state-unemployment'] = async () => {
   const d = await fred([...STATES.map(s => s[0] + 'UR'), 'UNRATE']);
   const times = d.CAUR.map(p => p[0]);
@@ -1020,12 +1088,31 @@ for (const [key, build] of Object.entries(builders)) {
   }
 }
 // Rebuild the catalog from whatever snapshots exist on disk.
+// `released` records when a dataset's latest observation first appeared, so the app can
+// show "new data" (a real release), not just "re-downloaded".
+let prevCat = [];
+try { prevCat = JSON.parse(await fs.readFile(path.join(OUT, 'catalog.json'), 'utf8')); } catch { }
+const prevById = new Map(prevCat.map(c => [c.id, c]));
+// Latest headline value, for dataset cards.
+function latestOf(ds) {
+  if (ds.kind === 'timeseries') {
+    const s = ds.series.find(x => x.id === ds.defaultSeries?.[0]) || ds.series[0];
+    const p = s?.points.at(-1);
+    return p ? { t: p[0], v: p[1], series: ds.series.length > 1 ? s.name : undefined } : null;
+  }
+  if (ds.kind === 'panel' && ds.national) {
+    for (let i = ds.times.length - 1; i >= 0; i--) if (ds.national.values[i] != null) return { t: ds.times[i], v: ds.national.values[i], series: ds.national.name };
+  }
+  return null;
+}
 for (const f of (await fs.readdir(OUT)).filter(f => f.endsWith('.json') && f !== 'catalog.json')) {
   const ds = JSON.parse(await fs.readFile(path.join(OUT, f), 'utf8'));
   const { series, entities, events, times, national, ...meta } = ds;
   const tag = DATASET_TAGS[meta.id] || {};
   const src = [...FEDERAL.map(f => ({ ...f, tier: 'federal' })), ...THIRD_PARTY].find(x => x.id === tag.source);
-  catalog.push({ ...meta, hasNational: !!national, topic: tag.topic || 'economy', sourceId: tag.source || null, tier: tag.tier || src?.tier || 'federal', nSeries: series?.length, nEntities: entities?.length, nEvents: events?.length,
+  const prev = prevById.get(meta.id);
+  const released = prev && prev.lastObservation !== meta.lastObservation ? NOW : prev?.released ?? null;
+  catalog.push({ ...meta, latest: latestOf(ds), released, hasNational: !!national, topic: tag.topic || 'economy', sourceId: tag.source || null, tier: tag.tier || src?.tier || 'federal', nSeries: series?.length, nEntities: entities?.length, nEvents: events?.length,
     firstObservation: times?.[0] ?? series?.[0]?.points?.[0]?.[0] ?? events?.[0]?.t });
 }
 catalog.sort((a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title));

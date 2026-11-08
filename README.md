@@ -56,6 +56,9 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 | Gas price, nominal and inflation-adjusted | EIA via FRED | time series | weekly |
 | New home price, nominal and inflation-adjusted | Census/HUD via FRED | time series | quarterly |
 | National debt: nominal, % of GDP, inflation-adjusted | Treasury Fiscal Data, OMB | time series | daily / quarterly |
+| Federal budget deficit: by fiscal year, % of GDP, rolling 12 months | OMB, Treasury Monthly Treasury Statement | time series | fiscal year / monthly |
+| Federal revenue vs. spending, % of GDP | OMB | time series (2 lines) | fiscal year |
+| Interest on the national debt: dollars, % of GDP | BEA, OMB | time series | quarterly / fiscal year |
 | Unemployment by state, 1976 to now | BLS LAUS via FRED | panel, US map | monthly |
 | Population by state, 1900 to now | Census via FRED | panel, US map | annual |
 | Overdose deaths by state: totals and per 100k | CDC NCHS | panel, US map | monthly |
@@ -199,6 +202,14 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 - **Captions file:** `.srt` captions for video, timed to match the burned-in captions. LinkedIn and Facebook accept them as uploads.
 - **PNG metadata:** exports carry title, description, source, source URL and the share link as embedded text. Platforms strip this on upload, so it is for provenance, not reach.
 - **Share to apps:** on phones and Safari, the system share sheet sends the file and text straight to installed apps. Elsewhere, the post text is copied and the platform's composer opens.
+
+## Finding data
+
+- **Popular** (the default tab): 16 plain-language questions ("How big is the national debt?", "Are prices still rising?"), each with its latest number and source, one tap to a ready-made chart. Picking a state turns state and county questions local. The list lives in `FEATURED` in `scripts/sources/catalog.mjs`. A "New data in the last two weeks" row appears when a dataset gets a new observation; the refresh job records when each dataset's latest observation first appeared (`released` in the catalog).
+- **Search**: ready-made datasets filter as you type, with synonyms (jobs, taxes, murder, climate…), area (national, states, counties, world), topic, and sort by best match or most recent data. Press Search to also query data.gov and every state and local portal.
+- **Topics** and **Sources** browse the same data by subject or publisher.
+
+**Budget balances** (deficit data) are written as "a $1.99T deficit", never "-$1.99T"; a bigger deficit counts as growth in the claim check, and "doubled" from a surplus is blocked. Fiscal years read "FY2026" (October 2025 to September 2026).
 
 ## Presentations, reports and websites
 

@@ -121,7 +121,7 @@
     const ser = dss.map(d => PS.asSeries(d, o));
     const ov = overlap(ser);
     const win = s => s.pts.filter(p => p.t >= ov[0] && p.t <= ov[1]);
-    const freqRank = { daily: 0, 'real-time': 0, weekly: 1, monthly: 2, quarterly: 3, annual: 4 };
+    const freqRank = { daily: 0, 'real-time': 0, weekly: 1, monthly: 2, quarterly: 3, annual: 4, fiscal: 4 };
     const frequency = dss.map(d => d.frequency).sort((x, y) => (freqRank[y] ?? 2) - (freqRank[x] ?? 2))[0];
     let series, unit, baseDate;
     if (method === 'indexed') {
@@ -130,7 +130,7 @@
         const pts = win(s), b0 = pts[0].v;
         return { id: 's' + i, name: s.name, unit: s.unit, raw: pts, pts: pts.map(p => ({ t: p.t, v: (p.v / b0) * 100 })), points: [] };
       });
-      unit = { label: `Index, ${PS.fmtDate(baseDate, frequency === 'annual' ? 'annual' : 'monthly')} = 100`, format: 'number', decimals: 0 };
+      unit = { label: `Index, ${PS.fmtDate(baseDate, frequency === 'annual' || frequency === 'fiscal' ? frequency : 'monthly')} = 100`, format: 'number', decimals: 0 };
     } else {
       series = ser.map((s, i) => ({ id: 's' + i, name: s.name, unit: s.unit, raw: win(s), pts: win(s), points: [] }));
       unit = method === 'shared' ? { ...dss[0].unit, label: dss[0].unit.label } : dss[0].unit;

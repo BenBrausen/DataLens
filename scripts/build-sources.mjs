@@ -12,7 +12,7 @@
 
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { TIERS, TOPICS, FEDERAL, THIRD_PARTY, DATASET_TAGS, EXTRA_STATE_PORTALS, ARCGIS_STATE_ORGS } from './sources/catalog.mjs';
+import { TIERS, TOPICS, FEDERAL, THIRD_PARTY, DATASET_TAGS, EXTRA_STATE_PORTALS, ARCGIS_STATE_ORGS, FEATURED } from './sources/catalog.mjs';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const OUT = path.join(ROOT, 'public/sources/registry.json');
@@ -109,7 +109,7 @@ try {
     .sort((a, b) => b.datasets - a.datasets);
 } catch { }
 
-const registry = { generated: NOW, tiers: TIERS, topics: TOPICS, federal: FEDERAL, thirdParty: THIRD_PARTY, datasetTags: DATASET_TAGS, states, catalogOrgs };
+const registry = { generated: NOW, tiers: TIERS, topics: TOPICS, featured: FEATURED, federal: FEDERAL, thirdParty: THIRD_PARTY, datasetTags: DATASET_TAGS, states, catalogOrgs };
 await fs.mkdir(path.dirname(OUT), { recursive: true });
 await fs.writeFile(OUT, JSON.stringify(registry, null, 1));
 const SEARCHABLE = ['socrata', 'ckan', 'arcgis', 'arcgis-org'];

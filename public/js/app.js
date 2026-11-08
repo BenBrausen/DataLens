@@ -7,9 +7,9 @@
 
   const S = {
     compareDs: new Map(), combo: null, comboKey: '', picker: null,
-    catalog: [], ds: null, step: 'data', dataTab: 'topics', topic: 'all', sourceOpen: null,
+    catalog: [], ds: null, step: 'data', dataTab: 'popular', topic: 'all', sourceOpen: null,
     state: (() => { try { return localStorage.getItem('ps-state') || ''; } catch { return ''; } })(), playing: false, p: 1, t0: 0,
-    analysis: null, audio: null, imported: null, search: { q: '', scope: 'all', org: null, orgName: '', results: [], busy: false, err: '', info: '' }, exporting: false, custom: [],
+    analysis: null, audio: null, imported: null, search: { q: '', geo: 'any', topic: '', sort: 'relevance', scope: 'all', org: null, orgName: '', results: [], busy: false, err: '', info: '' }, exporting: false, custom: [],
   };
   const DEFAULTS = {
     chart: 'line', platform: 'vertical', format: 'video', duration: 20, theme: 'newsroom', palette: 'plainsight',
@@ -216,7 +216,61 @@
     const active = S.ds && (S.ds.id === c.id || c.reframes?.includes(S.ds.id));
     const kind = c.kind === 'events' ? '<span class="badge live">Live</span>' : c.geo ? '<span class="badge">Map</span>' : c.kind === 'panel' ? '<span class="badge">Compare</span>' : '';
     const local = st && c.geo === 'us-states' ? `<span class="local">Shows ${esc(st.name)}${c.hasNational ? ' vs. U.S.' : ''}</span>` : st && c.geo === 'us-counties' ? `<span class="local">Zooms to ${esc(st.name)}'s counties</span>` : '';
-    return `<button class="ds ${active ? 'active' : ''}" data-ds="${c.id}"><b>${esc(c.title)}${kind}${tierBadge(c.tier)}</b><span>${esc(c.source.publisher)} · through ${esc(fmtThrough(c))}</span>${local}</button>`;
+    return `<button class="ds ${active ? 'active' : ''}" data-ds="${c.id}"><b>${esc(c.title)}${kind}${tierBadge(c.tier)}</b><span>${esc(c.source.publisher)} · ${esc(latestText(c))}</span>${local}</button>`;
+  }
+  // "$40.56T · Nov 5, 2026", "$1.99T deficit · FY2026", "U.S.: 4.2% · Sep 2026"
+  function latestText(c) {
+    const L = c.latest, u = c.unit || {};
+    if (L && Number.isFinite(L.v)) {
+      const sw = u.signWords;
+      const val = sw ? `${PS.fmt(Math.abs(L.v), u)}${sw.of || ''} ${L.v < 0 ? sw.neg : sw.pos}` : PS.fmt(L.v, u);
+      const who = c.kind === 'panel' ? (/united states/i.test(L.series || '') ? 'U.S.: ' : '') : '';
+      return `${who}${val} · ${fmtThrough({ ...c, lastObservation: L.t })}`;
+    }
+    if (c.kind === 'events') return `${(c.nEvents || 0).toLocaleString()} events · through ${fmtThrough(c)}`;
+    const geoWord = { 'us-states': 'states', 'us-counties': 'counties', world: 'countries' }[c.geo];
+    return geoWord && c.nEntities ? `${c.nEntities.toLocaleString()} ${geoWord} · ${fmtThrough(c)}` : `through ${fmtThrough(c)}`;
+  }
+
+  // ---------- ready-made dataset search (instant, local) ----------
+  const SYN = { jobs: ['unemploy', 'employ', 'job'], job: ['unemploy', 'employ'], work: ['unemploy', 'employ', 'job'], prices: ['inflation', 'price'], cpi: ['inflation'], cost: ['price', 'inflation'],
+    spending: ['outlay', 'spending'], taxes: ['revenue', 'receipt'], tax: ['revenue', 'receipt'], borrowing: ['debt', 'deficit'], budget: ['deficit', 'budget', 'debt'],
+    homes: ['home', 'housing'], housing: ['home', 'house', 'mortgage', 'permit'], rent: ['home', 'housing'], climate: ['temperature', 'co2', 'warming', 'heat'], warming: ['temperature'],
+    crime: ['crime', 'homicide'], murder: ['homicide'], vote: ['president', 'election'], voting: ['president', 'election'], election: ['president', 'election'], elections: ['president', 'election'],
+    drugs: ['overdose', 'drug'], opioid: ['overdose'], money: ['income'], wages: ['income', 'wage'], pay: ['income', 'wage'], salary: ['income', 'wage'], moving: ['migration'], movers: ['migration'],
+    disaster: ['disaster', 'risk', 'fema'], weather: ['disaster', 'heat', 'hurricane', 'flood'], storms: ['hurricane', 'disaster'], fire: ['wildfire'], gdp: ['gdp'], interest: ['interest', 'mortgage'],
+    old: ['65', 'age'], elderly: ['65', 'age'], seniors: ['65'], poor: ['poverty'], insurance: ['uninsured'], pollution: ['air', 'co2'], quake: ['earthquake'] };
+  const GEO_WORDS = { 'us-states': 'state states by-state', 'us-counties': 'county counties local', world: 'world country countries global international' };
+  function hay(c) {
+    if (c._hay) return c._hay;
+    const topic = PS.REGISTRY?.topics.find(t => t.id === c.topic);
+    const lo = x => String(x || '').toLowerCase();
+    c._hay = { title: lo(c.title + ' ' + (c.lens || '')), rest: lo([c.id, c.description, c.category, topic?.name, c.source?.publisher, c.source?.dataset, c.unit?.label, (c.howToRead || []).join(' '), GEO_WORDS[c.geo] || 'national united states u.s.', c.frequency].join(' ')) };
+    return c._hay;
+  }
+  function searchLocal(q, { geo = 'any', topic = '', sort = 'relevance' } = {}) {
+    const toks = q.toLowerCase().replace(/[^\w\s.%-]/g, ' ').split(/\s+/).filter(t => t.length > 1 && !['the', 'of', 'in', 'and', 'for', 'by', 'us', 'u.s.', 'how', 'what', 'is'].includes(t));
+    const geoOk = c => geo === 'any' || (geo === 'national' ? !c.geo : c.geo === geo);
+    let out = [];
+    for (const c of S.catalog) {
+      if (!geoOk(c) || (topic && c.topic !== topic)) continue;
+      const h = hay(c); let score = 0, ok = true;
+      for (const t of toks) {
+        const alts = [t, ...(SYN[t] || []), t.endsWith('s') ? t.slice(0, -1) : null].filter(Boolean);
+        const inTitle = alts.some(a => h.title.includes(a)), inRest = inTitle || alts.some(a => h.rest.includes(a));
+        if (!inRest) { ok = false; break; }
+        score += inTitle ? 3 : 1;
+      }
+      if (ok) out.push({ c, score: score + (c.reframes && c.reframes[0] !== c.id ? -0.5 : 0) });
+    }
+    if (sort === 'updated' || !toks.length) out.sort((a, b) => String(b.c.lastObservation).localeCompare(String(a.c.lastObservation)));
+    else out.sort((a, b) => b.score - a.score || a.c.title.localeCompare(b.c.title));
+    return out.map(x => x.c);
+  }
+  function localResultsHTML() {
+    const sc = S.search, list = searchLocal(sc.q, sc);
+    const head = `<p class="muted local-count"><b>${list.length}</b> of ${S.catalog.length} ready-made datasets${sc.q ? ` match "${esc(sc.q)}"` : ''}. Verified sources, updated automatically.</p>`;
+    return head + (list.length ? list.slice(0, 40).map(dsCard).join('') : '<p class="muted">No ready-made dataset matches. Search data.gov and state portals below.</p>');
   }
   const heads = list => list.filter(c => !c.reframes || c.reframes[0] === c.id);
   function lensHTML() {
@@ -235,11 +289,25 @@
     const st = stateInfo();
     const stateSel = `<div class="state-pick"><label for="statePick">Your state</label><select id="statePick"><option value="">All states (national view)</option>${PS.STATE_LIST.map(([c, , n]) => `<option value="${c}" ${S.state === c ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
       ${st ? `<p class="muted state-note">State-level charts now highlight ${esc(st.name)} and compare it with the U.S.</p>` : ''}`;
-    const tabs = `<div class="tabs">${[['topics', 'Topics'], ['sources', 'Sources'], ['search', 'Search'], ['upload', 'Upload']].map(([k, l]) => `<button data-tab="${k}" class="${S.dataTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>`;
+    const tabs = `<div class="tabs">${[['popular', 'Popular'], ['topics', 'Topics'], ['sources', 'Sources'], ['search', 'Search'], ['upload', 'Upload']].map(([k, l]) => `<button data-tab="${k}" class="${S.dataTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>`;
     let body = '';
     const reg = PS.REGISTRY;
 
-    if (S.dataTab === 'topics') {
+    if (S.dataTab === 'popular') {
+      const byId = new Map(S.catalog.map(c => [c.id, c]));
+      const week = Date.now() - 14 * 864e5;
+      const fresh = S.catalog.filter(c => c.released && Date.parse(c.released) > week).sort((a, b) => b.released.localeCompare(a.released)).slice(0, 6);
+      if (fresh.length) body += `<div class="ds-group"><h3>New data in the last two weeks</h3>${fresh.map(dsCard).join('')}</div>`;
+      const picks = (reg?.featured || []).map(f => ({ ...f, c: byId.get(f.id) })).filter(f => f.c);
+      body += `<div class="ds-group"><h3>Popular questions</h3><p class="muted tier-desc">Pick a question. Each one opens a ready-made chart from an official source, kept up to date.</p><div class="pop-grid">${picks.map(({ q, c }) => {
+        const active = S.ds && (S.ds.id === c.id || c.reframes?.includes(S.ds.id));
+        const local = st && c.geo === 'us-states' ? `For ${esc(st.name)}` : st && c.geo === 'us-counties' ? `${esc(st.name)} counties` : '';
+        return `<button class="pop ${active ? 'active' : ''}" data-ds="${c.id}"><b>${esc(st && c.geo ? q.replace('your state', st.name).replace('your county', `your ${st.name} county`) : q)}</b><span class="pop-val">${esc(latestText(c))}</span><span class="pop-src">${esc(c.source.publisher)}${local ? ' · ' + local : ''}</span></button>`;
+      }).join('')}</div></div>`;
+      body += `<button class="btn block" data-tab="search">Search all ${S.catalog.length} ready-made datasets, plus data.gov and state portals</button>`;
+    }
+
+    else if (S.dataTab === 'topics') {
       const topics = (reg?.topics || []).map(t => ({ ...t, n: heads(S.catalog).filter(c => c.topic === t.id).length })).filter(t => t.n);
       body += `<div class="chips topic-chips"><button class="chip ${S.topic === 'all' ? 'active' : ''}" data-topic="all">All</button>${topics.map(t => `<button class="chip ${S.topic === t.id ? 'active' : ''}" data-topic="${t.id}">${esc(t.name)} <small>${t.n}</small></button>`).join('')}</div>`;
       body += lensHTML();
@@ -297,7 +365,14 @@
     else if (S.dataTab === 'search') {
       const sc = S.search;
       const scopes = [['all', st ? `Everything + ${st.name}` : 'Everything'], ['datagov', 'Federal (data.gov)'], ...(st ? [['state', `${st.name} portals`]] : []), ['states', 'All state portals']];
-      body += `<form id="searchForm" class="row"><input type="search" id="q" placeholder="e.g. broadband, crashes, school enrollment" value="${esc(sc.q)}"><button class="btn primary" style="flex:none">Search</button></form>
+      const topicOpts = (reg?.topics || []).filter(t => S.catalog.some(c => c.topic === t.id));
+      body += `<form id="searchForm" class="row"><input type="search" id="q" placeholder="e.g. deficit, rent, overdoses, broadband" value="${esc(sc.q)}" autocomplete="off"><button class="btn primary" style="flex:none">Search</button></form>
+        <div class="ds-group"><h3>Ready-made</h3>
+        <div class="search-filters"><div class="chips">${[['any', 'Any area'], ['national', 'National'], ['us-states', 'States'], ['us-counties', 'Counties'], ['world', 'World']].map(([k, l]) => `<button class="chip ${sc.geo === k ? 'active' : ''}" data-geo="${k}">${l}</button>`).join('')}</div>
+        <div class="row"><select id="fTopic" aria-label="Topic"><option value="">All topics</option>${topicOpts.map(t => `<option value="${t.id}" ${sc.topic === t.id ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select>
+        <select id="fSort" aria-label="Sort"><option value="relevance" ${sc.sort === 'relevance' ? 'selected' : ''}>Best match</option><option value="updated" ${sc.sort === 'updated' ? 'selected' : ''}>Most recent data</option></select></div></div>
+        <div id="localResults">${localResultsHTML()}</div></div>
+        <h3>More from data.gov and state portals</h3><p class="muted tier-desc">Press Search to look through hundreds of thousands of government datasets. These load straight from the publisher and get the same trust checks.</p>
         <div class="chips scope-chips">${scopes.map(([k, l]) => `<button class="chip ${sc.scope === k ? 'active' : ''}" data-scope="${k}">${esc(l)}</button>`).join('')}</div>
         ${sc.org ? `<p class="muted">Limited to ${esc(sc.orgName)} <button class="linkbtn" data-act="clearOrg">clear</button></p>` : ''}
         ${st && sc.scope === 'state' ? portalChips(st.code) + portalChips(st.code, 'local') : ''}
@@ -341,6 +416,11 @@
       if (S.ds && !S.ds.id.startsWith('custom-')) selectDataset(S.ds.id); else renderStep();
     });
     $('#searchForm')?.addEventListener('submit', e => { e.preventDefault(); S.search.q = $('#q').value.trim(); runSearch(); });
+    // Ready-made results filter as you type; the slower external search waits for Search.
+    const refreshLocal = () => { const el = $('#localResults'); if (el) el.innerHTML = localResultsHTML(); };
+    $('#q')?.addEventListener('input', e => { S.search.q = e.target.value.trim(); refreshLocal(); });
+    $('#fTopic')?.addEventListener('change', e => { S.search.topic = e.target.value; refreshLocal(); });
+    $('#fSort')?.addEventListener('change', e => { S.search.sort = e.target.value; refreshLocal(); });
     $('#file')?.addEventListener('change', async e => {
       const f = e.target.files[0]; if (!f) return;
       if (f.size > 40e6) { toast('That file is over 40 MB. Filter it first.'); return; }
@@ -378,7 +458,8 @@
 
   $('#stepBody').addEventListener('click', async e => {
     const t = e.target.closest('button, [data-ds]'); if (!t) return;
-    if (t.dataset.tab) { S.dataTab = t.dataset.tab; renderStep(); return; }
+    if (t.dataset.tab) { S.dataTab = t.dataset.tab; renderStep(); if (t.dataset.tab === 'search') $('#q')?.focus(); return; }
+    if (t.dataset.geo) { S.search.geo = t.dataset.geo; document.querySelectorAll('[data-geo]').forEach(b => b.classList.toggle('active', b === t)); const el = $('#localResults'); if (el) el.innerHTML = localResultsHTML(); return; }
     if (t.dataset.topic) { S.topic = t.dataset.topic; renderStep(); return; }
     if (t.dataset.captab) { S.capTab = t.dataset.captab; renderStep(); return; }
     if (t.dataset.compose) {

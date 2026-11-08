@@ -216,6 +216,72 @@
    ]
   }
  ],
+ "featured": [
+  {
+   "id": "federal-debt",
+   "q": "How big is the national debt?"
+  },
+  {
+   "id": "federal-deficit",
+   "q": "How much more does Washington spend than it collects?"
+  },
+  {
+   "id": "federal-interest",
+   "q": "What does the debt cost in interest?"
+  },
+  {
+   "id": "us-inflation",
+   "q": "Are prices still rising?"
+  },
+  {
+   "id": "us-unemployment",
+   "q": "How strong is the job market?"
+  },
+  {
+   "id": "gas-price-real",
+   "q": "Is gas really more expensive than ever?"
+  },
+  {
+   "id": "mortgage-rate",
+   "q": "Where are mortgage rates now?"
+  },
+  {
+   "id": "state-home-values",
+   "q": "What does a typical home cost in your state?"
+  },
+  {
+   "id": "state-violent-crime",
+   "q": "Is violent crime rising or falling?"
+  },
+  {
+   "id": "overdose-deaths",
+   "q": "Is the overdose crisis easing?"
+  },
+  {
+   "id": "county-president",
+   "q": "How did your county vote?"
+  },
+  {
+   "id": "county-migration",
+   "q": "Where are Americans moving?"
+  },
+  {
+   "id": "global-temperature",
+   "q": "How much has the planet warmed?"
+  },
+  {
+   "id": "county-risk",
+   "q": "What disasters threaten your county?"
+  },
+  {
+   "id": "earthquakes",
+   "q": "Where did the earth shake this month?"
+  },
+  {
+   "id": "life-expectancy",
+   "q": "Where do people live longest?"
+  }
+ ],
  "federal": [
   {
    "id": "bls",
@@ -254,6 +320,14 @@
     "government"
    ],
    "catalogSlug": "treasury"
+  },
+  {
+   "id": "omb",
+   "name": "Office of Management and Budget",
+   "url": "https://www.whitehouse.gov/omb/information-resources/budget/historical-tables/",
+   "topics": [
+    "government"
+   ]
   },
   {
    "id": "cdc",
@@ -508,6 +582,30 @@
   "federal-debt-real": {
    "topic": "government",
    "source": "treasury"
+  },
+  "federal-deficit": {
+   "topic": "government",
+   "source": "omb"
+  },
+  "federal-deficit-gdp": {
+   "topic": "government",
+   "source": "omb"
+  },
+  "federal-deficit-12mo": {
+   "topic": "government",
+   "source": "treasury"
+  },
+  "federal-budget-gdp": {
+   "topic": "government",
+   "source": "omb"
+  },
+  "federal-interest": {
+   "topic": "government",
+   "source": "bea"
+  },
+  "federal-interest-gdp": {
+   "topic": "government",
+   "source": "omb"
   },
   "state-unemployment": {
    "topic": "economy",
