@@ -158,10 +158,18 @@
       const { ds, o } = this.scene;
       const s = ds.source;
       const tierLbl = { academic: ' (academic research)', nonprofit: ' (nonprofit research)', industry: ' (company data)' }[ds.tier] || '';
+      // Permanent context the creator can't remove: unverified uploads, cropped ranges.
+      if (s.unverified) return `Data provided by the creator (${s.dataset}); not verified by Plainsight.${o.note ? ' ' + o.note : ''}`;
       let txt = `Source: ${s.publisher}${tierLbl}${s.dataset ? ', ' + s.dataset : ''}${s.via ? ' (via ' + s.via + ')' : ''}. Retrieved ${PS.fmtRetrieved(ds.retrieved)}.`;
       if (ds.lens && ds.lens !== 'Nominal dollars' && /computed by Plainsight/.test((ds.caveats || []).join(' '))) txt += ' Adjusted by Plainsight.';
       if (o.note) txt += ' ' + o.note;
       if (this._axisNote) txt += ' Note: y-axis does not start at zero.';
+      if ((o.rangeStart != null || o.rangeEnd != null) && this.scene.fullRange) {
+        const [a, b] = this.scene.fullRange, yr = t => new Date(t).getUTCFullYear();
+        txt += ` Shows ${yr(o.rangeStart ?? a)}-${yr(o.rangeEnd ?? b)} of the ${yr(a)}-${yr(b)} record.`;
+        const flip = this.scene.analysis.checks?.find(c => c.title === 'Selected range reverses the long-term trend');
+        if (flip) txt += ' The full record shows the opposite trend.';
+      }
       return txt;
     }
 

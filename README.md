@@ -165,6 +165,39 @@ Election results get extra safeguards:
 - **Verified against certified results:** national margins 2000-2024, PA, TX, WI, WV.
 - **One-time download.** The data is downloaded once through Harvard Dataverse's guestbook. Rebuild with `ELECTIONS_FILE=<path> node scripts/refresh-data.mjs elections`.
 
+## Keeping the story true (claim check)
+
+Creators can write their own title, subtitle, takeaway, voiceover and notes, but not ones the data contradicts. `public/js/integrity.js` checks every sentence they type and **pauses export** when it finds:
+
+| Problem | Example that is blocked |
+|---|---|
+| A number that appears nowhere in the data or its computed facts | "The debt hit $90 trillion" |
+| A "now / currently / hits" figure that isn't the latest value (latest two releases count) | "Unemployment is now 12%" |
+| A direction the data contradicts, over the shown range or "since YYYY" | "Gas prices fell since 2020" ($2.58 → $4.15) |
+| Doubled / tripled / halved that the numbers don't support | "Home prices doubled since 2015" (1.36×) |
+| A record that isn't one, judged on the full history even when the chart is cropped | "2025 was a record hot year" (record: 2024) |
+
+Places named in a sentence are checked against that place ("California unemployment hits 9%" vs. California's 5.1%). Cause-and-effect wording ("because of tariffs") is a warning, since the data shows what happened, not why. Each block comes with a one-click fix (use the computed takeaway, restore the suggested title).
+
+Context that can't be removed is stamped into the source line of every export: a cropped time range ("Shows 2015-2020 of the 1948-2026 record", plus a note when the full record shows the opposite trend), a zoomed axis, and "Data provided by the creator; not verified by Plainsight" for uploads. Share links carry settings only and rebuild the chart from the official data, so anyone can check a chart against its source.
+
+Someone determined to mislead can still edit a file in another app. The goal is that Plainsight is never the easy way to do it.
+
+## Sharing
+
+- **Sizes**
+  - 9:16 for TikTok, Reels and Shorts
+  - 4:5 feed for Facebook, LinkedIn and Instagram
+  - 1:1 for LinkedIn, X and Threads
+  - 16:9
+  - 1.91:1 link preview (1200×628) for LinkedIn, Facebook and X
+  - 2:3 for Pinterest
+- **LinkedIn carousel:** a 4-page PDF document post. The pages are the chart, what the data shows, how to read it, and sources & method.
+- **Post text:** a version for each platform (LinkedIn, Facebook, X, Instagram, TikTok), with hashtags by topic, plus alt text.
+- **Captions file:** `.srt` captions for video, timed to match the burned-in captions. LinkedIn and Facebook accept them as uploads.
+- **PNG metadata:** exports carry title, description, source, source URL and the share link as embedded text. Platforms strip this on upload, so it is for provenance, not reach.
+- **Share to apps:** on phones and Safari, the system share sheet sends the file and text straight to installed apps. Elsewhere, the post text is copied and the platform's composer opens.
+
 ## Comparing datasets (overlays)
 
 In the Chart step, **Compare with another dataset** lists every dataset as either compatible, with the methods it allows, or blocked, with the reason. The method follows from the data, and a second y-axis is never used:

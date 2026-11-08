@@ -20,6 +20,9 @@
     kicker: '', title: '', subtitle: '', note: '', colorZero: false, focus: '', compareNational: true, titleEdited: false, minPop: 0, scope: '', compare: [], combineMethod: '',
   };
   let o = { ...DEFAULTS };
+  PS.DEFAULT_OPTIONS = DEFAULTS;
+  // What the dataset itself suggests (left out of share links, recomputed on open).
+  const autoOpts = () => ({ title: autoTitle(S.ds), subtitle: autoSubtitle(S.ds), chart: PS.defaultChart(S.ds), titleEdited: false, zeroBase: !S.ds?.zeroLine, minPop: S.ds?.geo === 'us-counties' && S.ds?.isRate ? 5000 : 0, highlight: o.focus, focus: o.focus });
 
   // ---------- helpers ----------
   const toast = msg => { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 3200); };
@@ -100,9 +103,12 @@
     const pc = PS.checkPalette(palette(), o.bg || T.bg, colorsInUse());
     S.analysis = PS.analyze(ds, { ...o, paletteCheck: colorsInUse() > 1 ? pc : null });
     if (!o.scriptEdited) o.script = S.analysis.script;
+    // Claim check: the creator's own words must not contradict the data.
+    S.integrity = PS.checkClaims(ds, S.analysis, { ...o, _autoSubtitle: autoSubtitle(S.ds), _autoTitle: autoTitle(S.ds), focus: o.focus || (stateInfo()?.fips && ds.geo === 'us-states' ? stateInfo().fips : '') }, S.ds);
+    S.analysis.checks = [...S.integrity.blocks.map(b => ({ level: 'block', title: b.title, detail: b.detail, fixAct: b.fix })), ...S.integrity.warns.map(w => ({ level: 'warn', title: w.title, detail: w.detail })), ...S.analysis.checks];
     const platform = PS.PLATFORMS[o.platform];
     renderer.setScene({
-      ds, platform, analysis: S.analysis, script: o.script,
+      ds, platform, analysis: S.analysis, script: o.script, fullRange: timeBounds(S.ds),
       o: { ...o, static: o.format === 'image', title: o.title || ds.title, subtitle: o.subtitle },
     });
     if (!S.playing) renderer.draw(S.p);
@@ -374,6 +380,14 @@
     const t = e.target.closest('button, [data-ds]'); if (!t) return;
     if (t.dataset.tab) { S.dataTab = t.dataset.tab; renderStep(); return; }
     if (t.dataset.topic) { S.topic = t.dataset.topic; renderStep(); return; }
+    if (t.dataset.captab) { S.capTab = t.dataset.captab; renderStep(); return; }
+    if (t.dataset.compose) {
+      if (gate()) return;
+      const text = $('#postCaption')?.value || '', link = PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts());
+      copy(text, 'Post text copied. Paste it into the post and attach your downloaded file.');
+      window.open(PS.composerUrl(t.dataset.compose, text, link), '_blank', 'noopener');
+      return;
+    }
     if (t.dataset.compare) { o.compare.push(t.dataset.compare); o.combineMethod = ''; S.picker = null; update(); renderStep(); return; }
     if (t.dataset.uncompare) { o.compare = o.compare.filter(x => x !== t.dataset.uncompare); o.combineMethod = ''; if (!o.compare.length) { o.chart = PS.defaultChart(S.ds); o.title = autoTitle(S.ds); o.subtitle = autoSubtitle(S.ds); o.zeroBase = !S.ds.zeroLine; } update(); renderStep(); return; }
     if (t.dataset.method) { o.combineMethod = t.dataset.method; S.comboKey = ''; update(); renderStep(); return; }
@@ -410,6 +424,14 @@
     ACTIONS[act]?.(t);
   });
 
+  // Export is refused while the creator's text contradicts the data.
+  function gate() {
+    if (!blocked()) return false;
+    toast('Export is paused: your text doesn\'t match the data. See the trust check for fixes.');
+    if (S.step !== 'export') { S.step = 'export'; renderStep(); }
+    return true;
+  }
+  const copy = (text, msg) => (navigator.clipboard?.writeText(text) || Promise.reject()).then(() => toast(msg)).catch(() => toast('Select the text and copy it manually.'));
   const ACTIONS = {
     openCompare: () => openPicker(),
     closeCompare: () => { S.picker = null; renderStep(); },
@@ -446,8 +468,44 @@
       renderStep();
     },
     removeAudio: () => { S.audio = null; renderStep(); },
-    png: async () => { const prev = o.format; o.format = 'image'; update({ panels: false }); await PS.exportPNG(renderer, `${PS.slug(o.title)}-${o.platform}`); o.format = prev; update({ panels: false }); toast('PNG saved.'); },
+    png: async () => {
+      if (gate()) return;
+      const prev = o.format; o.format = 'image'; update({ panels: false });
+      const raw = await new Promise(r => renderer.canvas.toBlob(r, 'image/png'));
+      const ds = S.comboDs || S.ds;
+      const blob = await PS.pngWithMeta(raw, { Title: o.title, Description: o.takeawayText || S.analysis.headline, Source: `${ds.source.publisher}${ds.source.dataset ? ', ' + ds.source.dataset : ''}`, 'Source URL': ds.source.url, Author: o.handle, Software: 'Plainsight', 'Creation Time': new Date().toUTCString(), Comment: PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts()) || '' });
+      const name = `${PS.slug(o.title)}-${o.platform}.png`;
+      S.lastExport = { blob, name, type: 'image/png' };
+      o.format = prev; update({ panels: false });
+      await PS.download(blob, name); toast('PNG saved, with source details embedded.'); if (S.step === 'export') renderStep();
+    },
+    carousel: async t => {
+      if (gate()) return;
+      t.disabled = true; t.textContent = 'Building PDF…';
+      const prevP = o.platform, prevF = o.format; o.platform = 'feed'; o.format = 'image'; update({ panels: false });
+      try {
+        const blob = await PS.exportCarousel({ renderer, ds: S.comboDs || S.ds, analysis: S.analysis, o: { ...o, title: o.title || S.ds.title }, link: PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts()) });
+        const name = `${PS.slug(o.title)}-linkedin-carousel.pdf`; S.lastExport = { blob, name, type: 'application/pdf' };
+        await PS.download(blob, name); toast('Carousel PDF saved. On LinkedIn, post it as a document.');
+      } catch (e) { toast(e.message); }
+      o.platform = prevP; o.format = prevF; renderPlatforms(); update({ panels: false }); renderStep();
+    },
+    srt: async () => { if (gate()) return; await PS.download(new Blob([PS.srt(o.script, o.duration)], { type: 'text/plain' }), `${PS.slug(o.title)}.srt`); toast('Captions file saved. Upload it with the video on LinkedIn or Facebook.'); },
+    shareApps: async () => {
+      if (gate() || !S.lastExport) return;
+      const file = new File([S.lastExport.blob], S.lastExport.name, { type: S.lastExport.type });
+      const text = $('#postCaption')?.value || '';
+      if (PS.canShareFiles(file)) { try { await navigator.share({ files: [file], title: o.title, text }); } catch (e) { if (e.name !== 'AbortError') toast('Sharing failed: ' + e.message); } }
+      else toast('This browser can\'t share files to apps. Use a platform button: the caption is copied and the composer opens.');
+    },
+    copyAlt: () => copy($('#altText').value, 'Alt text copied.'),
+    copyLink: () => copy($('#shareLink').value, 'Link copied.'),
+    clearTakeaway: () => { o.takeawayText = ''; update(); renderStep(); },
+    resetTitle: () => { o.titleEdited = false; o.title = autoTitle(S.ds); update(); renderStep(); },
+    resetSubtitle: () => { o.subtitle = autoSubtitle(S.ds); update(); renderStep(); },
+    clearField: t => { o[t.dataset.field] = ''; update(); renderStep(); },
     video: async t => {
+      if (gate()) return;
       pause(); S.exporting = true; t.disabled = true;
       const bar = $('#exportProgress i'), ctrl = new AbortController(); S.abort = ctrl;
       $('#cancelExport').hidden = false;
@@ -455,13 +513,14 @@
         const prev = o.format; o.format = 'video'; update({ panels: false });
         const { blob, ext } = await PS.exportVideo({ renderer, duration: o.duration, audioBuffer: S.audio?.buffer, signal: ctrl.signal, onProgress: p => (bar.style.width = (p * 100).toFixed(1) + '%') });
         o.format = prev;
-        await PS.download(blob, `${PS.slug(o.title)}-${o.platform}.${ext}`);
+        S.lastExport = { blob, name: `${PS.slug(o.title)}-${o.platform}.${ext}`, type: blob.type };
+        await PS.download(blob, S.lastExport.name);
         toast(`Video saved (${ext.toUpperCase()}, ${(blob.size / 1e6).toFixed(1)} MB).`);
       } catch (e) { toast(e.message); }
       S.exporting = false; t.disabled = false; $('#cancelExport').hidden = true; bar.style.width = '0'; S.p = 1; update({ panels: false });
     },
     cancel: () => S.abort?.abort(),
-    copyCaption: () => { navigator.clipboard.writeText($('#postCaption').value).then(() => toast('Caption copied.')); },
+    copyCaption: () => copy($('#postCaption').value, 'Post text copied.'),
     saveProject: () => PS.download(new Blob([JSON.stringify({ plainsight: 1, dataset: S.ds.id, options: o }, null, 1)], { type: 'application/json' }), PS.slug(o.title) + '.plainsight.json'),
     openProject: () => $('#projFile').click(),
     applyCheck: t => {
@@ -494,6 +553,11 @@
     update({ panels: !['title', 'subtitle', 'kicker', 'handle', 'note'].includes(k) || true });
     if (el.dataset.rerender != null) renderStep();
     if (k === 'script') { const f = $('#scriptFit'); if (f) f.innerHTML = fitText(); }
+    if (['title', 'subtitle', 'kicker', 'takeawayText', 'script', 'note'].includes(k)) {
+      clearTimeout(S._claimT);
+      S._claimT = setTimeout(() => { const box = document.querySelector('#stepBody .integrity'), html = integrityBox();
+        if (box) { if (html) box.outerHTML = html; else box.remove(); } else if (html) $('#stepBody').insertAdjacentHTML('afterbegin', html); }, 400);
+    }
   });
   $('#stepBody').addEventListener('change', e => {
     const el = e.target;
@@ -624,8 +688,9 @@
   };
   STEPS.story = () => {
     if (!S.ds) return '<p class="muted">Pick data first.</p>';
+    const box = integrityBox();
     const voices = PS.voices();
-    let html = `<h3>Headline</h3>
+    let html = box + `<h3>Headline</h3>
       ${field('Title', `<input type="text" data-k="title" value="${esc(o.title)}">`)}
       ${field('Subtitle', `<input type="text" data-k="subtitle" value="${esc(o.subtitle)}">`)}
       ${field('Kicker', `<input type="text" data-k="kicker" value="${esc(o.kicker)}" placeholder="${esc((S.ds.category + ' · ' + S.ds.source.publisher))}">`)}
@@ -656,22 +721,44 @@
   };
 
   // ---------- step: export ----------
+  function integrityBox() {
+    const b = S.integrity?.blocks || [];
+    if (!b.length) return '';
+    return `<div class="integrity"><b>Export is paused: your text doesn't match the data</b>${b.map(x => `<p><b>${esc(x.title)}.</b> ${esc(x.detail)}</p><button class="btn" data-act="${x.fix.act}" data-field="${x.fix.field || ''}">${esc(x.fix.label)}</button>`).join('')}
+      <p class="muted">Plainsight checks your title, subtitle, takeaway, script and notes against the data so the tool can't be used to misstate it. Edit the text in Story, or use the suggestion.</p></div>`;
+  }
+  const blocked = () => (S.integrity?.blocks.length || 0) > 0;
   STEPS.export = () => {
     if (!S.ds) return '<p class="muted">Pick data first.</p>';
     const P = PS.PLATFORMS[o.platform];
     const mime = PS.videoMime();
-    const caption = `${o.title}\n\n${o.takeawayText || S.analysis.headline}\n\nSource: ${S.ds.source.publisher}${S.ds.source.dataset ? ', ' + S.ds.source.dataset : ''}${S.ds.source.url ? ' ' + S.ds.source.url : ''} (retrieved ${PS.fmtRetrieved(S.ds.retrieved)}).`;
-    return `<h3>Format</h3><div class="tabs">${[['video', 'Video'], ['image', 'Image']].map(([k, l]) => `<button data-fmt="${k}" class="${o.format === k ? 'active' : ''}">${l}</button>`).join('')}</div>
-      <h3>Platform</h3><div class="chips">${Object.entries(PS.PLATFORMS).map(([id, p]) => `<button class="chip ${o.platform === id ? 'active' : ''}" data-platform-x="${id}">${p.ratio} · ${esc(p.name)}</button>`).join('')}</div>
+    const link = PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts());
+    const ds = S.comboDs || viewOf(S.ds);
+    const caps = PS.postCaptions(ds.combo ? { ...ds, topic: S.ds.topic } : { ...S.ds, topic: S.ds.topic }, S.analysis, { ...o, title: o.title || S.ds.title }, link);
+    const capTab = S.capTab || 'linkedin';
+    const dis = blocked() ? 'disabled' : '';
+    return integrityBox() + `<h3>Format</h3><div class="tabs">${[['video', 'Video'], ['image', 'Image']].map(([k, l]) => `<button data-fmt="${k}" class="${o.format === k ? 'active' : ''}">${l}</button>`).join('')}</div>
+      <h3>Size</h3><div class="chips">${Object.entries(PS.PLATFORMS).map(([id, p]) => `<button class="chip ${o.platform === id ? 'active' : ''}" data-platform-x="${id}">${p.ratio} · ${esc(p.name)}</button>`).join('')}</div>
       <p class="muted">${P.w}×${P.h}px. Content stays inside the platform's safe area; toggle "Safe zones" under the preview to see it.</p>
-      ${o.format === 'video' ? field('Length', range('duration', 6, 90), o.duration + 's') + `<p class="muted">${P.dur}s is the sweet spot for ${esc(P.name.split(' (')[0])}.</p>` : ''}
+      ${o.format === 'video' ? field('Length', range('duration', 6, 90), o.duration + 's') + `<p class="muted">${P.dur}s is the sweet spot for ${esc(P.name.split(':')[0])}.</p>` : ''}
       <h3>Download</h3>
-      ${o.format === 'video' ? `<button class="btn primary block" data-act="video" ${mime ? '' : 'disabled'}>Export video${mime ? ` (${mime.startsWith('video/mp4') ? 'MP4' : 'WebM'})` : ''}</button>
+      ${o.format === 'video' ? `<button class="btn primary block" data-act="video" ${mime && !blocked() ? '' : 'disabled'}>Export video${mime ? ` (${mime.startsWith('video/mp4') ? 'MP4' : 'WebM'})` : ''}</button>
         <div class="progress" id="exportProgress"><i></i></div><button class="btn block" id="cancelExport" data-act="cancel" hidden style="margin-top:6px">Cancel</button>
         <p class="muted">Renders in real time (${o.duration}s). Keep this tab visible while it records.${S.audio ? ' Includes your voiceover.' : ''}</p>` : ''}
-      <button class="btn ${o.format === 'image' ? 'primary' : ''} block" data-act="png" style="margin-top:6px">Export PNG (final frame)</button>
-      <h3>Post caption</h3><textarea id="postCaption" style="min-height:140px">${esc(caption)}</textarea>
-      <button class="btn block" data-act="copyCaption">Copy caption</button>
+      <button class="btn ${o.format === 'image' ? 'primary' : ''} block" data-act="png" style="margin-top:6px" ${dis}>Export PNG (final frame, with source details embedded)</button>
+      <button class="btn block" data-act="carousel" style="margin-top:6px" ${dis}>LinkedIn carousel (4-page PDF)</button>
+      ${o.format === 'video' && o.captions ? `<button class="btn block" data-act="srt" style="margin-top:6px" ${dis}>Captions file (.srt) for LinkedIn and Facebook</button>` : ''}
+      <h3>Share</h3>
+      ${S.lastExport ? `<p class="muted">Ready to share: ${esc(S.lastExport.name)}</p>` : '<p class="muted">Export a video or image first, then share it here.</p>'}
+      <button class="btn primary block" data-act="shareApps" ${S.lastExport && !blocked() ? '' : 'disabled'}>Share to apps (LinkedIn, Facebook, Instagram…)</button>
+      <p class="muted">On phones and Safari this opens your apps with the file and caption attached. Elsewhere, use a button below: the caption is copied and the composer opens; attach the downloaded file.</p>
+      <div class="chips">${[['linkedin', 'LinkedIn'], ['facebook', 'Facebook'], ['x', 'X'], ['threads', 'Threads'], ['bluesky', 'Bluesky'], ['reddit', 'Reddit']].map(([k, l]) => `<button class="chip" data-compose="${k}" ${dis}>${l}</button>`).join('')}</div>
+      <h3>Post text</h3><div class="tabs cap-tabs">${[['linkedin', 'LinkedIn'], ['facebook', 'Facebook'], ['x', 'X'], ['instagram', 'Instagram'], ['tiktok', 'TikTok']].map(([k, l]) => `<button data-captab="${k}" class="${capTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>
+      <textarea id="postCaption" style="min-height:170px">${esc(caps[capTab])}</textarea>
+      <div class="row"><button class="btn" data-act="copyCaption">Copy text</button><span class="muted" style="flex:none">${caps[capTab].length.toLocaleString()} characters</span></div>
+      <h3>Alt text</h3><textarea id="altText" style="min-height:90px">${esc(PS.altText(ds, S.analysis, { ...o, title: o.title || S.ds.title }))}</textarea>
+      <button class="btn block" data-act="copyAlt">Copy alt text</button><p class="muted">Paste into the platform's alt text field. It makes the chart readable to screen readers, and platforms use it to understand the post.</p>
+      <h3>Share link</h3>${link ? `<input type="text" id="shareLink" readonly value="${esc(link)}"><button class="btn block" data-act="copyLink" style="margin-top:6px">Copy link</button><p class="muted">Opens this exact chart, rebuilt from the official data, so anyone can check that what they saw matches the source.</p>` : '<p class="muted">Uploaded data can\'t be rebuilt from a link.</p>'}
       <h3>Project</h3><div class="row"><button class="btn" data-act="saveProject">Save project</button><button class="btn" data-act="openProject">Open project</button></div>
       <input type="file" id="projFile" accept=".json" hidden>`;
   };
@@ -694,8 +781,8 @@
       ${a.howTo ? `<div class="howto fit"><b>How these fit together</b>${esc(a.howTo)}</div>` : ''}
       <ul class="facts">${a.facts.map(f => `<li>${esc(f.text)}</li>`).join('')}</ul>
       ${ds.howToRead?.length ? `<div class="howto"><b>How to read it</b>${ds.howToRead.map(h => esc(h)).join(' ')}</div>` : ''}
-      <h2>Trust check</h2><div class="trust-score"><b>${pass}</b> passed · <b>${warn}</b> to review</div>
-      <ul class="checks">${a.checks.map(c => `<li><span class="ic ${c.level}">${c.level === 'pass' ? '✓' : c.level === 'warn' ? '!' : 'i'}</span><div><b>${esc(c.title)}</b><p>${esc(c.detail)}</p>${c.action ? actionBtn(c.action) : ''}</div></li>`).join('')}</ul>
+      <h2>Trust check</h2><div class="trust-score"><b>${pass}</b> passed · <b>${warn}</b> to review${S.integrity?.blocks.length ? ` · <b class="bad">${S.integrity.blocks.length}</b> blocking export` : ''}</div>
+      <ul class="checks">${a.checks.map(c => `<li><span class="ic ${c.level}">${c.level === 'pass' ? '✓' : c.level === 'warn' ? '!' : c.level === 'block' ? '✕' : 'i'}</span><div><b>${esc(c.title)}</b><p>${esc(c.detail)}</p>${c.action ? actionBtn(c.action) : ''}${c.fixAct ? `<button class="btn" data-act="${c.fixAct.act}" data-field="${c.fixAct.field || ''}">${esc(c.fixAct.label)}</button>` : ''}</div></li>`).join('')}</ul>
       <details><summary>View the data</summary>${table}</details>
       ${ds.source.url ? `<p class="muted">Original source: <a href="${esc(ds.source.url)}" target="_blank" rel="noopener">${esc(ds.source.publisher)} ↗</a></p>` : ''}`;
   }
@@ -741,8 +828,17 @@
     S.catalog = await PS.loadCatalog();
     const fonts = ['Inter', 'Source Serif 4', 'Archivo', 'IBM Plex Mono'].flatMap(f => [400, 600, 700, 800].map(w => document.fonts.load(`${w} 40px "${f}"`)));
     await Promise.race([Promise.allSettled(fonts), new Promise(r => setTimeout(r, 2500))]);
-    const start = new URLSearchParams(location.search).get('d') || 'us-unemployment';
+    const shared = PS.readShareLink();
+    const start = shared?.d || new URLSearchParams(location.search).get('d') || 'us-unemployment';
+    if (shared?.s) S.state = shared.s;
     await selectDataset(S.catalog.some(c => c.id === start) ? start : S.catalog[0]?.id);
+    if (shared && S.ds?.id === shared.d) {
+      // Rebuild exactly what was shared, from the official data: settings only, never data.
+      Object.assign(o, shared.o);
+      for (const id of o.compare || []) { try { S.compareDs.set(id, await PS.loadDataset(id)); } catch { } }
+      renderPlatforms(); update(); renderStep();
+      toast('Rebuilt from the official data.');
+    }
     document.fonts.ready.then(() => { renderer.layout = null; update({ panels: false }); });
     if (window.speechSynthesis) speechSynthesis.onvoiceschanged = () => S.step === 'story' && renderStep();
   })();

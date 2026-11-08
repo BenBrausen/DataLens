@@ -220,3 +220,12 @@ details summary { cursor: pointer; font-weight: 600; font-size: 13px; padding: 8
 .local-state { border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; margin-bottom: 5px; }
 .local-state summary { font-size: 13px; }
 .local-state .portal-list { margin-top: 8px; }
+
+/* ---------- claim check ---------- */
+.ic.block { background: var(--bad); }
+.trust-score .bad { color: var(--bad); }
+.integrity { border: 1px solid var(--bad); background: rgba(194,52,52,.07); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 12px; font-size: 12.5px; }
+.integrity > b { display: block; color: var(--bad); margin-bottom: 6px; font-size: 13px; }
+.integrity p { margin: 6px 0; }
+.integrity .btn { margin-bottom: 4px; }
+.cap-tabs { margin-bottom: 6px; }

@@ -32,18 +32,19 @@
     const below = pts.filter(p => p.v < last.v).length / pts.length;
     const yearAgo = pts.reduce((best, p) => (Math.abs(p.t - (last.t - 365 * DAY)) < Math.abs(best.t - (last.t - 365 * DAY)) ? p : best), first);
     const d = t => PS.fmtDate(t, f, true), v = x => PS.fmt(x, u);
+    const at = ['weekly', 'daily', 'real-time'].includes(f) ? 'on' : 'in'; // "on November 2, 2026", "in October 2026"
     const name = short(ds), startY = yr(first.t);
     const facts = [];
     let headline;
-    if (last.t === peak.t && pts.length > 10) headline = `${name} hit ${v(last.v)} in ${d(last.t)}, the highest on record since ${startY}.`;
-    else if (last.t === trough.t && pts.length > 10) headline = `${name} fell to ${v(last.v)} in ${d(last.t)}, the lowest since ${startY}.`;
+    if (last.t === peak.t && pts.length > 10) headline = `${name} hit ${v(last.v)} ${at} ${d(last.t)}, the highest on record since ${startY}.`;
+    else if (last.t === trough.t && pts.length > 10) headline = `${name} fell to ${v(last.v)} ${at} ${d(last.t)}, the lowest since ${startY}.`;
     else if (u.format === 'usdT' || ds.unit.format === 'usd' && first.v > 0 && last.v / first.v > 1.5)
-      headline = `${name} reached ${v(last.v)} in ${d(last.t)}, ${PS.fmtChange(first.v, last.v, u).replace(/^\+/, 'up ')} since ${startY}.`;
-    else headline = `${name} was ${v(last.v)} in ${d(last.t)}, ${last.v > avg ? 'above' : 'below'} its ${startY}–${yr(last.t)} average of ${v(avg)}.`;
+      headline = `${name} reached ${v(last.v)} ${at} ${d(last.t)}, ${PS.fmtChange(first.v, last.v, u).replace(/^\+/, 'up ')} since ${startY}.`;
+    else headline = `${name} was ${v(last.v)} ${at} ${d(last.t)}, ${last.v > avg ? 'above' : 'below'} its ${startY}–${yr(last.t)} average of ${v(avg)}.`;
     facts.push({ k: 'latest', text: `Latest: ${v(last.v)} (${d(last.t)}).` });
     facts.push({ k: 'change', text: `Since ${d(first.t)}: ${PS.fmtChange(first.v, last.v, u)}.` });
-    if (peak.t !== last.t) facts.push({ k: 'peak', text: `Peak: ${v(peak.v)} in ${d(peak.t)}.` });
-    if (trough.t !== last.t) facts.push({ k: 'trough', text: `Low: ${v(trough.v)} in ${d(trough.t)}.` });
+    if (peak.t !== last.t) facts.push({ k: 'peak', text: `Peak: ${v(peak.v)} ${at} ${d(peak.t)}.` });
+    if (trough.t !== last.t) facts.push({ k: 'trough', text: `Low: ${v(trough.v)} ${at} ${d(trough.t)}.` });
     if (last.t - first.t > 2 * 365 * DAY && yearAgo !== last) facts.push({ k: 'yoy', text: `One year earlier it was ${v(yearAgo.v)} (${PS.fmtChange(yearAgo.v, last.v, u)}).` });
     if (pts.length > 24) facts.push({ k: 'pctile', text: `The latest reading is higher than ${Math.round(below * 100)}% of all ${f === 'weekly' ? 'weeks' : f === 'quarterly' ? 'quarters' : f === 'annual' ? 'years' : 'months'} since ${startY}.` });
     if (view.series[1]) {
