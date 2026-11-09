@@ -622,6 +622,76 @@ builders['county-population'] = async () => {
   ];
 };
 
+// Census ACS table B28002 (internet subscriptions), keyless bulk files. Each file is
+// ~58 MB, so years already in the snapshot are reused and only new years are fetched.
+builders['broadband'] = async () => {
+  const prev = {};
+  for (const id of ['county-broadband', 'county-no-internet', 'state-broadband', 'state-no-internet']) {
+    try { const d = JSON.parse(await fs.readFile(path.join(OUT, id + '.json'), 'utf8')); prev[id] = d; } catch { }
+  }
+  const prevYears = new Set((prev['county-broadband']?.times || []).map(t => +t.slice(0, 4)));
+  const byYear = new Map(); // year -> Map(geoKey -> {tot, bb, none})
+  for (let y = 2021; y <= new Date().getUTCFullYear(); y++) {
+    if (prevYears.has(y)) continue;
+    let text;
+    try { text = await get(`https://www2.census.gov/programs-surveys/acs/summary_file/${y}/table-based-SF/data/5YRData/acsdt5y${y}-b28002.dat`, 'text', 1); }
+    catch { continue; } // not released yet
+    if (!text.startsWith('GEO_ID|')) continue;
+    const lines = text.split('\n'), head = lines[0].split('|'), ix = k => head.indexOf(k);
+    const iT = ix('B28002_E001'), iB = ix('B28002_E004'), iN = ix('B28002_E013'), m = new Map();
+    for (const ln of lines) {
+      const g = ln.slice(0, 14);
+      if (!/^(0100000US|0400000US\d\d|0500000US\d{5})/.test(g)) continue;
+      const c = ln.split('|'), key = c[0].startsWith('01') ? 'US' : c[0].slice(9);
+      m.set(key, { tot: +c[iT], bb: +c[iB], none: +c[iN] });
+    }
+    if (m.size > 3000) { byYear.set(y, m); console.log(`  ACS ${y}: ${m.size} geographies`); }
+  }
+  const years = [...new Set([...prevYears, ...byYear.keys()])].sort();
+  if (!years.length) throw new Error('No ACS B28002 files found');
+  // Pull a value for (dataset, entity, year): fresh file if fetched this run, else the previous snapshot.
+  const pick = (prevId, entId, y, fresh) => {
+    if (byYear.has(y)) return fresh(byYear.get(y));
+    const d = prev[prevId]; if (!d) return null;
+    const i = d.times.findIndex(t => +t.slice(0, 4) === y);
+    if (i < 0) return null;
+    if (entId === 'US') return d.national?.values[i] ?? null;
+    return d.entities.find(e => e.id === entId)?.values[i] ?? null;
+  };
+  const pct = (r, k) => (r && r.tot > 0 ? round(r[k] / r.tot * 100, 1) : null);
+  // Date each 5-year period by its last day, so freshness checks measure from when it ends.
+  const times = years.map(y => `${y}-12-31`);
+  const last = years.at(-1);
+  const src = { publisher: 'U.S. Census Bureau', dataset: `American Community Survey 5-year estimates, Table B28002 (${last - 4}–${last})`, url: 'https://data.census.gov/table/ACSDT5Y2023.B28002' };
+  const how = ['Each year is a 5-year average: "2024" covers 2020–2024. Compare periods that don\'t overlap (2019 vs. 2024) for the clearest trend.',
+    'This counts households that pay for or have home internet, not where service is available. A household can lack broadband because of cost or choice, not only because no provider serves it.'];
+  const cav = ['Survey estimates: small counties have wide margins of error, so differences of a few points there are often noise.',
+    'For where service is available (by address and speed), see the FCC National Broadband Map: broadbandmap.fcc.gov.'];
+  const metrics = [
+    ['broadband', 'bb', 'Households with broadband', 'Share of households with broadband (any type)', 'Share of households with a broadband subscription of any type: cable, fiber, DSL, satellite or a cellular data plan.'],
+    ['no-internet', 'none', 'Households with no internet', 'Share of households with no internet at home', 'Share of households with no internet access at home, by any means.'],
+  ];
+  const { vintage, recs } = await censusCountyFile();
+  const out = [];
+  for (const [slug, k, short, label, desc] of metrics) {
+    const reframesC = ['county-broadband', 'county-no-internet'], reframesS = ['state-broadband', 'state-no-internet'];
+    const unit = { label, format: 'pct', decimals: 1 };
+    const cid = `county-${slug}`, sid = `state-${slug}`;
+    const counties = recs.map(r => {
+      const id = r.STATE + r.COUNTY;
+      return { id, code: ABBR[r.STATE], name: `${r.CTYNAME}, ${ABBR[r.STATE]}`, short: r.CTYNAME, pop: +r[`POPESTIMATE${vintage}`],
+        values: years.map(y => pick(cid, id, y, m => pct(m.get(id), k))) };
+    });
+    const national = { name: 'United States', values: years.map(y => pick(cid, 'US', y, m => pct(m.get('US'), k))) };
+    out.push(panel({ id: cid, title: `${short} by county`, category: 'Technology', frequency: 'annual', geo: 'us-counties', lens: short.replace('Households with ', 'With ').replace(/^With no/, 'No'),
+      unit, description: desc, source: src, howToRead: how, caveats: [COUNTY_CAVEAT, ...cav], isRate: true, reframes: reframesC, national }, times, counties));
+    const states = STATES.map(([ab, fips, name]) => ({ id: fips, code: ab, name, values: years.map(y => pick(sid, fips, y, m => pct(m.get(fips), k))) }));
+    out.push(panel({ id: sid, title: `${short} by state`, category: 'Technology', frequency: 'annual', geo: 'us-states', lens: short.replace('Households with ', 'With ').replace(/^With no/, 'No'),
+      unit, description: desc, source: src, howToRead: how, caveats: cav, isRate: true, reframes: reframesS, national: { ...national } }, times, states));
+  }
+  return out;
+};
+
 // CDC PLACES: model-based county estimates for health measures (age-adjusted).
 const PLACES = [
   ['OBESITY', 'county-obesity', 'Adult obesity by county', 'Adults with obesity (BMI 30+)'],

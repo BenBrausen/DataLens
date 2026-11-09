@@ -264,3 +264,11 @@ body.embed .transport { padding: 2px 10px 2px 2px; border: 0; background: none; 
 .search-filters select { flex: 1; min-width: 0; }
 .local-count { margin: 4px 0 6px; }
 @media (min-width: 761px) and (max-width: 1180px) { .pop-grid { grid-template-columns: 1fr; } }
+
+/* search result quality flags */
+.result-flags { display: flex; flex-wrap: wrap; gap: 4px; margin: -2px 0 8px; }
+.flag { font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.flag.stale { background: rgba(240,166,58,.15); color: #9a5b00; }
+.flag.nofile { background: rgba(239,107,107,.14); color: #b42318; }
+:root[data-theme="dark"] .flag.stale { color: var(--warn); } :root[data-theme="dark"] .flag.nofile { color: var(--bad); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .flag.stale { color: var(--warn); } :root:not([data-theme="light"]) .flag.nofile { color: var(--bad); } }

@@ -29,6 +29,7 @@ export const TOPICS = [
   { id: 'government', name: 'Government & budget', kw: ['budget', 'spending', 'debt', 'tax', 'revenue', 'payroll', 'contract', 'finance'] },
   { id: 'elections', name: 'Elections', kw: ['election', 'vote', 'voter', 'ballot', 'turnout', 'precinct'] },
   { id: 'people', name: 'Population & demographics', kw: ['population', 'census', 'demographic', 'age', 'race', 'birth', 'migration'] },
+  { id: 'technology', name: 'Internet & technology', kw: ['broadband', 'internet', 'wifi', 'computer', 'technology', 'wireless'] },
   { id: 'world', name: 'World', kw: ['country', 'international', 'global', 'world'] },
 ];
 
@@ -118,6 +119,10 @@ export const DATASET_TAGS = {
   'federal-debt': { topic: 'government', source: 'treasury' },
   'federal-debt-gdp': { topic: 'government', source: 'treasury' },
   'federal-debt-real': { topic: 'government', source: 'treasury' },
+  'county-broadband': { topic: 'technology', source: 'census' },
+  'county-no-internet': { topic: 'technology', source: 'census' },
+  'state-broadband': { topic: 'technology', source: 'census' },
+  'state-no-internet': { topic: 'technology', source: 'census' },
   'federal-deficit': { topic: 'government', source: 'omb' },
   'federal-deficit-gdp': { topic: 'government', source: 'omb' },
   'federal-deficit-12mo': { topic: 'government', source: 'treasury' },
@@ -293,6 +298,7 @@ export const FEATURED = [
   { id: 'county-migration', q: 'Where are Americans moving?' },
   { id: 'global-temperature', q: 'How much has the planet warmed?' },
   { id: 'county-risk', q: 'What disasters threaten your county?' },
+  { id: 'county-broadband', q: 'How many homes near you have broadband?' },
   { id: 'earthquakes', q: 'Where did the earth shake this month?' },
   { id: 'life-expectancy', q: 'Where do people live longest?' },
 ];

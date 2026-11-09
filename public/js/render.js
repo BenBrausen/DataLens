@@ -713,7 +713,12 @@
       items.forEach(r => {
         ctx.fillStyle = colorOf(r.v); roundRect(ctx, x, y + 4 * S, 18 * S, 18 * S, 4 * S); ctx.fill();
         ctx.font = font(st, 500, 24 * S * st.ts); ctx.fillStyle = T.ink; ctx.textAlign = 'left';
-        const nm = PS.fit(ctx, r.e.name, w - 150 * S);
+        // Tight on space: "Madison County" -> "Madison" before truncating with an ellipsis.
+        const valTxt = fmt(r.v, ds.unit, { short: true });
+        ctx.font = font(st, 700, 24 * S * st.ts); const valW = ctx.measureText(valTxt).width;
+        ctx.font = font(st, 500, 24 * S * st.ts);
+        const room = w - 30 * S - valW - 14 * S, full = r.e.name;
+        const nm = ctx.measureText(full).width <= room ? full : PS.fit(ctx, full.replace(/ (County|Parish|Borough|Census Area|Municipality|city)(?=,|$)/, ''), room);
         ctx.fillText(nm, x + 30 * S, y);
         ctx.textAlign = 'right'; ctx.font = font(st, 700, 24 * S * st.ts); ctx.fillText(fmt(r.v, ds.unit, { short: true }), x + w, y);
         ctx.textAlign = 'left'; y += 38 * S;

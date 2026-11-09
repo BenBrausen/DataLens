@@ -56,6 +56,7 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 | Gas price, nominal and inflation-adjusted | EIA via FRED | time series | weekly |
 | New home price, nominal and inflation-adjusted | Census/HUD via FRED | time series | quarterly |
 | National debt: nominal, % of GDP, inflation-adjusted | Treasury Fiscal Data, OMB | time series | daily / quarterly |
+| Households with broadband / with no internet, by county and state | Census ACS 5-year, Table B28002 (bulk files, keyless) | county + state maps | annual (5-year periods) |
 | Federal budget deficit: by fiscal year, % of GDP, rolling 12 months | OMB, Treasury Monthly Treasury Statement | time series | fiscal year / monthly |
 | Federal revenue vs. spending, % of GDP | OMB | time series (2 lines) | fiscal year |
 | Interest on the national debt: dollars, % of GDP | BEA, OMB | time series | quarterly / fiscal year |
@@ -208,6 +209,7 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 - **Popular** (the default tab): 16 plain-language questions ("How big is the national debt?", "Are prices still rising?"), each with its latest number and source, one tap to a ready-made chart. Picking a state turns state and county questions local. The list lives in `FEATURED` in `scripts/sources/catalog.mjs`. A "New data in the last two weeks" row appears when a dataset gets a new observation; the refresh job records when each dataset's latest observation first appeared (`released` in the catalog).
 - **Search**: ready-made datasets filter as you type, with synonyms (jobs, taxes, murder, climate…), area (national, states, counties, world), topic, and sort by best match or most recent data. Press Search to also query data.gov and every state and local portal.
 - **Topics** and **Sources** browse the same data by subject or publisher.
+- **External results are ranked by what "Load data" will actually get**: current, downloadable tables first. Files older than 5 years sink and say "Last updated 2011; may be out of date"; entries that point at API documentation instead of a file sink and show "No data file". Raw layer names are tidied (`Iowa_Broadband_v5` → "Iowa Broadband v5"), and data.gov copies of state datasets are shown once.
 
 **Budget balances** (deficit data) are written as "a $1.99T deficit", never "-$1.99T"; a bigger deficit counts as growth in the claim check, and "doubled" from a surplus is blocked. Fiscal years read "FY2026" (October 2025 to September 2026).
 

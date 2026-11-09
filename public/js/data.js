@@ -111,6 +111,27 @@
     }
     throw new Error('Catalog search needs the Civic Charts server (CORS). ' + (lastErr?.message || ''));
   };
+  // Result quality: what a "Load data" click will actually get. Fresh tables first; stale
+  // files, non-table formats and API documentation pages sink and are labeled.
+  const YEAR = 365.25 * 864e5;
+  PS.resultQuality = r => {
+    const files = r.files || [], flags = [];
+    const isTable = f => /csv|tab-separated|text\/plain/.test(f.type || '') || /\.(csv|tsv|txt)(\?|$)|export\.csv|rows\.csv|\/csv\?/i.test(f.url || '');
+    // A documentation page, not a file: developer/docs paths, or an /api/ path that isn't a known download endpoint.
+    const isDoc = f => { const u = f.url || ''; if (/\/api\/download\/|\/sharing\/rest\/content\/|\/resource\/[\w-]+\.csv|[?&](accesstype|format)=|\.(csv|tsv|json|geojson|zip|xlsx?)(\?|$)|\/query\b|\/csv\b/i.test(u)) return false;
+      return /\/(developer|docs?|documentation)\//i.test(u) || /\/api\//i.test(u); };
+    const apiDoc = files.length > 0 && files.every(isDoc);
+    const table = files.some(isTable);
+    const t = Date.parse(r.modified), age = Number.isFinite(t) ? (Date.now() - t) / YEAR : null;
+    if (apiDoc) flags.push({ kind: 'nofile', text: 'API documentation, not a data file' });
+    if (age != null && age > 5) flags.push({ kind: 'stale', text: `Last updated ${new Date(t).getUTCFullYear()}; may be out of date` });
+    else if (age == null) flags.push({ kind: 'stale', text: 'No update date listed' });
+    const score = (apiDoc ? 8 : 0) + (age == null ? 2 : age > 5 ? 4 : age > 2 ? 1 : 0) + (table ? 0 : 2);
+    return { score, flags, loadable: !apiDoc };
+  };
+  // "Iowa_Broadband_v5_Eligible" -> "Iowa Broadband v5 Eligible"
+  PS.tidyTitle = s => (/_/.test(s) && !/\s/.test(s.trim()) ? s.replace(/_+/g, ' ').replace(/\s+/g, ' ').trim() : s);
+
   const ORGTYPE_TIER = { 'Federal Government': 'federal', 'State Government': 'state', 'City Government': 'local', 'County Government': 'local', University: 'academic' };
   const score = f => (/csv/.test(f.type) ? 2 : 0) + (/rows\.csv|export\.csv|\.csv/.test(f.url) ? 1 : 0);
 

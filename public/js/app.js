@@ -240,7 +240,7 @@
     crime: ['crime', 'homicide'], murder: ['homicide'], vote: ['president', 'election'], voting: ['president', 'election'], election: ['president', 'election'], elections: ['president', 'election'],
     drugs: ['overdose', 'drug'], opioid: ['overdose'], money: ['income'], wages: ['income', 'wage'], pay: ['income', 'wage'], salary: ['income', 'wage'], moving: ['migration'], movers: ['migration'],
     disaster: ['disaster', 'risk', 'fema'], weather: ['disaster', 'heat', 'hurricane', 'flood'], storms: ['hurricane', 'disaster'], fire: ['wildfire'], gdp: ['gdp'], interest: ['interest', 'mortgage'],
-    old: ['65', 'age'], elderly: ['65', 'age'], seniors: ['65'], poor: ['poverty'], insurance: ['uninsured'], pollution: ['air', 'co2'], quake: ['earthquake'] };
+    old: ['65', 'age'], elderly: ['65', 'age'], seniors: ['65'], poor: ['poverty'], insurance: ['uninsured'], pollution: ['air', 'co2'], quake: ['earthquake'], internet: ['broadband', 'internet'], wifi: ['broadband', 'internet'], online: ['broadband', 'internet'], connectivity: ['broadband'] };
   const GEO_WORDS = { 'us-states': 'state states by-state', 'us-counties': 'county counties local', world: 'world country countries global international' };
   function hay(c) {
     if (c._hay) return c._hay;
@@ -378,7 +378,7 @@
         ${sc.org ? `<p class="muted">Limited to ${esc(sc.orgName)} <button class="linkbtn" data-act="clearOrg">clear</button></p>` : ''}
         ${st && sc.scope === 'state' ? portalChips(st.code) + portalChips(st.code, 'local') : ''}
         <div class="results">${sc.busy ? '<p class="muted">Searching…</p>' : ''}${sc.err ? `<p class="err">${esc(sc.err)}</p>` : ''}${sc.info ? `<p class="muted">${esc(sc.info)}</p>` : ''}
-        ${sc.results.map((r, i) => `<div class="result"><b>${esc(r.title)}</b><div class="meta">${tierBadge(r.tier)} ${esc(r.publisher)}${r.state && !r.publisher.includes(r.state) ? ' · ' + esc(r.state) : ''}${r.modified ? ' · updated ' + esc(String(r.modified).slice(0, 10)) : ''} · ${esc(r.platform === 'data.gov' ? 'data.gov' : r.host)}</div>${r.description ? `<p>${esc(r.description)}</p>` : ''}<div class="row"><button class="btn" data-load="${i}">Load data</button><a class="muted" href="${esc(r.landing)}" target="_blank" rel="noopener" style="flex:none">Source page ↗</a></div></div>`).join('')}</div>` + mapperHTML();
+        ${sc.results.map((r, i) => `<div class="result"><b>${esc(r.title)}</b><div class="meta">${tierBadge(r.tier)} ${esc(r.publisher)}${r.state && !r.publisher.includes(r.state) ? ' · ' + esc(r.state) : ''}${r.modified ? ' · updated ' + esc(String(r.modified).slice(0, 10)) : ''} · ${esc(r.platform === 'data.gov' ? 'data.gov' : r.host)}</div>${r.description ? `<p>${esc(r.description)}</p>` : ''}${r.q?.flags.length ? `<div class="result-flags">${r.q.flags.map(f => `<span class="flag ${f.kind}">${esc(f.text)}</span>`).join('')}</div>` : ''}<div class="row">${r.q?.loadable === false ? '<button class="btn" disabled>No data file</button>' : `<button class="btn" data-load="${i}">Load data</button>`}<a class="muted" href="${esc(r.landing)}" target="_blank" rel="noopener" style="flex:none">Source page ↗</a></div></div>`).join('')}</div>` + mapperHTML();
     }
 
     else {
@@ -404,6 +404,12 @@
     while (lists.some(l => l.length)) lists.forEach(l => l.length && merged.push(l.shift()));
     const mine = st ? merged.filter(r => r.tier !== 'state' || r.state === st.name) : merged;
     sc.results = st && sc.scope === 'all' ? [...mine.filter(r => r.tier === 'state'), ...mine.filter(r => r.tier !== 'state')] : mine;
+    // Within that order, loadable and current files first (stable sort keeps relevance otherwise).
+    sc.results.forEach((r, i) => { r.q = PS.resultQuality(r); r.title = PS.tidyTitle(r.title || ''); r._i = i; });
+    sc.results.sort((a, b) => a.q.score - b.q.score || a._i - b._i);
+    // data.gov mirrors many state datasets; show each once (the better-ranked copy).
+    const seen = new Set();
+    sc.results = sc.results.filter(r => { const k = `${r.title.toLowerCase().replace(/\W+/g, ' ').trim()}|${r.state || ''}`; if (seen.has(k)) return false; seen.add(k); return true; });
     const errs = out.flatMap(x => (x.err ? [x.err] : []).concat(x.errs || []));
     if (errs.length) sc.info = errs[0];
     if (!sc.results.length) sc.err = sc.scope === 'state' && !out.some(x => x.portals) ? `${st.name}'s portals don't have a search API yet. Open them from the links above, or search Federal (data.gov) for ${st.name} data.` : 'No downloadable datasets matched. Try broader words.';

@@ -206,6 +206,18 @@
    ]
   },
   {
+   "id": "technology",
+   "name": "Internet & technology",
+   "kw": [
+    "broadband",
+    "internet",
+    "wifi",
+    "computer",
+    "technology",
+    "wireless"
+   ]
+  },
+  {
    "id": "world",
    "name": "World",
    "kw": [
@@ -272,6 +284,10 @@
   {
    "id": "county-risk",
    "q": "What disasters threaten your county?"
+  },
+  {
+   "id": "county-broadband",
+   "q": "How many homes near you have broadband?"
   },
   {
    "id": "earthquakes",
@@ -582,6 +598,22 @@
   "federal-debt-real": {
    "topic": "government",
    "source": "treasury"
+  },
+  "county-broadband": {
+   "topic": "technology",
+   "source": "census"
+  },
+  "county-no-internet": {
+   "topic": "technology",
+   "source": "census"
+  },
+  "state-broadband": {
+   "topic": "technology",
+   "source": "census"
+  },
+  "state-no-internet": {
+   "topic": "technology",
+   "source": "census"
   },
   "federal-deficit": {
    "topic": "government",

@@ -2620,6 +2620,196 @@
   "firstObservation": "1985-12-31"
  },
  {
+  "id": "county-broadband",
+  "title": "Households with broadband by county",
+  "category": "Technology",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "lens": "With broadband",
+  "unit": {
+   "label": "Share of households with broadband (any type)",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Share of households with a broadband subscription of any type: cable, fiber, DSL, satellite or a cellular data plan.",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Table B28002 (2020–2024)",
+   "url": "https://data.census.gov/table/ACSDT5Y2023.B28002"
+  },
+  "howToRead": [
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap (2019 vs. 2024) for the clearest trend.",
+   "This counts households that pay for or have home internet, not where service is available. A household can lack broadband because of cost or choice, not only because no provider serves it."
+  ],
+  "caveats": [
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map.",
+   "Survey estimates: small counties have wide margins of error, so differences of a few points there are often noise.",
+   "For where service is available (by address and speed), see the FCC National Broadband Map: broadbandmap.fcc.gov."
+  ],
+  "isRate": true,
+  "reframes": [
+   "county-broadband",
+   "county-no-internet"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-09T22:45:02.409Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 91,
+   "series": "United States"
+  },
+  "released": "2026-11-09T22:45:02.409Z",
+  "hasNational": true,
+  "topic": "technology",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2021-12-31"
+ },
+ {
+  "id": "state-broadband",
+  "title": "Households with broadband by state",
+  "category": "Technology",
+  "frequency": "annual",
+  "geo": "us-states",
+  "lens": "With broadband",
+  "unit": {
+   "label": "Share of households with broadband (any type)",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Share of households with a broadband subscription of any type: cable, fiber, DSL, satellite or a cellular data plan.",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Table B28002 (2020–2024)",
+   "url": "https://data.census.gov/table/ACSDT5Y2023.B28002"
+  },
+  "howToRead": [
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap (2019 vs. 2024) for the clearest trend.",
+   "This counts households that pay for or have home internet, not where service is available. A household can lack broadband because of cost or choice, not only because no provider serves it."
+  ],
+  "caveats": [
+   "Survey estimates: small counties have wide margins of error, so differences of a few points there are often noise.",
+   "For where service is available (by address and speed), see the FCC National Broadband Map: broadbandmap.fcc.gov."
+  ],
+  "isRate": true,
+  "reframes": [
+   "state-broadband",
+   "state-no-internet"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-09T22:45:02.409Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 91,
+   "series": "United States"
+  },
+  "released": "2026-11-09T22:45:02.409Z",
+  "hasNational": true,
+  "topic": "technology",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "2021-12-31"
+ },
+ {
+  "id": "county-no-internet",
+  "title": "Households with no internet by county",
+  "category": "Technology",
+  "frequency": "annual",
+  "geo": "us-counties",
+  "lens": "No internet",
+  "unit": {
+   "label": "Share of households with no internet at home",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Share of households with no internet access at home, by any means.",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Table B28002 (2020–2024)",
+   "url": "https://data.census.gov/table/ACSDT5Y2023.B28002"
+  },
+  "howToRead": [
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap (2019 vs. 2024) for the clearest trend.",
+   "This counts households that pay for or have home internet, not where service is available. A household can lack broadband because of cost or choice, not only because no provider serves it."
+  ],
+  "caveats": [
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map.",
+   "Survey estimates: small counties have wide margins of error, so differences of a few points there are often noise.",
+   "For where service is available (by address and speed), see the FCC National Broadband Map: broadbandmap.fcc.gov."
+  ],
+  "isRate": true,
+  "reframes": [
+   "county-broadband",
+   "county-no-internet"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-09T22:45:02.409Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 6.5,
+   "series": "United States"
+  },
+  "released": "2026-11-09T22:45:02.409Z",
+  "hasNational": true,
+  "topic": "technology",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2021-12-31"
+ },
+ {
+  "id": "state-no-internet",
+  "title": "Households with no internet by state",
+  "category": "Technology",
+  "frequency": "annual",
+  "geo": "us-states",
+  "lens": "No internet",
+  "unit": {
+   "label": "Share of households with no internet at home",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "Share of households with no internet access at home, by any means.",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Table B28002 (2020–2024)",
+   "url": "https://data.census.gov/table/ACSDT5Y2023.B28002"
+  },
+  "howToRead": [
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap (2019 vs. 2024) for the clearest trend.",
+   "This counts households that pay for or have home internet, not where service is available. A household can lack broadband because of cost or choice, not only because no provider serves it."
+  ],
+  "caveats": [
+   "Survey estimates: small counties have wide margins of error, so differences of a few points there are often noise.",
+   "For where service is available (by address and speed), see the FCC National Broadband Map: broadbandmap.fcc.gov."
+  ],
+  "isRate": true,
+  "reframes": [
+   "state-broadband",
+   "state-no-internet"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-09T22:45:02.409Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 6.5,
+   "series": "United States"
+  },
+  "released": "2026-11-09T22:45:02.409Z",
+  "hasNational": true,
+  "topic": "technology",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "2021-12-31"
+ },
+ {
   "id": "world-co2",
   "title": "CO₂ emissions per person by country",
   "category": "World",
