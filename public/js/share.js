@@ -113,7 +113,7 @@
       { text: src, size: 32 }, ...(ds.source.url ? [{ text: ds.source.url, size: 28, muted: true }] : []),
       { text: 'Every number on these slides comes from the source data. Nothing is estimated by AI.', size: 30 },
       ...(link ? [{ text: `Rebuild this chart from the official data at ${link.split('#')[0].replace(/^https?:\/\//, '').replace(/\/$/, '')} (full link in the post).`, size: 26, muted: true }] : []),
-    ], o.handle ? `${o.handle} · Made with Civic Charts` : 'Made with Civic Charts'));
+    ], o.handle ? `${o.handle} · Made with ${PS.SITE}` : `Made with ${PS.SITE}`));
     const doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'px', format: [W, H], hotfixes: ['px_scaling'] });
     pages.forEach((p, i) => { if (i) doc.addPage([W, H], 'portrait'); doc.addImage(p, 'JPEG', 0, 0, W, H); });
     doc.setProperties({ title: o.title, subject: analysis.headline, author: o.handle || 'Civic Charts', keywords: `${ds.source.publisher}, open data`, creator: 'Civic Charts' });
@@ -147,7 +147,7 @@
     const k = storyParts(ds, analysis, o, link), accent = hex(st?.accent), ink = '1A1A1A', muted = '5B6470', face = 'Arial';
     const pptx = new window.PptxGenJS();
     pptx.layout = 'LAYOUT_WIDE'; // 13.333 x 7.5 in, 16:9
-    pptx.title = k.title; pptx.subject = k.takeaway; pptx.author = o.handle || 'Civic Charts'; pptx.company = 'Made with Civic Charts';
+    pptx.title = k.title; pptx.subject = k.takeaway; pptx.author = o.handle || 'Civic Charts'; pptx.company = `Made with ${PS.SITE}`;
     const notes = [k.takeaway, '', ...k.facts.map(f => '- ' + f), '', ...k.read, ...(k.care.length ? ['', 'Keep in mind:', ...k.care.map(c => '- ' + c)] : []), '',
       `Source: ${k.source}. Retrieved ${k.retrieved}.`, k.url, k.link ? `Rebuild this chart from the official data: ${k.link}` : ''].filter(x => x != null).join('\n');
     const foot = (slide, text) => slide.addText(text, { x: 0.6, y: 6.75, w: 12.1, h: 0.45, fontFace: face, fontSize: 11, color: muted, valign: 'bottom' });
@@ -180,7 +180,7 @@
     rows.push({ text: 'Every number in this deck comes from the source data. Nothing is estimated by AI.', options: { breakLine: true, paraSpaceAfter: 10 } });
     if (k.link) rows.push({ text: 'Rebuild this chart from the official data', options: { hyperlink: { url: k.link }, color: accent, fontSize: 15, breakLine: true } });
     s4.addText(rows, { x: 0.85, y: 1.45, w: 11.9, h: 5.2, fontFace: face, fontSize: 18, color: ink, valign: 'top' });
-    foot(s4, o.handle ? `${o.handle} · Made with Civic Charts` : 'Made with Civic Charts'); s4.addNotes(notes);
+    foot(s4, o.handle ? `${o.handle} · Made with ${PS.SITE}` : `Made with ${PS.SITE}`); s4.addNotes(notes);
     return pptx.write({ outputType: 'blob' });
   };
 
@@ -228,7 +228,7 @@
     const n = doc.getNumberOfPages();
     for (let i = 1; i <= n; i++) {
       doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(120, 126, 134);
-      doc.text(latin(`${o.handle ? o.handle + ' · ' : ''}Made with Civic Charts · ${new Date().toISOString().slice(0, 10)}${n > 1 ? ` · ${i}/${n}` : ''}`), M, H - 34);
+      doc.text(latin(`${o.handle ? o.handle + ' · ' : ''}Made with ${PS.SITE} · ${new Date().toISOString().slice(0, 10)}${n > 1 ? ` · ${i}/${n}` : ''}`), M, H - 34);
       if (k.link) { doc.setTextColor(...rgb); doc.textWithLink('Rebuild this chart from the official data', W - M - doc.getTextWidth('Rebuild this chart from the official data'), H - 34, { url: k.link }); }
     }
     doc.setProperties({ title: k.title, subject: k.takeaway, author: o.handle || 'Civic Charts', keywords: `${ds.source.publisher}, open data`, creator: 'Civic Charts' });

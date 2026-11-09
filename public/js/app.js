@@ -804,7 +804,7 @@
         <p class="muted">Browser voices can preview but can't be embedded in video. Recorded or uploaded audio is mixed into the export.</p></div>
       <h3>Credit</h3>${field('Your handle or outlet', `<input type="text" data-k="handle" value="${esc(o.handle)}" placeholder="@yourhandle">`)}
       ${field('Extra note (appended to the source line)', `<input type="text" data-k="note" value="${esc(o.note)}" placeholder="e.g. Seasonally adjusted.">`)}
-      ${check('brand', 'Show "Made with Civic Charts"')}
+      ${check('brand', 'Show "Made with civiccharts.com"')}
       <p class="muted">The source line is always included and can't be removed.</p>`;
     return html;
   };

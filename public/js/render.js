@@ -271,7 +271,7 @@
         ctx.textAlign = 'right';
         let yy = L.footY;
         if (o.handle) { ctx.font = font(st, 700, L.footSize * 1.1); ctx.fillStyle = T.ink; ctx.fillText(o.handle, L.R.x + L.R.w, yy); yy += L.footSize * 1.4; }
-        if (o.brand) { ctx.font = font(st, 600, L.footSize * 0.9); ctx.fillStyle = T.faint; ctx.fillText('Made with Civic Charts', L.R.x + L.R.w, yy); }
+        if (o.brand) { ctx.font = font(st, 600, L.footSize * 0.9); ctx.fillStyle = T.faint; ctx.fillText(`Made with ${PS.SITE}`, L.R.x + L.R.w, yy); }
         ctx.textAlign = 'left';
       }
     }

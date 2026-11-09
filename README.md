@@ -2,12 +2,12 @@
 
 Turn official public data into honest, animated charts and maps, sized for any platform.
 
-**Live:** https://benbrausen.github.io/DataLens/
+**Live:** https://civiccharts.com/
 
 **Open data API** (no key, refreshed every 6 hours):
-- Catalog of every ready-made dataset: https://benbrausen.github.io/DataLens/data/catalog.json
-- One dataset: `https://benbrausen.github.io/DataLens/data/<id>.json` (for example `us-unemployment`, `county-poverty`, `disasters`)
-- Source registry (federal, state, local portals with verified platforms): https://benbrausen.github.io/DataLens/sources/registry.json
+- Catalog of every ready-made dataset: https://civiccharts.com/data/catalog.json
+- One dataset: `https://civiccharts.com/data/<id>.json` (for example `us-unemployment`, `county-poverty`, `disasters`)
+- Source registry (federal, state, local portals with verified platforms): https://civiccharts.com/sources/registry.json
 
 Pick a dataset (curated, searched from data.gov, or uploaded), choose a chart, style it, and export a video or image for TikTok, Reels, Shorts, Instagram, X, LinkedIn, YouTube or the web. Every frame carries its source citation. Every explanation is computed from the data, never generated.
 
