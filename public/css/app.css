@@ -87,6 +87,8 @@ textarea { min-height: 96px; resize: vertical; line-height: 1.45; }
 input[type=range] { width: 100%; accent-color: var(--accent); }
 input[type=color] { width: 34px; height: 30px; border: 1px solid var(--line); border-radius: 6px; padding: 2px; background: var(--surface); }
 .chk { display: flex; gap: 8px; align-items: center; font-size: 13px; margin: 6px 0; }
+/* Checkbox lists inside a field (Series, Compare) match the standalone checkboxes, not the field heading. */
+.field > label.chk { justify-content: flex-start; font-size: 13px; font-weight: 400; margin: 6px 0; }
 .chk.small { font-size: 12px; color: var(--muted); margin: 0; white-space: nowrap; }
 .row { display: flex; gap: 8px; align-items: center; }
 .row > * { flex: 1; }
