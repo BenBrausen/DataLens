@@ -211,6 +211,27 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 
 **Budget balances** (deficit data) are written as "a $1.99T deficit", never "-$1.99T"; a bigger deficit counts as growth in the claim check, and "doubled" from a surplus is blocked. Fiscal years read "FY2026" (October 2025 to September 2026).
 
+## Analytics (GA4)
+
+Off until a measurement ID is set: `window.CC_GA_ID = 'G-…'` in `public/index.html`. Everything measured is in `public/js/analytics.js` and the `PS.track(...)` calls in the app. No Google signals, no ad personalization; EEA/UK/Swiss visitors start with analytics storage denied. Share-link settings (the `#c=` hash) are never sent.
+
+| Event | When | Key parameters |
+|---|---|---|
+| `page_view` | every visit | `entry_type` (direct, share_link, embed), `embed_host` (the site an embed sits on) |
+| `select_dataset` | a dataset is picked | `dataset_id`, `via` (popular, topics, sources, search, lens, chart) |
+| `search` | search submitted, or typing pauses | `search_term`, `search_scope`, `results` |
+| `select_chart` / `select_size` / `select_state` | chart type, size or state changed | `chart_type`, `size`, `state` |
+| `add_compare` | an overlay dataset is added | `compare_id` |
+| `export` | any download | `export_kind` (video, image, slides, brief, carousel, data_csv, captions, project) |
+| `share` | share sheet, composer, copy link, embed code | `method` |
+| `copy` | post text or alt text copied | `what`, `network` |
+| `export_blocked` | the claim check stopped an export | `blocked_checks` |
+| `load_external` / `upload_data` | data loaded from a portal, or a CSV uploaded | `publisher_host`, `platform` |
+
+Every event also carries `dataset_id`, `chart_type`, `size` and `format`. To report on these in GA4, register them under Admin → Custom definitions → Create custom dimension (scope: Event).
+
+The link-preview card (`public/og.png`, 2400×1260) is rendered from `scripts/og-card.html`.
+
 ## Presentations, reports and websites
 
 - **PowerPoint (.pptx):** a 16:9 deck. Slide 1 is the chart exactly as exported (title, source line and stamps included). The rest are editable: what the data shows, how to read it, and sources and method. Every slide's speaker notes carry the takeaway, facts, cautions and sources, so the context travels with the presenter. Opens in PowerPoint, Keynote and Google Slides. Exported MP4s can be dropped onto a slide for the animated version.

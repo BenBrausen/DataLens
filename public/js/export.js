@@ -14,7 +14,13 @@
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
-  PS.download = download;
+  // Every export passes through here, so this is where exports are counted.
+  PS.download = (blob, name) => {
+    const n = String(name), kind = /-slides\.pptx$/.test(n) ? 'slides' : /-brief\.pdf$/.test(n) ? 'brief' : /carousel\.pdf$/.test(n) ? 'carousel'
+      : /\.csv$/.test(n) ? 'data_csv' : /\.srt$/.test(n) ? 'captions' : /\.png$/.test(n) ? 'image' : /\.(mp4|webm)$/.test(n) ? 'video' : /\.json$/.test(n) ? 'project' : 'other';
+    PS.track?.('export', { export_kind: kind, file_type: n.split('.').pop() });
+    return download(blob, name);
+  };
   PS.slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'civic-charts';
 
   PS.exportPNG = (renderer, name) => new Promise(res => renderer.canvas.toBlob(b => { download(b, name + '.png'); res(); }, 'image/png'));

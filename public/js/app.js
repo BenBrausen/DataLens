@@ -154,6 +154,7 @@
   }
   $('#platforms').onclick = e => {
     const b = e.target.closest('[data-platform]'); if (!b) return;
+    PS.track('select_size', { size: b.dataset.platform });
     const was = PS.PLATFORMS[o.platform].dur;
     o.platform = b.dataset.platform;
     if (o.duration === was) o.duration = PS.PLATFORMS[o.platform].dur;
@@ -389,6 +390,7 @@
 
   let searchSeq = 0;
   async function runSearch() {
+    if (S.search.q) PS.track('search', { search_term: S.search.q.toLowerCase(), search_scope: S.search.scope });
     const sc = S.search, st = stateInfo(), mySeq = ++searchSeq;
     Object.assign(sc, { busy: true, err: '', info: '', results: [] }); renderStep();
     const jobs = [];
@@ -411,6 +413,7 @@
   AFTER.data = () => {
     $('#statePick')?.addEventListener('change', e => {
       S.state = e.target.value;
+      PS.track('select_state', { state: S.state || 'national' });
       try { localStorage.setItem('ps-state', S.state); } catch { }
       if (S.search.scope === 'state' && !S.state) S.search.scope = 'all';
       if (S.ds && !S.ds.id.startsWith('custom-')) selectDataset(S.ds.id); else renderStep();
@@ -418,7 +421,12 @@
     $('#searchForm')?.addEventListener('submit', e => { e.preventDefault(); S.search.q = $('#q').value.trim(); runSearch(); });
     // Ready-made results filter as you type; the slower external search waits for Search.
     const refreshLocal = () => { const el = $('#localResults'); if (el) el.innerHTML = localResultsHTML(); };
-    $('#q')?.addEventListener('input', e => { S.search.q = e.target.value.trim(); refreshLocal(); });
+    // Count what people look for once they pause typing, not every keystroke.
+    $('#q')?.addEventListener('input', e => {
+      S.search.q = e.target.value.trim(); refreshLocal();
+      clearTimeout(S.searchTimer);
+      if (S.search.q.length > 2) S.searchTimer = setTimeout(() => PS.track('search', { search_term: S.search.q.toLowerCase(), search_scope: 'ready_made', results: searchLocal(S.search.q, S.search).length }), 1500);
+    });
     $('#fTopic')?.addEventListener('change', e => { S.search.topic = e.target.value; refreshLocal(); });
     $('#fSort')?.addEventListener('change', e => { S.search.sort = e.target.value; refreshLocal(); });
     $('#file')?.addEventListener('change', async e => {
@@ -443,6 +451,7 @@
   }
 
   async function importTable(text, meta) {
+    if (meta.source?.unverified) PS.track('upload_data', {});
     try {
       const table = PS.parseCSV(text);
       if (!table.rows.length) throw new Error('No rows found.');
@@ -462,14 +471,14 @@
     if (t.dataset.geo) { S.search.geo = t.dataset.geo; document.querySelectorAll('[data-geo]').forEach(b => b.classList.toggle('active', b === t)); const el = $('#localResults'); if (el) el.innerHTML = localResultsHTML(); return; }
     if (t.dataset.topic) { S.topic = t.dataset.topic; renderStep(); return; }
     if (t.dataset.captab) { S.capTab = t.dataset.captab; renderStep(); return; }
-    if (t.dataset.compose) {
+    if (t.dataset.compose) { PS.track('share', { method: t.dataset.compose, content_type: 'chart' });
       if (gate()) return;
       const text = $('#postCaption')?.value || '', link = PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts());
       copy(text, 'Post text copied. Paste it into the post and attach your downloaded file.');
       window.open(PS.composerUrl(t.dataset.compose, text, link), '_blank', 'noopener');
       return;
     }
-    if (t.dataset.compare) { o.compare.push(t.dataset.compare); o.combineMethod = ''; S.picker = null; update(); renderStep(); return; }
+    if (t.dataset.compare) { PS.track('add_compare', { compare_id: t.dataset.compare }); o.compare.push(t.dataset.compare); o.combineMethod = ''; S.picker = null; update(); renderStep(); return; }
     if (t.dataset.uncompare) { o.compare = o.compare.filter(x => x !== t.dataset.uncompare); o.combineMethod = ''; if (!o.compare.length) { o.chart = PS.defaultChart(S.ds); o.title = autoTitle(S.ds); o.subtitle = autoSubtitle(S.ds); o.zeroBase = !S.ds.zeroLine; } update(); renderStep(); return; }
     if (t.dataset.method) { o.combineMethod = t.dataset.method; S.comboKey = ''; update(); renderStep(); return; }
     if (t.dataset.src) { S.sourceOpen = S.sourceOpen === t.dataset.src ? null : t.dataset.src; renderStep(); return; }
@@ -480,9 +489,10 @@
       if (S.ds && !S.ds.id.startsWith('custom-')) selectDataset(S.ds.id);
       runSearch(); return;
     }
-    if (t.dataset.ds) { selectDataset(t.dataset.ds); return; }
+    if (t.dataset.ds) { PS.track('select_dataset', { dataset_id: t.dataset.ds, via: t.closest('.lens') ? 'lens' : S.step === 'data' ? S.dataTab : S.step }); selectDataset(t.dataset.ds); return; }
     if (t.dataset.load != null) {
       const r = S.search.results[+t.dataset.load];
+      PS.track('load_external', { publisher_host: r.platform === 'data.gov' ? 'catalog.data.gov' : r.host, platform: r.platform, tier: r.tier });
       t.disabled = true; t.textContent = 'Loading…';
       try {
         const { text, truncated } = await PS.fetchRemote(r.files[0].url);
@@ -496,7 +506,7 @@
       } catch (err) { toast(err.message); t.disabled = false; t.textContent = 'Load data'; }
       return;
     }
-    if (t.dataset.chart) { o.chart = t.dataset.chart; Object.assign(o, { takeawayText: '' }); if (!o.titleEdited) o.title = autoTitle(S.ds); update(); renderStep(); return; }
+    if (t.dataset.chart) { PS.track('select_chart', { chart_type: t.dataset.chart }); o.chart = t.dataset.chart; Object.assign(o, { takeawayText: '' }); if (!o.titleEdited) o.title = autoTitle(S.ds); update(); renderStep(); return; }
     if (t.dataset.theme) { o.theme = t.dataset.theme; o.bg = ''; update(); renderStep(); return; }
     if (t.dataset.pal) { o.palette = t.dataset.pal; update(); renderStep(); return; }
     if (t.dataset.ramp) { o.ramp = t.dataset.ramp; update(); renderStep(); return; }
@@ -508,6 +518,7 @@
   // Export is refused while the creator's text contradicts the data.
   function gate() {
     if (!blocked()) return false;
+    PS.track('export_blocked', { blocked_checks: S.integrity.blocks.map(b => b.title.split(':')[0]).join(' | ') });
     toast('Export is paused: your text doesn\'t match the data. See the trust check for fixes.');
     if (S.step !== 'export') { S.step = 'export'; renderStep(); }
     return true;
@@ -585,17 +596,17 @@
       await PS.download(new Blob([PS.toCsv(head, rows, { ...ds, title: o.title || S.ds.title })], { type: 'text/csv' }), `${PS.slug(o.title)}-data.csv`);
       toast(`Data saved: ${rows.length.toLocaleString()} rows, with the source on top.`);
     },
-    copyEmbed: async () => { const v = $('#embedCode')?.value; if (!v) return; try { await navigator.clipboard.writeText(v); toast('Embed code copied.'); } catch { $('#embedCode').select(); } },
+    copyEmbed: async () => { PS.track('share', { method: 'embed_code', content_type: 'chart' }); const v = $('#embedCode')?.value; if (!v) return; try { await navigator.clipboard.writeText(v); toast('Embed code copied.'); } catch { $('#embedCode').select(); } },
     srt: async () => { if (gate()) return; await PS.download(new Blob([PS.srt(o.script, o.duration)], { type: 'text/plain' }), `${PS.slug(o.title)}.srt`); toast('Captions file saved. Upload it with the video on LinkedIn or Facebook.'); },
-    shareApps: async () => {
+    shareApps: async () => { PS.track('share', { method: 'share_sheet', content_type: 'chart' });
       if (gate() || !S.lastExport) return;
       const file = new File([S.lastExport.blob], S.lastExport.name, { type: S.lastExport.type });
       const text = $('#postCaption')?.value || '';
       if (PS.canShareFiles(file)) { try { await navigator.share({ files: [file], title: o.title, text }); } catch (e) { if (e.name !== 'AbortError') toast('Sharing failed: ' + e.message); } }
       else toast('This browser can\'t share files to apps. Use a platform button: the caption is copied and the composer opens.');
     },
-    copyAlt: () => copy($('#altText').value, 'Alt text copied.'),
-    copyLink: () => copy($('#shareLink').value, 'Link copied.'),
+    copyAlt: () => PS.track('copy', { what: 'alt_text' }) || copy($('#altText').value, 'Alt text copied.'),
+    copyLink: () => PS.track('share', { method: 'copy_link', content_type: 'chart' }) || copy($('#shareLink').value, 'Link copied.'),
     clearTakeaway: () => { o.takeawayText = ''; update(); renderStep(); },
     resetTitle: () => { o.titleEdited = false; o.title = autoTitle(S.ds); update(); renderStep(); },
     resetSubtitle: () => { o.subtitle = autoSubtitle(S.ds); update(); renderStep(); },
@@ -616,7 +627,7 @@
       S.exporting = false; t.disabled = false; $('#cancelExport').hidden = true; bar.style.width = '0'; S.p = 1; update({ panels: false });
     },
     cancel: () => S.abort?.abort(),
-    copyCaption: () => copy($('#postCaption').value, 'Post text copied.'),
+    copyCaption: () => PS.track('copy', { what: 'post_text', network: S.capTab || 'linkedin' }) || copy($('#postCaption').value, 'Post text copied.'),
     saveProject: () => PS.download(new Blob([JSON.stringify({ plainsight: 1, dataset: S.ds.id, options: o }, null, 1)], { type: 'application/json' }), PS.slug(o.title) + '.plainsight.json'),
     openProject: () => $('#projFile').click(),
     applyCheck: t => {
@@ -979,6 +990,7 @@
 
   // ---------- boot ----------
   const EMBED = new URLSearchParams(location.search).get('embed') === '1';
+  PS.ctx = () => ({ dataset_id: S.ds?.id, chart_type: o.chart, size: o.platform, format: o.format, state: S.state || undefined });
   if (EMBED) document.body.classList.add('embed');
   (async function boot() {
     renderPlatforms();
