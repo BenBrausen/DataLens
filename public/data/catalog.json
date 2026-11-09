@@ -22,7 +22,7 @@
    "Postings on one website, not total U.S. job openings. The official measure is the BLS Job Openings and Labor Turnover Survey (JOLTS)."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-10-30",
   "latest": {
    "t": "2026-10-30",
@@ -67,7 +67,7 @@
    "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
   ],
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2024-12-31",
   "latest": null,
   "released": null,
@@ -104,7 +104,7 @@
   ],
   "geo": "us-states",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-01-01",
   "latest": {
    "t": "2025-01-01",
@@ -146,7 +146,7 @@
   ],
   "geo": "us-states",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-01-01",
   "latest": {
    "t": "2026-01-01",
@@ -186,7 +186,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-09-01",
   "latest": {
    "t": "2026-09-01",
@@ -226,7 +226,7 @@
   ],
   "geo": "us-states",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-01-01",
   "latest": {
    "t": "2025-01-01",
@@ -272,7 +272,7 @@
    "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
   ],
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2024-12-31",
   "latest": null,
   "released": null,
@@ -308,7 +308,7 @@
    "The survey changed from phone to online interviews in 2024, which may affect comparisons with earlier years."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-09-01",
   "latest": {
    "t": "2026-09-01",
@@ -351,7 +351,7 @@
   ],
   "zeroLine": true,
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-09-01",
   "latest": {
    "t": "2026-09-01",
@@ -394,7 +394,7 @@
    "UNRATE"
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-10-01",
   "latest": {
    "t": "2026-10-01",
@@ -435,7 +435,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-09-01",
   "latest": {
    "t": "2026-09-01",
@@ -566,7 +566,7 @@
    "Prices are in dollars of each year. A $3 gallon in 2008 cost more in today's money than a $3 gallon today."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-11-02",
   "latest": {
    "t": "2026-11-02",
@@ -609,7 +609,7 @@
    "Adjusted with the all-items CPI computed by Plainsight; the source publishes nominal prices only."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-09-28",
   "latest": {
    "t": "2026-09-28",
@@ -650,7 +650,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": null,
   "released": null,
@@ -685,16 +685,16 @@
   "caveats": [
    "Small quakes are detected far more often near dense sensor networks (like the U.S.), so the map over-represents those regions at low magnitudes."
   ],
-  "retrieved": "2026-11-09T06:17:30.117Z",
-  "lastObservation": "2026-11-09T05:36:21.170Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
+  "lastObservation": "2026-11-09T15:27:46.066Z",
   "latest": null,
-  "released": "2026-11-09T06:17:30.117Z",
+  "released": "2026-11-09T16:11:28.912Z",
   "hasNational": false,
   "topic": "environment",
   "sourceId": "usgs",
   "tier": "federal",
-  "nEvents": 1993,
-  "firstObservation": "2026-10-10T06:17:48.120Z"
+  "nEvents": 1977,
+  "firstObservation": "2026-10-10T16:32:28.780Z"
  },
  {
   "id": "county-disasters",
@@ -723,7 +723,7 @@
    "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
   ],
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": null,
   "released": null,
@@ -764,7 +764,7 @@
    "ANNUAL"
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-07-01",
   "latest": {
    "t": "2025-07-01",
@@ -813,7 +813,7 @@
   "isRate": true,
   "lens": "Heat wave",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-01-01",
   "latest": null,
   "released": null,
@@ -859,7 +859,7 @@
   "isRate": true,
   "lens": "Hurricane",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-01-01",
   "latest": null,
   "released": null,
@@ -905,7 +905,7 @@
   "isRate": true,
   "lens": "Inland flooding",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-01-01",
   "latest": null,
   "released": null,
@@ -943,7 +943,7 @@
    "ALL"
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": {
    "t": "2025-12-31",
@@ -993,7 +993,7 @@
   "isRate": true,
   "lens": "All hazards",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-01-01",
   "latest": null,
   "released": null,
@@ -1039,7 +1039,7 @@
   "isRate": true,
   "lens": "Wildfire",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-01-01",
   "latest": null,
   "released": null,
@@ -1088,7 +1088,7 @@
    "negWord": "surplus"
   },
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-09-30",
   "latest": {
    "t": "2025-09-30",
@@ -1134,7 +1134,7 @@
    "In dollars of each year; the share-of-GDP view adjusts for the size of the economy."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-07-01",
   "latest": {
    "t": "2026-07-01",
@@ -1178,7 +1178,7 @@
    "Updated once a year, after the fiscal year closes."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-09-30",
   "latest": {
    "t": "2025-09-30",
@@ -1231,7 +1231,7 @@
   ],
   "defaultChart": "columns",
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-09-30",
   "latest": {
    "t": "2026-09-30",
@@ -1285,7 +1285,7 @@
   ],
   "defaultChart": "columns",
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-09-30",
   "latest": {
    "t": "2025-09-30",
@@ -1338,7 +1338,7 @@
    "Shifts in payment timing (when a due date falls on a weekend) can move a month between fiscal years and nudge the 12-month total."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-09-01",
   "latest": {
    "t": "2026-09-01",
@@ -1381,7 +1381,7 @@
    "A growing economy and inflation make nominal debt rise almost every year. Debt as a share of GDP is the measure economists use to judge whether it is getting harder to carry."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-11-05",
   "latest": {
    "t": "2026-11-05",
@@ -1425,7 +1425,7 @@
    "GDP collapsed briefly in 2020, which spiked the ratio even before new borrowing showed up."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-04-01",
   "latest": {
    "t": "2026-04-01",
@@ -1468,7 +1468,7 @@
    "Inflation adjustment computed by Plainsight with CPI-U."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-09-30",
   "latest": {
    "t": "2026-09-30",
@@ -1509,7 +1509,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2023-12-31",
   "latest": null,
   "released": null,
@@ -1547,7 +1547,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2023-12-31",
   "latest": null,
   "released": null,
@@ -1585,7 +1585,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2023-12-31",
   "latest": null,
   "released": null,
@@ -1623,7 +1623,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2023-12-31",
   "latest": null,
   "released": null,
@@ -1665,7 +1665,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": null,
   "released": null,
@@ -1707,7 +1707,7 @@
   ],
   "isCount": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": null,
   "released": null,
@@ -1745,7 +1745,7 @@
    "I"
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-10-01",
   "latest": {
    "t": "2026-10-01",
@@ -1787,7 +1787,7 @@
    "I"
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-10-01",
   "latest": {
    "t": "2026-10-01",
@@ -1829,7 +1829,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2023-12-31",
   "latest": null,
   "released": null,
@@ -1867,7 +1867,7 @@
    "MORTGAGE30US"
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-11-05",
   "latest": {
    "t": "2026-11-05",
@@ -1907,7 +1907,7 @@
   ],
   "geo": "us-states",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-04-01",
   "latest": {
    "t": "2026-04-01",
@@ -1951,7 +1951,7 @@
    "Not adjusted for inflation, and the mix of homes being built changes over time (bigger homes push the median up)."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-07-01",
   "latest": {
    "t": "2026-07-01",
@@ -1994,7 +1994,7 @@
    "Inflation adjustment computed by Plainsight using CPI-U."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-07-01",
   "latest": {
    "t": "2026-07-01",
@@ -2038,7 +2038,7 @@
   "description": "New housing units authorized by building permits each year.",
   "isCount": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": null,
   "released": null,
@@ -2079,7 +2079,7 @@
   "description": "New housing units authorized by building permits each year, per 1,000 residents.",
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": {
    "t": "2025-12-31",
@@ -2118,7 +2118,7 @@
    "Not adjusted for inflation."
   ],
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2026-09-30",
   "latest": null,
   "released": null,
@@ -2163,7 +2163,7 @@
   ],
   "geo": "us-counties",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-07-01",
   "latest": null,
   "released": null,
@@ -2209,7 +2209,7 @@
   ],
   "geo": "us-counties",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-07-01",
   "latest": null,
   "released": null,
@@ -2250,7 +2250,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-07-01",
   "latest": null,
   "released": null,
@@ -2292,7 +2292,7 @@
   "isCount": true,
   "geo": "us-counties",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-07-01",
   "latest": null,
   "released": null,
@@ -2328,7 +2328,7 @@
    "Estimates are revised after each decennial census, so older numbers may change."
   ],
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-01-01",
   "latest": {
    "t": "2025-01-01",
@@ -2376,7 +2376,7 @@
   "zeroLine": true,
   "geo": "us-counties",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-07-01",
   "latest": null,
   "released": null,
@@ -2417,7 +2417,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-07-01",
   "latest": null,
   "released": null,
@@ -2461,7 +2461,7 @@
   "zeroLine": true,
   "geo": "us-counties",
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-07-01",
   "latest": null,
   "released": null,
@@ -2506,7 +2506,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": {
    "t": "2025-12-31",
@@ -2555,7 +2555,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": {
    "t": "2025-12-31",
@@ -2604,7 +2604,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": {
    "t": "2025-12-31",
@@ -2644,7 +2644,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2024-12-31",
   "latest": null,
   "released": null,
@@ -2680,7 +2680,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2024-12-31",
   "latest": null,
   "released": null,
@@ -2716,7 +2716,7 @@
    "GDP measures the size of an economy, not how well off its people are; divide by population for that."
   ],
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2025-12-31",
   "latest": null,
   "released": null,
@@ -2752,7 +2752,7 @@
   ],
   "isRate": true,
   "kind": "panel",
-  "retrieved": "2026-11-09T06:17:30.117Z",
+  "retrieved": "2026-11-09T16:11:28.912Z",
   "lastObservation": "2024-12-31",
   "latest": null,
   "released": null,
