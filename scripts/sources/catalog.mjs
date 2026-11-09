@@ -51,7 +51,7 @@ export const FEDERAL = [
   { id: 'epa', name: 'U.S. Environmental Protection Agency', url: 'https://www.epa.gov/outdoor-air-quality-data', topics: ['environment', 'health'], catalogSlug: 'epa' },
   { id: 'fda', name: 'U.S. Food and Drug Administration', url: 'https://open.fda.gov/', topics: ['health'], catalogSlug: 'hhs' },
   { id: 'usda', name: 'U.S. Department of Agriculture', url: 'https://www.usda.gov/topics/data', topics: ['economy', 'environment'], catalogSlug: 'usda' },
-  { id: 'fred', name: 'Federal Reserve Bank of St. Louis (FRED)', url: 'https://fred.stlouisfed.org/', topics: ['economy', 'prices', 'housing'], note: 'Redistributes official series from the agencies above; Plainsight cites the original agency.' },
+  { id: 'fred', name: 'Federal Reserve Bank of St. Louis (FRED)', url: 'https://fred.stlouisfed.org/', topics: ['economy', 'prices', 'housing'], note: 'Redistributes official series from the agencies above; Civic Charts cites the original agency.' },
 ];
 
 export const THIRD_PARTY = [

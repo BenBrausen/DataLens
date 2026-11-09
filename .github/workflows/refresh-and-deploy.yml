@@ -36,8 +36,8 @@ jobs:
       - run: node scripts/build-artifact.mjs
       - name: Commit changed snapshots (gives every dataset a version history)
         run: |
-          git config user.name "plainsight-bot"
-          git config user.email "plainsight-bot@users.noreply.github.com"
+          git config user.name "civiccharts-bot"
+          git config user.email "civiccharts-bot@users.noreply.github.com"
           git add public/data public/sources
           git diff --cached --quiet || git commit -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
           git pull --rebase origin main && git push

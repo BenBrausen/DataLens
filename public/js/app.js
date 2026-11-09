@@ -1,4 +1,4 @@
-// Plainsight app: state, step panels, preview loop, export.
+// Civic Charts app: state, step panels, preview loop, export.
 (function (PS) {
   const $ = s => document.querySelector(s);
   const esc = PS.esc;
@@ -381,7 +381,7 @@
     }
 
     else {
-      body = `<p class="muted">Upload a CSV. Plainsight detects dates, numbers, states and countries automatically. Uploaded files are labeled as unverified in the citation.</p>
+      body = `<p class="muted">Upload a CSV. Civic Charts detects dates, numbers, states and countries automatically. Uploaded files are labeled as unverified in the citation.</p>
         <input type="file" id="file" accept=".csv,.tsv,.txt,text/csv"><p class="muted">Tip: one row per date (and place), one column per measure.</p>` + mapperHTML();
     }
     return stateSel + tabs + body;
@@ -392,7 +392,7 @@
     const sc = S.search, st = stateInfo(), mySeq = ++searchSeq;
     Object.assign(sc, { busy: true, err: '', info: '', results: [] }); renderStep();
     const jobs = [];
-    if (sc.scope === 'all' || sc.scope === 'datagov') jobs.push(PS.searchCatalog(sc.q, null, sc.org).then(r => ({ results: r.results })).catch(e => ({ results: [], err: sc.scope === 'datagov' ? e.message : 'data.gov search needs the Plainsight server or proxy; showing state portals only.' })));
+    if (sc.scope === 'all' || sc.scope === 'datagov') jobs.push(PS.searchCatalog(sc.q, null, sc.org).then(r => ({ results: r.results })).catch(e => ({ results: [], err: sc.scope === 'datagov' ? e.message : 'data.gov search needs the Civic Charts server or proxy; showing state portals only.' })));
     if (!sc.org && (sc.scope === 'state' || (sc.scope === 'all' && st))) jobs.push(PS.searchPortals(st.code, sc.q).then(r => ({ results: r.results, errs: r.errors, portals: r.portals })));
     if (!sc.org && (sc.scope === 'states' || (sc.scope === 'all' && !st))) jobs.push(PS.searchPortals(null, sc.q).then(r => ({ results: r.results, errs: r.errors, portals: r.portals })));
     const out = await Promise.all(jobs);
@@ -424,7 +424,7 @@
     $('#file')?.addEventListener('change', async e => {
       const f = e.target.files[0]; if (!f) return;
       if (f.size > 40e6) { toast('That file is over 40 MB. Filter it first.'); return; }
-      importTable(await f.text(), { title: f.name.replace(/\.[^.]+$/, ''), category: 'Your data', source: { publisher: 'Uploaded by user', dataset: f.name, unverified: true }, caveats: ['Plainsight could not verify where this file came from. Cite the original publisher before sharing.'] });
+      importTable(await f.text(), { title: f.name.replace(/\.[^.]+$/, ''), category: 'Your data', source: { publisher: 'Uploaded by user', dataset: f.name, unverified: true }, caveats: ['Civic Charts could not verify where this file came from. Cite the original publisher before sharing.'] });
     });
   };
 
@@ -490,7 +490,7 @@
           title: r.title, category: r.state || 'data.gov', state: r.state || null, description: r.description, tier: r.tier,
           source: { publisher: r.publisher + (r.state && !r.publisher.includes(r.state) ? `, ${r.state}` : ''), dataset: r.title, url: r.landing, portal: r.host },
           howToRead: r.description ? [r.description.slice(0, 220)] : [],
-          caveats: truncated ? ['This file is very large, so Plainsight loaded only its first rows. Check that the chart covers the period you mean to show.'] : [],
+          caveats: truncated ? ['This file is very large, so Civic Charts loaded only its first rows. Check that the chart covers the period you mean to show.'] : [],
         });
         if (truncated) toast('Large file: loaded the first 30 MB of rows.');
       } catch (err) { toast(err.message); t.disabled = false; t.textContent = 'Load data'; }
@@ -554,7 +554,7 @@
       const prev = o.format; o.format = 'image'; update({ panels: false });
       const raw = await new Promise(r => renderer.canvas.toBlob(r, 'image/png'));
       const ds = S.comboDs || S.ds;
-      const blob = await PS.pngWithMeta(raw, { Title: o.title, Description: o.takeawayText || S.analysis.headline, Source: `${ds.source.publisher}${ds.source.dataset ? ', ' + ds.source.dataset : ''}`, 'Source URL': ds.source.url, Author: o.handle, Software: 'Plainsight', 'Creation Time': new Date().toUTCString(), Comment: PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts()) || '' });
+      const blob = await PS.pngWithMeta(raw, { Title: o.title, Description: o.takeawayText || S.analysis.headline, Source: `${ds.source.publisher}${ds.source.dataset ? ', ' + ds.source.dataset : ''}`, 'Source URL': ds.source.url, Author: o.handle, Software: 'Civic Charts', 'Creation Time': new Date().toUTCString(), Comment: PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts()) || '' });
       const name = `${PS.slug(o.title)}-${o.platform}.png`;
       S.lastExport = { blob, name, type: 'image/png' };
       o.format = prev; update({ panels: false });
@@ -702,7 +702,7 @@
       const [a, b] = timeBounds(ds), y0 = yearOf(a), y1 = yearOf(b);
       const years = d3.range(y0, y1 + 1);
       const sv = o.rangeStart != null ? yearOf(o.rangeStart) : '', ev = o.rangeEnd != null ? yearOf(o.rangeEnd) : '';
-      html += field('Time range', `<div class="row"><select id="rs"><option value="">From ${y0}</option>${years.map(y => `<option ${y === sv ? 'selected' : ''}>${y}</option>`).join('')}</select><select id="re"><option value="">To ${y1}</option>${years.map(y => `<option ${y === ev ? 'selected' : ''}>${y}</option>`).join('')}</select></div><p class="muted">Plainsight warns you if a shorter range flips the long-term trend.</p>`);
+      html += field('Time range', `<div class="row"><select id="rs"><option value="">From ${y0}</option>${years.map(y => `<option ${y === sv ? 'selected' : ''}>${y}</option>`).join('')}</select><select id="re"><option value="">To ${y1}</option>${years.map(y => `<option ${y === ev ? 'selected' : ''}>${y}</option>`).join('')}</select></div><p class="muted">Civic Charts warns you if a shorter range flips the long-term trend.</p>`);
     }
     html += '<h3>Motion</h3>' + field('Pacing', select('motion', [['steady', 'Steady (best for reading values)'], ['smooth', 'Smooth (eases in and out)']]));
     return html;
@@ -804,7 +804,7 @@
         <p class="muted">Browser voices can preview but can't be embedded in video. Recorded or uploaded audio is mixed into the export.</p></div>
       <h3>Credit</h3>${field('Your handle or outlet', `<input type="text" data-k="handle" value="${esc(o.handle)}" placeholder="@yourhandle">`)}
       ${field('Extra note (appended to the source line)', `<input type="text" data-k="note" value="${esc(o.note)}" placeholder="e.g. Seasonally adjusted.">`)}
-      ${check('brand', 'Show "Made with Plainsight"')}
+      ${check('brand', 'Show "Made with Civic Charts"')}
       <p class="muted">The source line is always included and can't be removed.</p>`;
     return html;
   };
@@ -859,7 +859,7 @@
     const b = S.integrity?.blocks || [];
     if (!b.length) return '';
     return `<div class="integrity"><b>Export is paused: your text doesn't match the data</b>${b.map(x => `<p><b>${esc(x.title)}.</b> ${esc(x.detail)}</p><button class="btn" data-act="${x.fix.act}" data-field="${x.fix.field || ''}">${esc(x.fix.label)}</button>`).join('')}
-      <p class="muted">Plainsight checks your title, subtitle, takeaway, script and notes against the data so the tool can't be used to misstate it. Edit the text in Story, or use the suggestion.</p></div>`;
+      <p class="muted">Civic Charts checks your title, subtitle, takeaway, script and notes against the data so the tool can't be used to misstate it. Edit the text in Story, or use the suggestion.</p></div>`;
   }
   const blocked = () => (S.integrity?.blocks.length || 0) > 0;
   STEPS.export = () => {
@@ -1001,7 +1001,7 @@
       const stale = S.integrity?.blocks.length;
       const bar = document.createElement('div'); bar.className = 'embed-bar';
       bar.innerHTML = `${stale ? `<span class="embed-warn">Text on this chart was written for an earlier data release and no longer matches the latest numbers.</span>` : ''}
-        <span>Live data: ${esc(ds.source.publisher)}, retrieved ${esc(PS.fmtRetrieved(ds.retrieved))}</span><a href="${esc(full)}" target="_blank" rel="noopener">Open in Plainsight ↗</a>`;
+        <span>Live data: ${esc(ds.source.publisher)}, retrieved ${esc(PS.fmtRetrieved(ds.retrieved))}</span><a href="${esc(full)}" target="_blank" rel="noopener">Open in Civic Charts ↗</a>`;
       document.querySelector('.stage').appendChild(bar);
       play();
     }

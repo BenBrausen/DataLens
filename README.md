@@ -1,4 +1,4 @@
-# Plainsight
+# Civic Charts
 
 Turn official public data into honest, animated charts and maps, sized for any platform.
 
@@ -182,9 +182,9 @@ Creators can write their own title, subtitle, takeaway, voiceover and notes, but
 
 Places named in a sentence are checked against that place ("California unemployment hits 9%" vs. California's 5.1%). Cause-and-effect wording ("because of tariffs") is a warning, since the data shows what happened, not why. Each block comes with a one-click fix (use the computed takeaway, restore the suggested title).
 
-Context that can't be removed is stamped into the source line of every export: a cropped time range ("Shows 2015-2020 of the 1948-2026 record", plus a note when the full record shows the opposite trend), a zoomed axis, and "Data provided by the creator; not verified by Plainsight" for uploads. Share links carry settings only and rebuild the chart from the official data, so anyone can check a chart against its source.
+Context that can't be removed is stamped into the source line of every export: a cropped time range ("Shows 2015-2020 of the 1948-2026 record", plus a note when the full record shows the opposite trend), a zoomed axis, and "Data provided by the creator; not verified by Civic Charts" for uploads. Share links carry settings only and rebuild the chart from the official data, so anyone can check a chart against its source.
 
-Someone determined to mislead can still edit a file in another app. The goal is that Plainsight is never the easy way to do it.
+Someone determined to mislead can still edit a file in another app. The goal is that Civic Charts is never the easy way to do it.
 
 ## Sharing
 
@@ -216,7 +216,7 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 - **PowerPoint (.pptx):** a 16:9 deck. Slide 1 is the chart exactly as exported (title, source line and stamps included). The rest are editable: what the data shows, how to read it, and sources and method. Every slide's speaker notes carry the takeaway, facts, cautions and sources, so the context travels with the presenter. Opens in PowerPoint, Keynote and Google Slides. Exported MP4s can be dropped onto a slide for the animated version.
 - **One-page brief (PDF):** US Letter, real selectable text: the chart at 3:2, what it shows, how to read it, what to keep in mind, and the source with a link. Text is measured first and the chart shrinks if needed, so it always fits on one page.
 - **Data (CSV):** every number behind the current chart (respecting the chosen range, focus and overlays), with the title, source, URL and retrieval date as `#` lines on top.
-- **Embed:** an `<iframe>` of the share link with `?embed=1`. It shows only the chart and player, plus a live-data line and an "Open in Plainsight" link. It rebuilds from the latest data on every visit, and if the creator's text no longer matches a newer release, it says so on the embed. Phone sizes embed as 16:9.
+- **Embed:** an `<iframe>` of the share link with `?embed=1`. It shows only the chart and player, plus a live-data line and an "Open in Civic Charts" link. It rebuilds from the latest data on every visit, and if the creator's text no longer matches a newer release, it says so on the embed. Phone sizes embed as 16:9.
 
 All of these go through the same claim check as images and video.
 

@@ -1,4 +1,4 @@
-// Plainsight server: zero dependencies (Node 22+).
+// Civic Charts server: zero dependencies (Node 22+).
 //   - serves public/
 //   - /api/search   -> data.gov catalog search (adds CORS)
 //   - /api/proxy    -> fetches CSV/JSON from allowlisted public-data hosts (adds CORS, caches)
@@ -39,7 +39,7 @@ function send(res, code, body, headers = {}) {
 async function cachedFetch(url, accept) {
   const hit = cache.get(url);
   if (hit && Date.now() - hit.at < CACHE_MS) return hit;
-  const r = await fetch(url, { headers: { 'User-Agent': 'plainsight/1.0 (public data visualizer)', Accept: accept || '*/*' }, redirect: 'follow', signal: AbortSignal.timeout(45000) });
+  const r = await fetch(url, { headers: { 'User-Agent': 'civiccharts/1.0 (public data visualizer)', Accept: accept || '*/*' }, redirect: 'follow', signal: AbortSignal.timeout(45000) });
   if (!r.ok) throw Object.assign(new Error(`Upstream HTTP ${r.status}`), { status: 502 });
   const len = +r.headers.get('content-length');
   if (len > MAX_BYTES) throw Object.assign(new Error('File is larger than 40 MB'), { status: 413 });
@@ -87,4 +87,4 @@ function refresh() {
 }
 if (REFRESH_HOURS > 0) setInterval(refresh, REFRESH_HOURS * 3600e3).unref();
 
-server.listen(PORT, () => console.log(`Plainsight running at http://localhost:${PORT}  (snapshots refresh every ${REFRESH_HOURS || '∞'}h)`));
+server.listen(PORT, () => console.log(`Civic Charts running at http://localhost:${PORT}  (snapshots refresh every ${REFRESH_HOURS || '∞'}h)`));

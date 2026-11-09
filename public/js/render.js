@@ -1,4 +1,4 @@
-// Plainsight frame renderer.
+// Civic Charts frame renderer.
 // draw(p) renders the whole composition at timeline position p in [0, 1].
 // Preview, PNG export and video export all call the same function, so what you
 // see is exactly what ships.
@@ -159,9 +159,9 @@
       const s = ds.source;
       const tierLbl = { academic: ' (academic research)', nonprofit: ' (nonprofit research)', industry: ' (company data)' }[ds.tier] || '';
       // Permanent context the creator can't remove: unverified uploads, cropped ranges.
-      if (s.unverified) return `Data provided by the creator (${s.dataset}); not verified by Plainsight.${o.note ? ' ' + o.note : ''}`;
+      if (s.unverified) return `Data provided by the creator (${s.dataset}); not verified by Civic Charts.${o.note ? ' ' + o.note : ''}`;
       let txt = `Source: ${s.publisher}${tierLbl}${s.dataset ? ', ' + s.dataset : ''}${s.via ? ' (via ' + s.via + ')' : ''}. Retrieved ${PS.fmtRetrieved(ds.retrieved)}.`;
-      if (ds.lens && ds.lens !== 'Nominal dollars' && /computed by Plainsight/.test((ds.caveats || []).join(' '))) txt += ' Adjusted by Plainsight.';
+      if (ds.lens && ds.lens !== 'Nominal dollars' && /computed by Civic Charts/.test((ds.caveats || []).join(' '))) txt += ' Adjusted by Civic Charts.';
       if (o.note) txt += ' ' + o.note;
       if (this._axisNote) txt += ' Note: y-axis does not start at zero.';
       if ((o.rangeStart != null || o.rangeEnd != null) && this.scene.fullRange) {
@@ -271,7 +271,7 @@
         ctx.textAlign = 'right';
         let yy = L.footY;
         if (o.handle) { ctx.font = font(st, 700, L.footSize * 1.1); ctx.fillStyle = T.ink; ctx.fillText(o.handle, L.R.x + L.R.w, yy); yy += L.footSize * 1.4; }
-        if (o.brand) { ctx.font = font(st, 600, L.footSize * 0.9); ctx.fillStyle = T.faint; ctx.fillText('Made with Plainsight', L.R.x + L.R.w, yy); }
+        if (o.brand) { ctx.font = font(st, 600, L.footSize * 0.9); ctx.fillStyle = T.faint; ctx.fillText('Made with Civic Charts', L.R.x + L.R.w, yy); }
         ctx.textAlign = 'left';
       }
     }

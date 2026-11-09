@@ -1,4 +1,4 @@
-// Plainsight data layer: curated snapshots, live sources, data.gov catalog search,
+// Civic Charts data layer: curated snapshots, live sources, data.gov catalog search,
 // CSV import with type inference, and conversion into the three render shapes.
 (function (PS) {
   // API_BASE: where /api/search and /api/proxy live (server.js on the same origin, or the
@@ -109,7 +109,7 @@
         };
       } catch (e) { lastErr = e; }
     }
-    throw new Error('Catalog search needs the Plainsight server (CORS). ' + (lastErr?.message || ''));
+    throw new Error('Catalog search needs the Civic Charts server (CORS). ' + (lastErr?.message || ''));
   };
   const ORGTYPE_TIER = { 'Federal Government': 'federal', 'State Government': 'state', 'City Government': 'local', 'County Government': 'local', University: 'academic' };
   const score = f => (/csv/.test(f.type) ? 2 : 0) + (/rows\.csv|export\.csv|\.csv/.test(f.url) ? 1 : 0);
@@ -121,7 +121,7 @@
   }
   // Downloads at most maxBytes, cutting at the last full line, so a 160 MB GIS
   // export never freezes the tab. Tries the publisher directly first (Socrata,
-  // CKAN and ArcGIS allow it), then the Plainsight proxy.
+  // CKAN and ArcGIS allow it), then the Civic Charts proxy.
   async function readCapped(r, maxBytes) {
     const reader = r.body.getReader(), chunks = [];
     let n = 0, truncated = false;
@@ -143,7 +143,7 @@
       try { const r = await fetch(u); if (!r.ok) throw new Error(`HTTP ${r.status}`); return await readCapped(r, maxBytes); }
       catch (e) { lastErr = e; }
     }
-    throw new Error(`Could not download (${lastErr?.message}). This publisher blocks browser downloads; run the Plainsight server or proxy to load it.`);
+    throw new Error(`Could not download (${lastErr?.message}). This publisher blocks browser downloads; run the Civic Charts server or proxy to load it.`);
   };
   PS.fetchRemoteText = async url => (await PS.fetchRemote(url)).text;
 

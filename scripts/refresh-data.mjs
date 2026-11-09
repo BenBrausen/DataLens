@@ -1,5 +1,5 @@
 // Pulls every curated dataset from its official source, normalizes it into
-// Plainsight's three shapes (timeseries | panel | events), and writes
+// Civic Charts's three shapes (timeseries | panel | events), and writes
 // public/data/<id>.json plus public/data/catalog.json.
 //
 // Run on a schedule (cron / GitHub Action) to keep everything current:
@@ -34,7 +34,7 @@ export const STATES = [
 async function get(url, type = 'json', tries = 3) {
   for (let i = 0; i < tries; i++) {
     try {
-      const r = await fetch(url, { headers: { 'User-Agent': 'plainsight-data-refresh/1.0' } });
+      const r = await fetch(url, { headers: { 'User-Agent': 'civiccharts-data-refresh/1.0' } });
       if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
       if (type === 'latin1') return new TextDecoder('latin1').decode(await r.arrayBuffer());
       return type === 'json' ? await r.json() : await r.text();
@@ -195,7 +195,7 @@ builders['gas-price'] = async () => {
     ts({ ...base, id: 'gas-price-real', title: 'U.S. gas price, adjusted for inflation', lens: 'Today\'s dollars',
       unit: { label: `Dollars per gallon (${d.CPIAUCSL.at(-1)[0].slice(0, 7)} dollars)`, format: 'usd', decimals: 2 },
       description: 'Average retail price of regular gasoline, converted into today\'s dollars using CPI-U.',
-      caveats: ['Adjusted with the all-items CPI computed by Plainsight; the source publishes nominal prices only.'],
+      caveats: ['Adjusted with the all-items CPI computed by Civic Charts; the source publishes nominal prices only.'],
     }, [{ id: 'GASREGW_REAL', name: 'Regular gasoline (inflation-adjusted)', points: deflate(d.GASREGW, d.CPIAUCSL) }]),
   ];
 };
@@ -215,7 +215,7 @@ builders['home-price'] = async () => {
     ts({ ...base, id: 'home-price-real', title: 'Median price of new U.S. homes, adjusted for inflation', lens: 'Today\'s dollars',
       unit: { label: 'Median sales price (today\'s dollars)', format: 'usd', decimals: 0 },
       description: 'Median sales price of new houses converted into today\'s dollars with CPI-U.',
-      caveats: ['Inflation adjustment computed by Plainsight using CPI-U.'] },
+      caveats: ['Inflation adjustment computed by Civic Charts using CPI-U.'] },
       [{ id: 'MSPUS_REAL', name: 'Median sales price (inflation-adjusted)', points: deflate(d.MSPUS, d.CPIAUCSL) }]),
   ];
 };
@@ -254,7 +254,7 @@ builders['federal-debt'] = async () => {
       description: 'Total public debt converted into today\'s dollars with CPI-U.',
       source: { publisher: 'U.S. Department of the Treasury', dataset: 'Debt to the Penny, deflated by BLS CPI-U', url: 'https://fiscaldata.treasury.gov/datasets/debt-to-the-penny/' },
       howToRead: ['Removes the effect of rising prices so years can be compared directly.'],
-      caveats: ['Inflation adjustment computed by Plainsight with CPI-U.'] },
+      caveats: ['Inflation adjustment computed by Civic Charts with CPI-U.'] },
       [{ id: 'DEBT_REAL', name: 'Total public debt (inflation-adjusted)', points: deflate(nominal, d.CPIAUCSL) }]),
   ];
 };
@@ -297,7 +297,7 @@ builders['federal-deficit'] = async () => {
     ts({ ...base, id: 'federal-deficit-12mo', title: 'U.S. federal budget deficit, last 12 months', lens: 'Rolling 12 months', frequency: 'monthly',
       unit: { label: 'Surplus or deficit (-), trailing 12 months', format: 'usdT', decimals: 2, signWords: { neg: 'deficit', pos: 'surplus', subject: 'The federal government', trailing: true } },
       description: 'Federal surplus or deficit over the 12 months ending each month, from the Monthly Treasury Statement.',
-      source: { publisher: 'U.S. Department of the Treasury', dataset: 'Monthly Treasury Statement, Federal Surplus or Deficit (MTSDS133FMS), 12-month sum computed by Plainsight', url: 'https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/', via: 'FRED, Federal Reserve Bank of St. Louis' },
+      source: { publisher: 'U.S. Department of the Treasury', dataset: 'Monthly Treasury Statement, Federal Surplus or Deficit (MTSDS133FMS), 12-month sum computed by Civic Charts', url: 'https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/', via: 'FRED, Federal Reserve Bank of St. Louis' },
       howToRead: [signHow, 'Each point adds up the latest 12 months, so it updates monthly without the big swings single months show around tax deadlines.', debtLink],
       caveats: ['Shifts in payment timing (when a due date falls on a weekend) can move a month between fiscal years and nudge the 12-month total.'] },
       [{ id: 'MTS12', name: 'Surplus or deficit, last 12 months', points: roll }]),
@@ -393,7 +393,7 @@ builders['overdose-deaths'] = async () => {
     panel({ ...base, id: 'overdose-rate', title: 'Drug overdose death rate by state', lens: 'Per 100,000 people',
       unit: { label: 'Deaths per 100,000 residents', format: 'number', decimals: 1 },
       description: 'Reported drug overdose deaths per 100,000 residents, 12 months ending in December.',
-      caveats: ['Rate computed by Plainsight using Census population estimates. It is not age-adjusted, unlike CDC\'s official rates.', 'Recent months are provisional and are usually revised upward.'],
+      caveats: ['Rate computed by Civic Charts using Census population estimates. It is not age-adjusted, unlike CDC\'s official rates.', 'Recent months are provisional and are usually revised upward.'],
       isRate: true }, times, rates),
   ];
 };
@@ -611,7 +611,7 @@ builders['county-population'] = async () => {
       unit: { label: 'Population change since April 2020', format: 'pct', decimals: 1 },
       description: 'How much each county\'s population has grown or shrunk since the 2020 Census.',
       howToRead: ['Percent change from the April 2020 Census base, so small counties can swing a lot from a few hundred people.'],
-      caveats: [COUNTY_CAVEAT, 'Percent change computed by Plainsight from Census estimates.'], isRate: true, zeroLine: true },
+      caveats: [COUNTY_CAVEAT, 'Percent change computed by Civic Charts from Census estimates.'], isRate: true, zeroLine: true },
       recs, years, (r, y) => round((+r[`POPESTIMATE${y}`] / +r.ESTIMATESBASE2020 - 1) * 100, 2)),
     countyPanel({ ...base, id: 'county-migration', title: 'Where Americans are moving, by county', lens: 'Moves within the U.S.',
       unit: { label: 'Net domestic migration per 1,000 residents', format: 'number', decimals: 1 },
@@ -872,7 +872,7 @@ builders['business-applications'] = async () => {
     description: 'Applications for a new employer ID number (EIN) each month, a leading sign of new businesses, per 100,000 residents.',
     source: { publisher: 'U.S. Census Bureau', dataset: 'Business Formation Statistics (seasonally adjusted)', url: 'https://www.census.gov/econ/bfs/' },
     howToRead: ['An application is an intention to start a business; only some become employers. Applications jumped in mid-2020 and stayed high.'],
-    caveats: ['Per-person rate computed by Plainsight with Census population estimates.'], isRate: true,
+    caveats: ['Per-person rate computed by Civic Charts with Census population estimates.'], isRate: true,
     national: { name: 'United States', values: times.map(t => { const v = series.get('US')?.get(t); return v == null ? null : round(v / usPop(t) * 1e5, 1); }) } }, times, entities);
 };
 

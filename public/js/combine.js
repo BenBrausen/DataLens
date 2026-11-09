@@ -1,4 +1,4 @@
-// Plainsight overlays: put two or more datasets in one visual, honestly.
+// Civic Charts overlays: put two or more datasets in one visual, honestly.
 //
 // The method follows from what the datasets are, never from what looks dramatic:
 //   shared   one axis      same unit and comparable scale

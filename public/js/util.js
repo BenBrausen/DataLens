@@ -1,4 +1,4 @@
-// Plainsight shared utilities: formatting, dates, easing, palettes, themes, platforms.
+// Civic Charts shared utilities: formatting, dates, easing, palettes, themes, platforms.
 window.PS = window.PS || {};
 (function (PS) {
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -137,7 +137,7 @@ window.PS = window.PS || {};
   // ---------- palettes ----------
   // Categorical orders. "safe" ones were chosen for color-blind separation.
   PS.PALETTES = {
-    plainsight: { name: 'Plainsight', group: 'Tested', colors: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6', '#e34948'], dark: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'] },
+    plainsight: { name: 'Civic Charts', group: 'Tested', colors: ['#2a78d6', '#eb6834', '#1baf7a', '#eda100', '#e87ba4', '#008300', '#6250d6', '#e34948'], dark: ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#008300', '#9085e9', '#e66767'] },
     okabe: { name: 'Color-blind safe', group: 'Tested', colors: ['#0072B2', '#E69F00', '#009E73', '#CC79A7', '#56B4E9', '#D55E00', '#F0E442', '#000000'], dark: ['#56B4E9', '#E69F00', '#009E73', '#CC79A7', '#0072B2', '#D55E00', '#F0E442', '#ffffff'] },
     newsroom: { name: 'Newsroom', group: 'Tested', colors: ['#1d5c96', '#d1603d', '#3f8f6b', '#c9972b', '#7b5ea7', '#8a8a85'], dark: ['#5b9bd5', '#e07a5a', '#5fb08b', '#e0b24a', '#a68bd0', '#b5b5b0'] },
     earth: { name: 'Earth', group: 'Tested', colors: ['#2f6b5e', '#c26a2e', '#7a8b3a', '#a14b3b', '#3f6c8f', '#b08d57'], dark: ['#4fa38f', '#e08a4c', '#a3b55a', '#d0705e', '#6b9cc3', '#d4b27a'] },

@@ -182,7 +182,7 @@
    "An application is an intention to start a business; only some become employers. Applications jumped in mid-2020 and stayed high."
   ],
   "caveats": [
-   "Per-person rate computed by Plainsight with Census population estimates."
+   "Per-person rate computed by Civic Charts with Census population estimates."
   ],
   "isRate": true,
   "kind": "panel",
@@ -606,7 +606,7 @@
   },
   "description": "Average retail price of regular gasoline, converted into today's dollars using CPI-U.",
   "caveats": [
-   "Adjusted with the all-items CPI computed by Plainsight; the source publishes nominal prices only."
+   "Adjusted with the all-items CPI computed by Civic Charts; the source publishes nominal prices only."
   ],
   "kind": "timeseries",
   "retrieved": "2026-11-09T16:11:28.912Z",
@@ -1325,7 +1325,7 @@
   "description": "Federal surplus or deficit over the 12 months ending each month, from the Monthly Treasury Statement.",
   "source": {
    "publisher": "U.S. Department of the Treasury",
-   "dataset": "Monthly Treasury Statement, Federal Surplus or Deficit (MTSDS133FMS), 12-month sum computed by Plainsight",
+   "dataset": "Monthly Treasury Statement, Federal Surplus or Deficit (MTSDS133FMS), 12-month sum computed by Civic Charts",
    "url": "https://fiscaldata.treasury.gov/datasets/monthly-treasury-statement/",
    "via": "FRED, Federal Reserve Bank of St. Louis"
   },
@@ -1465,7 +1465,7 @@
    "Removes the effect of rising prices so years can be compared directly."
   ],
   "caveats": [
-   "Inflation adjustment computed by Plainsight with CPI-U."
+   "Inflation adjustment computed by Civic Charts with CPI-U."
   ],
   "kind": "timeseries",
   "retrieved": "2026-11-09T16:11:28.912Z",
@@ -1660,7 +1660,7 @@
   },
   "description": "Reported drug overdose deaths per 100,000 residents, 12 months ending in December.",
   "caveats": [
-   "Rate computed by Plainsight using Census population estimates. It is not age-adjusted, unlike CDC's official rates.",
+   "Rate computed by Civic Charts using Census population estimates. It is not age-adjusted, unlike CDC's official rates.",
    "Recent months are provisional and are usually revised upward."
   ],
   "isRate": true,
@@ -1991,7 +1991,7 @@
   },
   "description": "Median sales price of new houses converted into today's dollars with CPI-U.",
   "caveats": [
-   "Inflation adjustment computed by Plainsight using CPI-U."
+   "Inflation adjustment computed by Civic Charts using CPI-U."
   ],
   "kind": "timeseries",
   "retrieved": "2026-11-09T16:11:28.912Z",
@@ -2370,7 +2370,7 @@
   ],
   "caveats": [
    "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map.",
-   "Percent change computed by Plainsight from Census estimates."
+   "Percent change computed by Civic Charts from Census estimates."
   ],
   "isRate": true,
   "zeroLine": true,

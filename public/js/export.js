@@ -1,4 +1,4 @@
-// Plainsight export: PNG stills, video (MP4 when the browser can encode it, else WebM),
+// Civic Charts export: PNG stills, video (MP4 when the browser can encode it, else WebM),
 // and voiceover audio (recorded or uploaded) mixed into the video track.
 (function (PS) {
   // Inside a claude.ai artifact, downloads go through the viewer-confirmed `downloads`
@@ -15,7 +15,7 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 4000);
   }
   PS.download = download;
-  PS.slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'plainsight';
+  PS.slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'civic-charts';
 
   PS.exportPNG = (renderer, name) => new Promise(res => renderer.canvas.toBlob(b => { download(b, name + '.png'); res(); }, 'image/png'));
 

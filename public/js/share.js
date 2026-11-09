@@ -1,4 +1,4 @@
-// Plainsight post kit and sharing: per-platform captions, alt text, SRT captions,
+// Civic Charts post kit and sharing: per-platform captions, alt text, SRT captions,
 // PNG provenance metadata, the LinkedIn carousel PDF, share links that rebuild a
 // chart from official data, and sharing to installed apps.
 (function (PS) {
@@ -113,10 +113,10 @@
       { text: src, size: 32 }, ...(ds.source.url ? [{ text: ds.source.url, size: 28, muted: true }] : []),
       { text: 'Every number on these slides comes from the source data. Nothing is estimated by AI.', size: 30 },
       ...(link ? [{ text: `Rebuild this chart from the official data at ${link.split('#')[0].replace(/^https?:\/\//, '').replace(/\/$/, '')} (full link in the post).`, size: 26, muted: true }] : []),
-    ], o.handle ? `${o.handle} · Made with Plainsight` : 'Made with Plainsight'));
+    ], o.handle ? `${o.handle} · Made with Civic Charts` : 'Made with Civic Charts'));
     const doc = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'px', format: [W, H], hotfixes: ['px_scaling'] });
     pages.forEach((p, i) => { if (i) doc.addPage([W, H], 'portrait'); doc.addImage(p, 'JPEG', 0, 0, W, H); });
-    doc.setProperties({ title: o.title, subject: analysis.headline, author: o.handle || 'Plainsight', keywords: `${ds.source.publisher}, open data`, creator: 'Plainsight' });
+    doc.setProperties({ title: o.title, subject: analysis.headline, author: o.handle || 'Civic Charts', keywords: `${ds.source.publisher}, open data`, creator: 'Civic Charts' });
     return doc.output('blob');
   };
 
@@ -147,7 +147,7 @@
     const k = storyParts(ds, analysis, o, link), accent = hex(st?.accent), ink = '1A1A1A', muted = '5B6470', face = 'Arial';
     const pptx = new window.PptxGenJS();
     pptx.layout = 'LAYOUT_WIDE'; // 13.333 x 7.5 in, 16:9
-    pptx.title = k.title; pptx.subject = k.takeaway; pptx.author = o.handle || 'Plainsight'; pptx.company = 'Made with Plainsight';
+    pptx.title = k.title; pptx.subject = k.takeaway; pptx.author = o.handle || 'Civic Charts'; pptx.company = 'Made with Civic Charts';
     const notes = [k.takeaway, '', ...k.facts.map(f => '- ' + f), '', ...k.read, ...(k.care.length ? ['', 'Keep in mind:', ...k.care.map(c => '- ' + c)] : []), '',
       `Source: ${k.source}. Retrieved ${k.retrieved}.`, k.url, k.link ? `Rebuild this chart from the official data: ${k.link}` : ''].filter(x => x != null).join('\n');
     const foot = (slide, text) => slide.addText(text, { x: 0.6, y: 6.75, w: 12.1, h: 0.45, fontFace: face, fontSize: 11, color: muted, valign: 'bottom' });
@@ -174,13 +174,13 @@
     }
     // 4. Sources and method.
     const s4 = pptx.addSlide(); head(s4, 'Sources and method');
-    const rows = [{ text: k.unverified ? `Data provided by the presenter (${ds.source.dataset}); not verified by Plainsight.` : `${k.source}. Retrieved ${k.retrieved}.`, options: { breakLine: true, paraSpaceAfter: 10 } }];
+    const rows = [{ text: k.unverified ? `Data provided by the presenter (${ds.source.dataset}); not verified by Civic Charts.` : `${k.source}. Retrieved ${k.retrieved}.`, options: { breakLine: true, paraSpaceAfter: 10 } }];
     if (k.url) rows.push({ text: k.url, options: { hyperlink: { url: k.url }, color: accent, fontSize: 15, breakLine: true, paraSpaceAfter: 14 } });
     k.caveats.forEach(c => rows.push({ text: c, options: { bullet: { indent: 18 }, color: muted, fontSize: 15, breakLine: true, paraSpaceAfter: 8 } }));
     rows.push({ text: 'Every number in this deck comes from the source data. Nothing is estimated by AI.', options: { breakLine: true, paraSpaceAfter: 10 } });
     if (k.link) rows.push({ text: 'Rebuild this chart from the official data', options: { hyperlink: { url: k.link }, color: accent, fontSize: 15, breakLine: true } });
     s4.addText(rows, { x: 0.85, y: 1.45, w: 11.9, h: 5.2, fontFace: face, fontSize: 18, color: ink, valign: 'top' });
-    foot(s4, o.handle ? `${o.handle} · Made with Plainsight` : 'Made with Plainsight'); s4.addNotes(notes);
+    foot(s4, o.handle ? `${o.handle} · Made with Civic Charts` : 'Made with Civic Charts'); s4.addNotes(notes);
     return pptx.write({ outputType: 'blob' });
   };
 
@@ -210,7 +210,7 @@
       if (k.read.length) { heading('How to read it'); k.read.forEach(t => para(t)); }
       if (k.care.length) { heading('Keep in mind'); k.care.forEach(t => para(t, { bullet: true, size: 9.5, color: [70, 76, 84], gap: 3 })); }
       heading('Source');
-      para(k.unverified ? `Data provided by the creator (${ds.source.dataset}); not verified by Plainsight.` : `${k.source}. Retrieved ${k.retrieved}.`, { size: 9.5 });
+      para(k.unverified ? `Data provided by the creator (${ds.source.dataset}); not verified by Civic Charts.` : `${k.source}. Retrieved ${k.retrieved}.`, { size: 9.5 });
       if (k.url) { if (!dry) { doc.setTextColor(...rgb); doc.setFontSize(9.5); doc.textWithLink(latin(k.url).slice(0, 110), M, y, { url: k.url, baseline: 'top' }); } y += 16; }
     };
     y = 0; body(); const textH = y;
@@ -228,17 +228,17 @@
     const n = doc.getNumberOfPages();
     for (let i = 1; i <= n; i++) {
       doc.setPage(i); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(120, 126, 134);
-      doc.text(latin(`${o.handle ? o.handle + ' · ' : ''}Made with Plainsight · ${new Date().toISOString().slice(0, 10)}${n > 1 ? ` · ${i}/${n}` : ''}`), M, H - 34);
+      doc.text(latin(`${o.handle ? o.handle + ' · ' : ''}Made with Civic Charts · ${new Date().toISOString().slice(0, 10)}${n > 1 ? ` · ${i}/${n}` : ''}`), M, H - 34);
       if (k.link) { doc.setTextColor(...rgb); doc.textWithLink('Rebuild this chart from the official data', W - M - doc.getTextWidth('Rebuild this chart from the official data'), H - 34, { url: k.link }); }
     }
-    doc.setProperties({ title: k.title, subject: k.takeaway, author: o.handle || 'Plainsight', keywords: `${ds.source.publisher}, open data`, creator: 'Plainsight' });
+    doc.setProperties({ title: k.title, subject: k.takeaway, author: o.handle || 'Civic Charts', keywords: `${ds.source.publisher}, open data`, creator: 'Civic Charts' });
     return doc.output('blob');
   };
 
   // CSV of exactly what the chart shows, with the source on top so it travels with the numbers.
   PS.toCsv = (head, rows, ds) => {
     const q = v => { const t = v == null ? '' : String(v); return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; };
-    const meta = [['# ' + (ds.title || '')], [`# Source: ${sourceText(ds)}${ds.source.url ? ' ' + ds.source.url : ''}`], [`# Retrieved: ${PS.fmtRetrieved(ds.retrieved)}`], ...(ds.source.unverified ? [['# Uploaded by the creator; not verified by Plainsight']] : [])];
+    const meta = [['# ' + (ds.title || '')], [`# Source: ${sourceText(ds)}${ds.source.url ? ' ' + ds.source.url : ''}`], [`# Retrieved: ${PS.fmtRetrieved(ds.retrieved)}`], ...(ds.source.unverified ? [['# Uploaded by the creator; not verified by Civic Charts']] : [])];
     return '﻿' + [...meta, head, ...rows].map(r => r.map(q).join(',')).join('\r\n') + '\r\n';
   };
 

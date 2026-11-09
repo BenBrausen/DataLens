@@ -1,4 +1,4 @@
-// Plainsight explanation engine.
+// Civic Charts explanation engine.
 // Every sentence is computed from the data on screen (no generated guesses), so the
 // takeaway, captions and voiceover can always be traced back to a number.
 (function (PS) {
@@ -216,7 +216,7 @@
     const checks = [];
     const add = (level, title, detail, action) => checks.push({ level, title, detail, action });
 
-    if (ds.source.unverified) add('warn', 'Unverified source', 'This data was uploaded, so Plainsight cannot confirm where it came from. Name the original publisher in the note before sharing.');
+    if (ds.source.unverified) add('warn', 'Unverified source', 'This data was uploaded, so Civic Charts cannot confirm where it came from. Name the original publisher in the note before sharing.');
     else add('pass', 'Source cited on every frame',`${ds.source.publisher}${ds.source.via ? ', via ' + ds.source.via : ''}. Retrieved ${PS.fmtRetrieved(ds.retrieved)}. Citations can be restyled but not removed.`);
 
     if (ds.aggWarning) add('warn', `Rows were ${ds.aggWarning.agg === 'sum' ? 'added together' : 'averaged'}`, `${ds.aggWarning.rows.toLocaleString()} rows shared a date or place and were combined. If the file mixes totals with their parts (a state total plus its counties), the result double counts. Check the "Only rows where" filter.`);

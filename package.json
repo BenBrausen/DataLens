@@ -1,5 +1,5 @@
 {
-  "name": "plainsight",
+  "name": "civic-charts",
   "version": "1.0.0",
   "description": "Turn official public data into honest, animated charts and maps.",
   "main": "index.js",

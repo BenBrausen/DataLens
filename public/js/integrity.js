@@ -1,4 +1,4 @@
-// Plainsight claim check: keeps the tool from being an easy way to misstate data.
+// Civic Charts claim check: keeps the tool from being an easy way to misstate data.
 //
 // Everything the creator types (title, subtitle, kicker, takeaway, voiceover script,
 // note) is checked against the data on screen. Clear contradictions BLOCK export:
@@ -49,7 +49,7 @@
     if (ds.kind === 'events') { ds.events.forEach(e => push(e.value, u)); vals.push(ds.events.length); }
     if (ds.kind === 'scatter') ds.points.forEach(p => { p.xs.forEach(v => push(v, ds.x.unit)); p.ys.forEach(v => push(v, ds.y.unit)); });
     if (full?.kind === 'timeseries') full.series.forEach(s => s.pts.forEach(p => push(p.v, full.unit)));
-    // Facts Plainsight computed, and the source's own wording, are fair game.
+    // Facts Civic Charts computed, and the source's own wording, are fair game.
     const texts = [ds.title, ds.description, ds.unit?.label, ds.lens, ds.source?.dataset, ...(ds.howToRead || []), ...(ds.caveats || []),
       a.headline, a.howTo, ...(a.facts || []).map(f => f.text), ...(a.checks || []).map(c => c.detail), o._autoSubtitle, o._autoTitle];
     texts.filter(Boolean).forEach(t => numbersIn(t).forEach(n => vals.push(n.v)));

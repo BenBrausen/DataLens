@@ -19,7 +19,7 @@ export default {
     const cache = caches.default, key = new Request(target.toString());
     let res = await cache.match(key);
     if (!res) {
-      const up = await fetch(target, { headers: { 'User-Agent': 'plainsight/1.0 (public data visualizer)' } });
+      const up = await fetch(target, { headers: { 'User-Agent': 'civiccharts/1.0 (public data visualizer)' } });
       if (!up.ok) return new Response(`Upstream HTTP ${up.status}`, { status: 502, headers: cors });
       if (+up.headers.get('content-length') > 40e6) return new Response('File is larger than 40 MB', { status: 413, headers: cors });
       res = new Response(up.body, { headers: { ...cors, 'Content-Type': up.headers.get('content-type') || 'text/plain', 'Cache-Control': 'public, max-age=3600' } });
