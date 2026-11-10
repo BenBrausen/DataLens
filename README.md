@@ -207,6 +207,10 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 - **PNG metadata:** exports carry title, description, source, source URL and the share link as embedded text. Platforms strip this on upload, so it is for provenance, not reach.
 - **Share to apps:** on phones and Safari, the system share sheet sends the file and text straight to installed apps. Elsewhere, the post text is copied and the platform's composer opens.
 
+## Simple and Advanced modes
+
+A switch in the top bar. **Simple** (the default for new visitors, remembered per browser) has three steps: Data (Popular, Topics, Search), Design (best-fit chart plus up to three alternatives, four looks, four palettes, title, subtitle, takeaway, captions, handle) and Share (five main sizes, video or image, share kit; slides, PDF, CSV and embed under "More formats"). **Advanced** has every control: comparisons, time ranges, fonts, custom colors, map ramps, motion, voiceover, uploads, all sizes and projects. The source line, claim check and trust panel are the same in both. `?mode=simple` or `?mode=advanced` in a link opens a mode directly.
+
 ## Finding data
 
 - **Popular** (the default tab): 16 plain-language questions ("How big is the national debt?", "Are prices still rising?"), each with its latest number and source, one tap to a ready-made chart. Picking a state turns state and county questions local. The list lives in `FEATURED` in `scripts/sources/catalog.mjs`. A "New data in the last two weeks" row appears when a dataset gets a new observation; the refresh job records when each dataset's latest observation first appeared (`released` in the catalog).
@@ -235,7 +239,7 @@ Off until a measurement ID is set: `window.CC_GA_ID = 'G-…'` in `public/index.
 
 To exclude your own visits, open `https://civiccharts.com/?notrack=1` once in each browser and device (stored in that browser; `?notrack=0` undoes it).
 
-Every event also carries `dataset_id`, `chart_type`, `size` and `format`. To report on these in GA4, register them under Admin → Custom definitions → Create custom dimension (scope: Event).
+Every event also carries `ui_mode` (simple or advanced), `dataset_id`, `chart_type`, `size` and `format`; switching modes sends `ui_mode`. To report on these in GA4, register them under Admin → Custom definitions → Create custom dimension (scope: Event).
 
 The link-preview card (`public/og.png`, 2400×1260) is rendered from `scripts/og-card.html`.
 

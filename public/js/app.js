@@ -150,7 +150,7 @@
 
   // ---------- platforms ----------
   function renderPlatforms() {
-    $('#platforms').innerHTML = Object.entries(PS.PLATFORMS).map(([id, p]) =>
+    $('#platforms').innerHTML = Object.entries(PS.PLATFORMS).filter(([id]) => !SIMPLE() || SIMPLE_SIZES.includes(id) || id === o.platform).map(([id, p]) =>
       `<button class="chip ${o.platform === id ? 'active' : ''}" data-platform="${id}" title="${esc(p.name)}">${p.ratio}<small>${esc(p.name.split(' / ')[0].split(' (')[0])}</small></button>`).join('');
   }
   $('#platforms').onclick = e => {
@@ -193,6 +193,23 @@
     const b = e.target.closest('[data-step]'); if (!b) return;
     S.step = b.dataset.step; renderStep();
   };
+  // Simple mode: three steps with the choices most people need. Advanced: every control.
+  const SIMPLE = () => S.mode !== 'advanced';
+  const NAV = { simple: [['data', '1 Data'], ['design', '2 Design'], ['export', '3 Share']], advanced: [['data', '1 Data'], ['chart', '2 Chart'], ['style', '3 Style'], ['story', '4 Story'], ['export', '5 Export']] };
+  const SIMPLE_SIZES = ['vertical', 'reels', 'feed', 'square', 'landscape'];
+  function setMode(m, { quiet } = {}) {
+    S.mode = m === 'advanced' ? 'advanced' : 'simple';
+    try { localStorage.setItem('cc-mode', S.mode); } catch { }
+    document.body.classList.toggle('mode-simple', SIMPLE());
+    document.querySelectorAll('#modeToggle [data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === S.mode));
+    if (SIMPLE() && ['chart', 'style', 'story'].includes(S.step)) S.step = 'design';
+    if (!SIMPLE() && S.step === 'design') S.step = 'chart';
+    if (SIMPLE() && ['sources', 'upload'].includes(S.dataTab)) S.dataTab = 'popular';
+    document.querySelector('.steps').innerHTML = NAV[S.mode].map(([k, l]) => `<button role="tab" data-step="${k}">${l}</button>`).join('');
+    renderPlatforms();
+    if (!quiet) { PS.track('ui_mode', { mode: S.mode }); renderStep(); }
+  }
+  $('#modeToggle').onclick = e => { const b = e.target.closest('[data-mode]'); if (b && b.dataset.mode !== S.mode) setMode(b.dataset.mode); };
   function renderStep() {
     document.querySelectorAll('.steps button').forEach(b => b.classList.toggle('active', b.dataset.step === S.step));
     $('#stepBody').innerHTML = STEPS[S.step]();
@@ -291,7 +308,7 @@
     const st = stateInfo();
     const stateSel = `<div class="state-pick"><label for="statePick">Your state</label><select id="statePick"><option value="">All states (national view)</option>${PS.STATE_LIST.map(([c, , n]) => `<option value="${c}" ${S.state === c ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select></div>
       ${st ? `<p class="muted state-note">State-level charts now highlight ${esc(st.name)} and compare it with the U.S.</p>` : ''}`;
-    const tabs = `<div class="tabs">${[['popular', 'Popular'], ['topics', 'Topics'], ['sources', 'Sources'], ['search', 'Search'], ['upload', 'Upload']].map(([k, l]) => `<button data-tab="${k}" class="${S.dataTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>`;
+    const tabs = `<div class="tabs">${[['popular', 'Popular'], ['topics', 'Topics'], ['sources', 'Sources'], ['search', 'Search'], ['upload', 'Upload']].filter(([k]) => !SIMPLE() || !['sources', 'upload'].includes(k)).map(([k, l]) => `<button data-tab="${k}" class="${S.dataTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>`;
     let body = '';
     const reg = PS.REGISTRY;
 
@@ -474,6 +491,8 @@
 
   $('#stepBody').addEventListener('click', async e => {
     const t = e.target.closest('button, [data-ds]'); if (!t) return;
+    if (t.dataset.modeGo) { setMode(t.dataset.modeGo); return; }
+    if (t.dataset.stepGo) { S.step = t.dataset.stepGo; renderStep(); return; }
     if (t.dataset.tab) { S.dataTab = t.dataset.tab; renderStep(); if (t.dataset.tab === 'search') $('#q')?.focus(); return; }
     if (t.dataset.geo) { S.search.geo = t.dataset.geo; document.querySelectorAll('[data-geo]').forEach(b => b.classList.toggle('active', b === t)); const el = $('#localResults'); if (el) el.innerHTML = localResultsHTML(); return; }
     if (t.dataset.topic) { S.topic = t.dataset.topic; renderStep(); return; }
@@ -804,6 +823,34 @@
   ACTIONS.resetBg = () => { o.bg = ''; update(); renderStep(); };
   ACTIONS.resetAccent = () => { o.accent = ''; update(); renderStep(); };
 
+  // ---------- step: design (Simple mode) ----------
+  const SIMPLE_THEMES = ['newsroom', 'clean', 'midnight', 'civic'], SIMPLE_PALS = ['plainsight', 'okabe', 'newsroom', 'usa'];
+  STEPS.design = () => {
+    if (!S.ds) return '<p class="muted">Pick data first.</p>';
+    const ds = S.ds, best = PS.defaultChart(ds);
+    const charts = PS.chartsFor(ds).sort((a, b) => (b.id === best) - (a.id === best)).slice(0, 4);
+    if (!charts.some(c => c.id === o.chart)) { const cur = PS.chartsFor(ds).find(c => c.id === o.chart); if (cur) charts[charts.length - 1] = cur; }
+    const T = PS.THEMES[o.theme];
+    let html = integrityBox();
+    if (S.combo) html += `<p class="muted">This chart compares datasets. Switch to <button class="linkbtn" data-mode-go="advanced">Advanced</button> to change how they're combined.</p>`;
+    else html += `<h3>Chart</h3><div class="chart-mini">${charts.map(c => `<button class="chart-opt ${o.chart === c.id ? 'active' : ''}" data-chart="${c.id}"><svg viewBox="0 0 24 24"><path d="${c.icon}"/></svg><b>${c.name}${best === c.id ? ' <span class="badge">Best fit</span>' : ''}</b></button>`).join('')}</div>`;
+    html += `<h3>Look</h3><div class="grid3 grid4">${SIMPLE_THEMES.filter(id => PS.THEMES[id]).map(id => { const t = PS.THEMES[id], pal = PS.PALETTES[o.palette === 'custom' ? 'plainsight' : o.palette][t.mode === 'dark' ? 'dark' : 'colors'];
+      return `<button class="theme-opt ${o.theme === id ? 'active' : ''}" data-theme="${id}"><div class="sw" style="background:${t.bg}">${pal.slice(0, 4).map((c, i) => `<i style="background:${c};height:${10 + i * 5}px"></i>`).join('')}</div><b style="font-family:'${t.head}'">${t.name}</b></button>`; }).join('')}</div>`;
+    html += `<h3>Colors</h3><div class="pal-mini">${SIMPLE_PALS.filter(id => PS.PALETTES[id]).map(id => { const p = PS.PALETTES[id], cs = p[T.mode === 'dark' ? 'dark' : 'colors'];
+      return `<button class="pal ${o.palette === id ? 'active' : ''}" data-pal="${id}"><span class="strip">${cs.slice(0, 5).map(c => `<i style="background:${c}"></i>`).join('')}</span><b>${p.name}</b></button>`; }).join('')}</div>`;
+    html += `<h3>Words</h3>
+      ${field('Title', `<input type="text" data-k="title" value="${esc(o.title)}">`)}
+      ${field('Subtitle', `<input type="text" data-k="subtitle" value="${esc(o.subtitle)}">`)}
+      ${check('takeaway', 'Show the takeaway (what the data shows)')}
+      <details class="mini-details"><summary>Edit the takeaway wording</summary>${field('', `<textarea data-k="takeawayText" placeholder="${esc(S.analysis?.headline || '')}">${esc(o.takeawayText)}</textarea><p class="muted">Leave blank to use the computed takeaway. Every number must match the data.</p>`)}</details>
+      ${o.format === 'video' ? check('captions', 'Captions on the video (most people watch muted)') : ''}
+      ${field('Your handle (optional)', `<input type="text" data-k="handle" value="${esc(o.handle)}" placeholder="@yourhandle">`)}
+      <button class="btn" data-act="resetStory">Reset words to suggested</button>
+      <p class="muted" style="margin-top:14px">The source is always shown on the chart. Want fonts, custom colors, time ranges, voiceover or comparisons? <button class="linkbtn" data-mode-go="advanced">Switch to Advanced</button></p>
+      <button class="btn primary block" data-step-go="export" style="margin-top:8px">Next: Share →</button>`;
+    return html;
+  };
+
   // ---------- step: story ----------
   const fitText = () => {
     const sec = PS.scriptSeconds(o.script);
@@ -887,7 +934,7 @@
     const b = S.integrity?.blocks || [];
     if (!b.length) return '';
     return `<div class="integrity"><b>Export is paused: your text doesn't match the data</b>${b.map(x => `<p><b>${esc(x.title)}.</b> ${esc(x.detail)}</p><button class="btn" data-act="${x.fix.act}" data-field="${x.fix.field || ''}">${esc(x.fix.label)}</button>`).join('')}
-      <p class="muted">Civic Charts checks your title, subtitle, takeaway, script and notes against the data so the tool can't be used to misstate it. Edit the text in Story, or use the suggestion.</p></div>`;
+      <p class="muted">Civic Charts checks your title, subtitle, takeaway, script and notes against the data so the tool can't be used to misstate it. Edit the text in ${SIMPLE() ? 'Design' : 'Story'}, or use the suggestion.</p></div>`;
   }
   const blocked = () => (S.integrity?.blocks.length || 0) > 0;
   STEPS.export = () => {
@@ -902,15 +949,18 @@
     // Websites want landscape: a phone-shaped size embeds as 16:9.
     const embedP = ['vertical', 'reels', 'pin', 'feed'].includes(o.platform) ? 'landscape' : o.platform;
     const embed = PS.embedCode(PS.shareLink(S.ds.id, { ...o, platform: embedP }, S.state, DEFAULTS, autoOpts()), PS.PLATFORMS[embedP], o.title || S.ds.title);
+    const adv = !SIMPLE();
+    const sizes = Object.entries(PS.PLATFORMS).filter(([id]) => adv || SIMPLE_SIZES.includes(id) || id === o.platform);
     return integrityBox() + `<h3>Format</h3><div class="tabs">${[['video', 'Video'], ['image', 'Image']].map(([k, l]) => `<button data-fmt="${k}" class="${o.format === k ? 'active' : ''}">${l}</button>`).join('')}</div>
-      <h3>Size</h3><div class="chips">${Object.entries(PS.PLATFORMS).map(([id, p]) => `<button class="chip ${o.platform === id ? 'active' : ''}" data-platform-x="${id}">${p.ratio} · ${esc(p.name)}</button>`).join('')}</div>
+      <h3>Size</h3><div class="chips">${sizes.map(([id, p]) => `<button class="chip ${o.platform === id ? 'active' : ''}" data-platform-x="${id}">${p.ratio} · ${esc(p.name)}</button>`).join('')}</div>
       <p class="muted">${P.w}×${P.h}px. Content stays inside the platform's safe area; toggle "Safe zones" under the preview to see it.</p>
-      ${o.format === 'video' ? field('Length', range('duration', 6, 90), o.duration + 's') + `<p class="muted">${P.dur}s is the sweet spot for ${esc(P.name.split(':')[0])}.</p>` : ''}
+      ${o.format === 'video' && adv ? field('Length', range('duration', 6, 90), o.duration + 's') + `<p class="muted">${P.dur}s is the sweet spot for ${esc(P.name.split(':')[0])}.</p>` : ''}
       <h3>Download</h3>
       ${o.format === 'video' ? `<button class="btn primary block" data-act="video" ${mime && !blocked() ? '' : 'disabled'}>Export video${mime ? ` (${mime.startsWith('video/mp4') ? 'MP4' : 'WebM'})` : ''}</button>
         <div class="progress" id="exportProgress"><i></i></div><button class="btn block" id="cancelExport" data-act="cancel" hidden style="margin-top:6px">Cancel</button>
         <p class="muted">Renders in real time (${o.duration}s). Keep this tab visible while it records.${S.audio ? ' Includes your voiceover.' : ''}</p>` : ''}
       <button class="btn ${o.format === 'image' ? 'primary' : ''} block" data-act="png" style="margin-top:6px" ${dis}>Export PNG (final frame, with source details embedded)</button>
+      ${adv ? '' : '<details class="mini-details more-formats"><summary>More formats: slides, PDF, data, embed</summary>'}
       <button class="btn block" data-act="carousel" style="margin-top:6px" ${dis}>LinkedIn carousel (4-page PDF)</button>
       ${o.format === 'video' && o.captions ? `<button class="btn block" data-act="srt" style="margin-top:6px" ${dis}>Captions file (.srt) for LinkedIn and Facebook</button>` : ''}
       <h3>Presentations and reports</h3>
@@ -923,6 +973,7 @@
       <h3>Embed on a website</h3>
       ${embed ? `<textarea id="embedCode" readonly style="min-height:80px;font-family:var(--mono, monospace);font-size:12px">${esc(embed)}</textarea><button class="btn block" data-act="copyEmbed" ${dis}>Copy embed code</button>
       <p class="muted">Paste into any site or CMS. ${embedP !== o.platform ? 'Embeds use 16:9 for web pages. ' : ''}The embed rebuilds from the latest official data on every visit, so it stays current, and it flags itself if your text no longer matches a newer release.</p>` : '<p class="muted">Uploaded data can\'t be embedded; export an image instead.</p>'}
+      ${adv ? '' : '</details>'}
       <h3>Share</h3>
       ${S.lastExport ? `<p class="muted">Ready to share: ${esc(S.lastExport.name)}</p>` : '<p class="muted">Export a video or image first, then share it here.</p>'}
       <button class="btn primary block" data-act="shareApps" ${S.lastExport && !blocked() ? '' : 'disabled'}>Share to apps (LinkedIn, Facebook, Instagram…)</button>
@@ -938,7 +989,7 @@
       <h3>Alt text</h3><textarea id="altText" style="min-height:90px">${esc(PS.altText(ds, S.analysis, { ...o, title: o.title || S.ds.title }))}</textarea>
       <button class="btn block" data-act="copyAlt">Copy alt text</button><p class="muted">Paste into the platform's alt text field. It makes the chart readable to screen readers, and platforms use it to understand the post.</p>
       <h3>Share link</h3>${link ? `<input type="text" id="shareLink" readonly value="${esc(link)}"><button class="btn block" data-act="copyLink" style="margin-top:6px">Copy link</button><p class="muted">Opens this exact chart, rebuilt from the official data, so anyone can check that what they saw matches the source.</p>` : '<p class="muted">Uploaded data can\'t be rebuilt from a link.</p>'}
-      <h3>Project</h3><div class="row"><button class="btn" data-act="saveProject">Save project</button><button class="btn" data-act="openProject">Open project</button></div>
+      ${adv ? `<h3>Project</h3><div class="row"><button class="btn" data-act="saveProject">Save project</button><button class="btn" data-act="openProject">Open project</button></div>` : ''}
       <input type="file" id="projFile" accept=".json" hidden>`;
   };
   AFTER.export = () => {
@@ -1028,9 +1079,11 @@
 
   // ---------- boot ----------
   const EMBED = new URLSearchParams(location.search).get('embed') === '1';
-  PS.ctx = () => ({ dataset_id: S.ds?.id, chart_type: o.chart, size: o.platform, format: o.format, state: S.state || undefined });
+  PS.ctx = () => ({ ui_mode: S.mode, dataset_id: S.ds?.id, chart_type: o.chart, size: o.platform, format: o.format, state: S.state || undefined });
   if (EMBED) document.body.classList.add('embed');
   (async function boot() {
+    let m0 = 'simple'; try { m0 = localStorage.getItem('cc-mode') || 'simple'; } catch { }
+    setMode(new URLSearchParams(location.search).get('mode') || m0, { quiet: true });
     renderPlatforms();
     S.catalog = await PS.loadCatalog();
     const fonts = ['Inter', 'Source Serif 4', 'Archivo', 'IBM Plex Mono'].flatMap(f => [400, 600, 700, 800].map(w => document.fonts.load(`${w} 40px "${f}"`)));
