@@ -18,8 +18,8 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with: { node-version: 22, cache: npm }
       - run: npm ci
       - name: Pull latest data from official sources
@@ -38,9 +38,22 @@ jobs:
         run: |
           git config user.name "civiccharts-bot"
           git config user.email "civiccharts-bot@users.noreply.github.com"
-          git add public/data public/sources
-          git diff --cached --quiet || git commit -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
-          git pull --rebase origin main && git push
+          # Save only the files this run changed, on top of the latest main. If another run
+          # pushed meanwhile, start again from its commit instead of merging JSON (which
+          # conflicts); a source that failed here keeps the other run's newer copy.
+          changed=$(git status --porcelain public/data public/sources | awk '{print $2}')
+          [ -z "$changed" ] && { echo "No data changes"; exit 0; }
+          tmp=$(mktemp -d); for f in $changed; do mkdir -p "$tmp/$(dirname "$f")"; cp "$f" "$tmp/$f"; done
+          for attempt in 1 2 3; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            (cd "$tmp" && find . -type f) | while read f; do cp "$tmp/$f" "$f"; done
+            git add -- $changed
+            git diff --cached --quiet && { echo "Already up to date"; exit 0; }
+            git commit -q -m "Data refresh $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push -q origin HEAD:main && exit 0
+            echo "Push raced another run; retrying ($attempt)"; sleep $((attempt * 5))
+          done
+          exit 1
       # Publishing is opt-in: enable Pages (Settings > Pages > Source: GitHub Actions),
       # then add a repository variable PAGES_ENABLED = true.
       - if: vars.PAGES_ENABLED == 'true'
