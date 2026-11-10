@@ -958,9 +958,13 @@
     const subj = encodeURIComponent(`Correction: ${o.title || S.ds?.title || 'Civic Charts'}`);
     const body = encodeURIComponent(`Chart: ${o.title || S.ds?.title || ''}\n${link ? 'Link: ' + link + '\n' : ''}\nWhat looks wrong:\n\n`);
     return `<div class="site-foot"><p><b>Spot an error?</b> Email <a data-contact="corrections" href="mailto:${PS.CONTACT.corrections}?subject=${subj}&body=${body}">${PS.CONTACT.corrections}</a>. We review every report and correct any errors we find.</p>
-      <p class="muted">Questions, ideas or data you'd like to see: <a data-contact="hello" href="mailto:${PS.CONTACT.hello}">${PS.CONTACT.hello}</a></p></div>`;
+      <p class="muted">Questions, ideas or data you'd like to see: <a data-contact="hello" href="mailto:${PS.CONTACT.hello}">${PS.CONTACT.hello}</a></p>
+      ${PS.SOCIAL.length ? `<p class="follow"><b>Follow Civic Charts:</b> ${PS.SOCIAL.map(s => `<a data-social="${s.id}" href="${s.url}" target="_blank" rel="noopener me">${s.name}</a>`).join(' · ')}</p>` : ''}</div>`;
   }
-  $('#insight').addEventListener('click', e => { const a = e.target.closest('a[data-contact]'); if (a) PS.track('contact', { contact_type: a.dataset.contact }); });
+  $('#insight').addEventListener('click', e => {
+    const a = e.target.closest('a[data-contact]'); if (a) PS.track('contact', { contact_type: a.dataset.contact });
+    const f = e.target.closest('a[data-social]'); if (f) PS.track('follow_click', { network: f.dataset.social });
+  });
 
   function actionBtn(a) {
     if (a.type === 'dataset') {

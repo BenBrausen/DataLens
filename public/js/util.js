@@ -183,6 +183,17 @@ window.PS = window.PS || {};
   // safe: fraction insets {t,r,b,l} that keep content clear of platform UI overlays.
   // Printed on every export so reposted charts lead back to the source of truth.
   PS.SITE = 'civiccharts.com';
+  // Official social accounts. A link shows on the site only once its URL is filled in.
+  PS.SOCIAL = [
+    ['facebook', 'Facebook', 'https://www.facebook.com/profile.php?id=61596267393158'],
+    ['instagram', 'Instagram', ''],
+    ['threads', 'Threads', ''],
+    ['tiktok', 'TikTok', ''],
+    ['youtube', 'YouTube', ''],
+    ['linkedin', 'LinkedIn', ''],
+    ['x', 'X', ''],
+    ['bluesky', 'Bluesky', ''],
+  ].filter(s => s[2]).map(([id, name, url]) => ({ id, name, url }));
   PS.CONTACT = { hello: 'hello@civiccharts.com', corrections: 'corrections@civiccharts.com' };
 
   PS.PLATFORMS = {
