@@ -272,3 +272,8 @@ body.embed .transport { padding: 2px 10px 2px 2px; border: 0; background: none; 
 .flag.nofile { background: rgba(239,107,107,.14); color: #b42318; }
 :root[data-theme="dark"] .flag.stale { color: var(--warn); } :root[data-theme="dark"] .flag.nofile { color: var(--bad); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .flag.stale { color: var(--warn); } :root:not([data-theme="light"]) .flag.nofile { color: var(--bad); } }
+
+/* corrections & contact */
+.site-foot { margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12.5px; }
+.site-foot p { margin: 0 0 6px; }
+.site-foot a { color: var(--accent); }

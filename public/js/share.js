@@ -183,6 +183,7 @@
     const rows = [{ text: k.unverified ? `Data provided by the presenter (${ds.source.dataset}); not verified by Civic Charts.` : `${k.source}. Retrieved ${k.retrieved}.`, options: { breakLine: true, paraSpaceAfter: 10 } }];
     if (k.url) rows.push({ text: k.url, options: { hyperlink: { url: k.url }, color: accent, fontSize: 15, breakLine: true, paraSpaceAfter: 14 } });
     k.caveats.forEach(c => rows.push({ text: c, options: { bullet: { indent: 18 }, color: muted, fontSize: 15, breakLine: true, paraSpaceAfter: 8 } }));
+    rows.push({ text: `Spot an error? ${PS.CONTACT.corrections}`, options: { hyperlink: { url: `mailto:${PS.CONTACT.corrections}` }, color: muted, fontSize: 14, breakLine: true, paraSpaceAfter: 10 } });
     rows.push({ text: 'Every number in this deck comes from the source data. Nothing is estimated by AI.', options: { breakLine: true, paraSpaceAfter: 10 } });
     if (k.link) rows.push({ text: 'Rebuild this chart from the official data', options: { hyperlink: { url: k.link }, color: accent, fontSize: 15, breakLine: true } });
     s4.addText(rows, { x: 0.85, y: 1.45, w: 11.9, h: 5.2, fontFace: face, fontSize: 18, color: ink, valign: 'top' });
@@ -218,6 +219,7 @@
       heading('Source');
       para(k.unverified ? `Data provided by the creator (${ds.source.dataset}); not verified by Civic Charts.` : `${k.source}. Retrieved ${k.retrieved}.`, { size: 9.5 });
       if (k.url) { if (!dry) { doc.setTextColor(...rgb); doc.setFontSize(9.5); doc.textWithLink(latin(k.url).slice(0, 110), M, y, { url: k.url, baseline: 'top' }); } y += 16; }
+      para(`Spot an error? ${PS.CONTACT.corrections}`, { size: 9, color: [91, 100, 112], gap: 4 });
     };
     y = 0; body(); const textH = y;
     // Chart takes the full width unless that would push the text off the page (min 55% width).

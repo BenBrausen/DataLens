@@ -183,6 +183,7 @@ window.PS = window.PS || {};
   // safe: fraction insets {t,r,b,l} that keep content clear of platform UI overlays.
   // Printed on every export so reposted charts lead back to the source of truth.
   PS.SITE = 'civiccharts.com';
+  PS.CONTACT = { hello: 'hello@civiccharts.com', corrections: 'corrections@civiccharts.com' };
 
   PS.PLATFORMS = {
     // 9:16 safe area is the union of TikTok, Instagram/Facebook Reels and Stories, and

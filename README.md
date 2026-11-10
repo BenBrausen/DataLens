@@ -2,7 +2,7 @@
 
 Turn official public data into honest, animated charts and maps, sized for any platform.
 
-**Live:** https://civiccharts.com/
+**Live:** https://civiccharts.com/ · Contact: hello@civiccharts.com · Corrections: corrections@civiccharts.com
 
 **Open data API** (no key, refreshed every 6 hours):
 - Catalog of every ready-made dataset: https://civiccharts.com/data/catalog.json

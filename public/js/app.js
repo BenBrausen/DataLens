@@ -949,8 +949,19 @@
       <h2>Trust check</h2><div class="trust-score"><b>${pass}</b> passed · <b>${warn}</b> to review${S.integrity?.blocks.length ? ` · <b class="bad">${S.integrity.blocks.length}</b> blocking export` : ''}</div>
       <ul class="checks">${a.checks.map(c => `<li><span class="ic ${c.level}">${c.level === 'pass' ? '✓' : c.level === 'warn' ? '!' : c.level === 'block' ? '✕' : 'i'}</span><div><b>${esc(c.title)}</b><p>${esc(c.detail)}</p>${c.action ? actionBtn(c.action) : ''}${c.fixAct ? `<button class="btn" data-act="${c.fixAct.act}" data-field="${c.fixAct.field || ''}">${esc(c.fixAct.label)}</button>` : ''}</div></li>`).join('')}</ul>
       <details><summary>View the data</summary>${table}</details>
-      ${ds.source.url ? `<p class="muted">Original source: <a href="${esc(ds.source.url)}" target="_blank" rel="noopener">${esc(ds.source.publisher)} ↗</a></p>` : ''}`;
+      ${ds.source.url ? `<p class="muted">Original source: <a href="${esc(ds.source.url)}" target="_blank" rel="noopener">${esc(ds.source.publisher)} ↗</a></p>` : ''}
+      ${siteFoot()}`;
   }
+  // Corrections and contact. The correction email arrives pre-filled with the chart and its link.
+  function siteFoot() {
+    const link = S.ds ? PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts()) : '';
+    const subj = encodeURIComponent(`Correction: ${o.title || S.ds?.title || 'Civic Charts'}`);
+    const body = encodeURIComponent(`Chart: ${o.title || S.ds?.title || ''}\n${link ? 'Link: ' + link + '\n' : ''}\nWhat looks wrong:\n\n`);
+    return `<div class="site-foot"><p><b>Spot an error?</b> Email <a data-contact="corrections" href="mailto:${PS.CONTACT.corrections}?subject=${subj}&body=${body}">${PS.CONTACT.corrections}</a>. We review every report and correct any errors we find.</p>
+      <p class="muted">Questions, ideas or data you'd like to see: <a data-contact="hello" href="mailto:${PS.CONTACT.hello}">${PS.CONTACT.hello}</a></p></div>`;
+  }
+  $('#insight').addEventListener('click', e => { const a = e.target.closest('a[data-contact]'); if (a) PS.track('contact', { contact_type: a.dataset.contact }); });
+
   function actionBtn(a) {
     if (a.type === 'dataset') {
       return a.ids.map(id => { const c = S.catalog.find(x => x.id === id); return c ? `<button class="btn" data-act="applyCheck" data-payload='${esc(JSON.stringify({ type: 'dataset', ids: [id] }))}'>Switch to: ${esc(c.lens || c.title)}</button> ` : ''; }).join('');
