@@ -183,7 +183,7 @@ window.PS = window.PS || {};
   // safe: fraction insets {t,r,b,l} that keep content clear of platform UI overlays.
   // Printed on every export so reposted charts lead back to the source of truth.
   PS.SITE = 'civiccharts.com';
-  // Official social accounts. A link shows on the site only once its URL is filled in.
+  // Official social accounts, in display order (X deliberately last). A link shows only once its URL is set.
   PS.SOCIAL = [
     ['facebook', 'Facebook', 'https://www.facebook.com/profile.php?id=61596267393158'],
     ['instagram', 'Instagram', 'https://www.instagram.com/civiccharts/'],
@@ -191,8 +191,8 @@ window.PS = window.PS || {};
     ['tiktok', 'TikTok', 'https://www.tiktok.com/@civiccharts'],
     ['youtube', 'YouTube', 'https://www.youtube.com/@civiccharts'],
     ['linkedin', 'LinkedIn', 'https://www.linkedin.com/company/civiccharts'],
-    ['x', 'X', 'https://x.com/civiccharts'],
     ['bluesky', 'Bluesky', 'https://bsky.app/profile/civiccharts.com'],
+    ['x', 'X', 'https://x.com/civiccharts'],
   ].filter(s => s[2]).map(([id, name, url]) => ({ id, name, url }));
   PS.CONTACT = { hello: 'hello@civiccharts.com', corrections: 'corrections@civiccharts.com' };
 
