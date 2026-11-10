@@ -21,7 +21,8 @@
     PS.track?.('export', { export_kind: kind, file_type: n.split('.').pop() });
     return download(blob, name);
   };
-  PS.slug = s => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'civic-charts';
+  // "U.S. Unemployment Rate" -> "us-unemployment-rate": drop periods and apostrophes before dashing.
+  PS.slug = s => String(s).toLowerCase().replace(/[.'’]/g, '').replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'civic-charts';
 
   PS.exportPNG = (renderer, name) => new Promise(res => renderer.canvas.toBlob(b => { download(b, name + '.png'); res(); }, 'image/png'));
 

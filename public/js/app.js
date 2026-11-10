@@ -15,7 +15,7 @@
   const DEFAULTS = {
     chart: 'line', platform: 'vertical', format: 'video', duration: 20, theme: 'newsroom', palette: 'plainsight',
     customColors: ['#1d4e89', '#e4572e', '#29a36a', '#f2a541', '#7d5ba6', '#5c5c5c'], ramp: 'auto', headFont: 'theme', bodyFont: 'theme',
-    accent: '', bg: '', bgGradient: false, radius: 6, lineWidth: 5, grid: 'light', textScale: 1, annotate: true, zeroBase: true,
+    accent: '', bg: '', bgGradient: false, radius: 6, lineWidth: 5, grid: 'light', textScale: 1, titleStyle: 'title', annotate: true, zeroBase: true,
     series: [], entities: [], topN: 10, highlight: '', sortAsc: false, rangeStart: null, rangeEnd: null, handle: '', brand: true,
     motion: 'steady', takeaway: true, takeawayText: '', captions: true, script: '', scriptEdited: false, voice: '', speakPreview: false,
     kicker: '', title: '', subtitle: '', note: '', colorZero: false, focus: '', compareNational: true, titleEdited: false, minPop: 0, scope: '', compare: [], combineMethod: '',
@@ -44,9 +44,9 @@
   const stateInfo = () => { const r = PS.STATE_LIST.find(x => x[0] === S.state); return r ? { code: r[0], fips: r[1], name: r[2] } : null; };
   function autoTitle(ds) {
     const st = stateInfo();
-    if (o.focus && st && o.chart === 'line') return `${ds.title.replace(/ by state$/i, '')} in ${st.name}`;
-    if (st && ds.geo === 'us-counties') return `${ds.title} in ${st.name}`;
-    return ds.title;
+    const t = o.focus && st && o.chart === 'line' ? `${ds.title.replace(/ by state$/i, '')} in ${st.name}`
+      : st && ds.geo === 'us-counties' ? `${ds.title} in ${st.name}` : ds.title;
+    return o.titleStyle === 'sentence' ? t : PS.titleCase(t);
   }
   function palette() {
     const T = PS.THEMES[o.theme];
@@ -672,6 +672,7 @@
     const out = el.closest('.field')?.querySelector('output');
     if (out) out.textContent = OUTFMT[k] ? OUTFMT[k](v) : v;
     if (k === 'rangeStart' || k === 'rangeEnd') o.subtitle = autoSubtitle(S.ds);
+    if (k === 'titleStyle' && !o.titleEdited) o.title = autoTitle(S.ds);
     update({ panels: !['title', 'subtitle', 'kicker', 'handle', 'note'].includes(k) || true });
     if (el.dataset.rerender != null) renderStep();
     if (k === 'script') { const f = $('#scriptFit'); if (f) f.innerHTML = fitText(); }
@@ -793,6 +794,7 @@
     html += field('Corners', range('radius', 0, 24), OUTFMT.radius(o.radius));
     html += field('Line weight', range('lineWidth', 2, 12), o.lineWidth + 'px');
     html += field('Text size', range('textScale', 0.8, 1.3, 0.05), Math.round(o.textScale * 100) + '%');
+    html += field('Title style', select('titleStyle', [['title', 'Title Case'], ['sentence', 'Sentence case']]));
     html += field('Gridlines', select('grid', [['light', 'Light'], ['dashed', 'Dashed'], ['none', 'None']]));
     html += `<div class="row">${field('Headline font', select('headFont', Object.entries(PS.FONTS)))}${field('Body font', select('bodyFont', Object.entries(PS.FONTS)))}</div>`;
     html += `<h3>Background &amp; accent</h3><div class="row" style="align-items:flex-end">${field('Background', `<div class="row"><input type="color" data-k="bg" value="${o.bg || T.bg}"><button class="btn" data-act="resetBg" style="flex:none">Reset</button></div>`)}${field('Accent', `<div class="row"><input type="color" data-k="accent" value="${o.accent || palette()[0]}"><button class="btn" data-act="resetAccent" style="flex:none">Reset</button></div>`)}</div>`;
@@ -898,7 +900,7 @@
     const capTab = S.capTab || 'linkedin';
     const dis = blocked() ? 'disabled' : '';
     // Websites want landscape: a phone-shaped size embeds as 16:9.
-    const embedP = ['vertical', 'pin', 'feed'].includes(o.platform) ? 'landscape' : o.platform;
+    const embedP = ['vertical', 'reels', 'pin', 'feed'].includes(o.platform) ? 'landscape' : o.platform;
     const embed = PS.embedCode(PS.shareLink(S.ds.id, { ...o, platform: embedP }, S.state, DEFAULTS, autoOpts()), PS.PLATFORMS[embedP], o.title || S.ds.title);
     return integrityBox() + `<h3>Format</h3><div class="tabs">${[['video', 'Video'], ['image', 'Image']].map(([k, l]) => `<button data-fmt="${k}" class="${o.format === k ? 'active' : ''}">${l}</button>`).join('')}</div>
       <h3>Size</h3><div class="chips">${Object.entries(PS.PLATFORMS).map(([id, p]) => `<button class="chip ${o.platform === id ? 'active' : ''}" data-platform-x="${id}">${p.ratio} · ${esc(p.name)}</button>`).join('')}</div>

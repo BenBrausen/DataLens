@@ -192,14 +192,15 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 ## Sharing
 
 - **Sizes**
-  - 9:16 for TikTok, Instagram and Facebook Reels and Stories, and YouTube Shorts
+  - 9:16 for TikTok and YouTube Shorts (deep bottom margin for the caption and username overlay)
+  - 9:16 for Instagram Reels and Stories and Facebook Reels (content centered in the band the Instagram feed's crop shows, clear of the account name at the top)
   - 4:5 feed for Facebook, LinkedIn and Instagram
   - 1:1 for LinkedIn, X and Threads
   - 16:9 for YouTube, slides, web and broadcast
   - 3:2 for blogs, newsletters and reports
   - 1.91:1 link preview (1200×628) for LinkedIn, Facebook and X
   - 2:3 for Pinterest
-- **9:16 safe area:** content stays out of the union of every vertical platform's overlays (organic posts): top 13% for tabs and the Stories profile and progress bar, right 14% for the like, comment and share buttons, bottom 25% for the caption, username, sound and reply bar. Stills get the same margins, since Stories and TikTok photo posts are covered too. The "Safe zones" toggle under the preview labels each area. Paid ads add a CTA button and need more bottom room (about 35%).
+- **9:16 safe area (TikTok/Shorts):** content stays out of the union of those platforms' overlays (organic posts): top 13% for tabs and the Stories profile and progress bar, right 14% for the like, comment and share buttons, bottom 25% for the caption, username, sound and reply bar. Stills get the same margins, since Stories and TikTok photo posts are covered too. The "Safe zones" toggle under the preview labels each area. Paid ads add a CTA button and need more bottom room (about 35%).
 - **LinkedIn carousel:** a 4-page PDF document post. The pages are the chart, what the data shows, how to read it, and sources & method.
 - **Post text:** a version for each platform (LinkedIn, Facebook, X, Instagram, TikTok), with hashtags by topic, plus alt text.
 - **Captions file:** `.srt` captions for video, timed to match the burned-in captions. LinkedIn and Facebook accept them as uploads.

@@ -201,12 +201,22 @@ window.PS = window.PS || {};
     // YouTube Shorts overlays (organic posts): top tabs and the Stories profile bar,
     // the right-side action buttons, and the caption, username, sound and reply bar.
     // Applies to stills too, since Stories and TikTok photo posts get the same overlays.
-    vertical: { name: 'TikTok, Reels, Shorts, Stories', ratio: '9:16', w: 1080, h: 1920, dur: 20, uiOverlay: true,
+    vertical: { name: 'TikTok, YouTube Shorts', ratio: '9:16', w: 1080, h: 1920, dur: 20, uiOverlay: true,
       safe: { t: 0.13, r: 0.14, b: 0.25, l: 0.06 },
       zones: [
         { side: 't', label: 'Tabs, profile and progress bar (Stories)' },
         { side: 'r', label: 'Like, comment, share buttons' },
         { side: 'b', label: 'Caption, username, sound, reply bar' },
+      ] },
+    // Instagram Reels and Stories: the feed shows Reels cropped to about 4:5 with the account
+    // name over the top, and Stories put the profile and progress bar there. The bottom has
+    // less overlay than TikTok, so content sits centered in the band every view shows.
+    reels: { name: 'Instagram Reels & Stories, Facebook Reels', ratio: '9:16', w: 1080, h: 1920, dur: 20, uiOverlay: true,
+      safe: { t: 0.17, r: 0.12, b: 0.17, l: 0.06 },
+      zones: [
+        { side: 't', label: 'Account name, feed crop, Stories bar' },
+        { side: 'r', label: 'Like, comment, share buttons' },
+        { side: 'b', label: 'Feed crop, caption, reply bar' },
       ] },
     feed: { name: 'Feed: Facebook, LinkedIn, Instagram', ratio: '4:5', w: 1080, h: 1350, dur: 15, safe: { t: 0.05, r: 0.06, b: 0.05, l: 0.06 } },
     square: { name: 'Square: LinkedIn, X, Threads', ratio: '1:1', w: 1080, h: 1080, dur: 15, safe: { t: 0.05, r: 0.05, b: 0.05, l: 0.05 } },
@@ -214,6 +224,24 @@ window.PS = window.PS || {};
     link: { name: 'Link preview: LinkedIn, Facebook, X', ratio: '1.91:1', w: 1200, h: 628, dur: 15, safe: { t: 0.05, r: 0.04, b: 0.05, l: 0.04 } },
     report: { name: 'Blog, newsletter, report', ratio: '3:2', w: 1800, h: 1200, dur: 15, safe: { t: 0.05, r: 0.05, b: 0.05, l: 0.05 } },
     pin: { name: 'Pinterest', ratio: '2:3', w: 1000, h: 1500, dur: 15, safe: { t: 0.05, r: 0.06, b: 0.08, l: 0.06 } },
+  };
+
+  // AP-style Title Case: capitalize words of 4+ letters and all major words; keep short
+  // articles, conjunctions and prepositions lowercase unless first or last; leave acronyms
+  // and mixed-case tokens (U.S., GDP, CO₂, FY2026, iPhone) exactly as written.
+  const SMALL = new Set(['a', 'an', 'the', 'and', 'but', 'or', 'nor', 'for', 'so', 'yet', 'as', 'at', 'by', 'in', 'of', 'off', 'on', 'per', 'to', 'up', 'via', 'vs', 'vs.']);
+  PS.titleCase = s => {
+    const words = String(s).split(/(\s+)/);
+    const idx = words.map((w, i) => (/\S/.test(w) ? i : -1)).filter(i => i >= 0), first = idx[0], last = idx.at(-1);
+    return words.map((w, i) => {
+      if (!/\S/.test(w)) return w;
+      return w.split('-').map((part, j) => {
+        if (!/^[a-z]/.test(part) || /[A-Z]/.test(part.slice(1))) return part; // acronyms, numbers, mixed case
+        const bare = part.toLowerCase().replace(/[^a-z.]/g, '');
+        if (SMALL.has(bare) && i !== first && i !== last && j === 0) return part;
+        return part[0].toUpperCase() + part.slice(1);
+      }).join('-');
+    }).join('');
   };
 
   // ---------- text layout on canvas ----------

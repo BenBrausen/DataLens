@@ -14,7 +14,7 @@
   // ---------- share links: settings only, rebuilt from official data on open ----------
   const LINK_KEYS = ['chart', 'platform', 'format', 'duration', 'theme', 'palette', 'customColors', 'ramp', 'headFont', 'bodyFont', 'accent', 'bg', 'bgGradient', 'radius',
     'lineWidth', 'grid', 'textScale', 'annotate', 'zeroBase', 'series', 'entities', 'topN', 'highlight', 'sortAsc', 'rangeStart', 'rangeEnd', 'handle', 'brand', 'motion',
-    'takeaway', 'takeawayText', 'captions', 'kicker', 'title', 'subtitle', 'note', 'colorZero', 'minPop', 'compare', 'combineMethod', 'titleEdited'];
+    'takeaway', 'takeawayText', 'captions', 'titleStyle', 'kicker', 'title', 'subtitle', 'note', 'colorZero', 'minPop', 'compare', 'combineMethod', 'titleEdited'];
   const b64 = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   const unb64 = s => decodeURIComponent(escape(atob(s.replace(/-/g, '+').replace(/_/g, '/'))));
   // Only settings that differ from the defaults and from what the dataset suggests travel in the link.
