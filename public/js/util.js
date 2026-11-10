@@ -192,7 +192,7 @@ window.PS = window.PS || {};
     ['youtube', 'YouTube', ''],
     ['linkedin', 'LinkedIn', ''],
     ['x', 'X', ''],
-    ['bluesky', 'Bluesky', ''],
+    ['bluesky', 'Bluesky', 'https://bsky.app/profile/civiccharts.com'],
   ].filter(s => s[2]).map(([id, name, url]) => ({ id, name, url }));
   PS.CONTACT = { hello: 'hello@civiccharts.com', corrections: 'corrections@civiccharts.com' };
 
