@@ -83,18 +83,8 @@
   function spaced(ctx, px) { if ('letterSpacing' in ctx) ctx.letterSpacing = px + 'px'; }
 
   // ---------- captions ----------
-  function captionChunks(script) {
-    const words = script.split(/\s+/).filter(Boolean), chunks = [];
-    let cur = [];
-    for (const w of words) {
-      cur.push(w);
-      if (cur.length >= 7 || (/[.!?]$/.test(w) && cur.length >= 3) || (/,$/.test(w) && cur.length >= 5)) { chunks.push(cur.join(' ')); cur = []; }
-    }
-    if (cur.length) chunks.push(cur.join(' '));
-    const total = chunks.reduce((a, c) => a + c.split(' ').length, 0);
-    let acc = 0;
-    return chunks.map(c => { const n = c.split(' ').length; const r = { text: c, a: acc / total, b: (acc + n) / total }; acc += n; return r; });
-  }
+  // One caption splitter for burned-in captions and the .srt file (share.js), so they always match.
+  const captionChunks = script => PS.captionChunks(script);
 
   // ---------- main renderer ----------
   class Renderer {
