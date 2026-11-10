@@ -196,6 +196,9 @@ window.PS = window.PS || {};
   ].filter(s => s[2]).map(([id, name, url]) => ({ id, name, url }));
   PS.CONTACT = { hello: 'hello@civiccharts.com', corrections: 'corrections@civiccharts.com' };
 
+  // Which network's post text each size opens with: the first network in the size's name.
+  PS.POST_FOR = { vertical: 'tiktok', reels: 'instagram', feed: 'facebook', square: 'linkedin', landscape: 'youtube', link: 'linkedin', report: 'linkedin', pin: 'facebook' };
+
   PS.PLATFORMS = {
     // 9:16 safe area is the union of TikTok, Instagram/Facebook Reels and Stories, and
     // YouTube Shorts overlays (organic posts): top tabs and the Stories profile bar,

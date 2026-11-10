@@ -496,14 +496,14 @@
     if (t.dataset.tab) { S.dataTab = t.dataset.tab; renderStep(); if (t.dataset.tab === 'search') $('#q')?.focus(); return; }
     if (t.dataset.geo) { S.search.geo = t.dataset.geo; document.querySelectorAll('[data-geo]').forEach(b => b.classList.toggle('active', b === t)); const el = $('#localResults'); if (el) el.innerHTML = localResultsHTML(); return; }
     if (t.dataset.topic) { S.topic = t.dataset.topic; renderStep(); return; }
-    if (t.dataset.captab) { S.capTab = t.dataset.captab; renderStep(); return; }
+    if (t.dataset.captab) { S.capTab = t.dataset.captab; S.capTabFor = o.platform; renderStep(); return; }
     if (t.dataset.compose) { PS.track('share', { method: t.dataset.compose, content_type: 'chart' });
       if (gate()) return;
       const text = $('#postCaption')?.value || '', link = PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts());
       if (t.dataset.compose === 'reddit') {
         // Reddit: title goes into the composer; the source comment is copied for the first comment.
         const title = $('#redditTitle')?.value || `[OC] ${o.title || S.ds.title}`;
-        if (S.capTab === 'reddit') copy(text, 'Source comment copied. Post it as the first comment after your image.');
+        if (S.capTabShown === 'reddit') copy(text, 'Source comment copied. Post it as the first comment after your image.');
         window.open(PS.composerUrl('reddit', title, link), '_blank', 'noopener');
         return;
       }
@@ -661,7 +661,7 @@
     },
     cancel: () => S.abort?.abort(),
     copyRedditTitle: () => PS.track('copy', { what: 'post_text', network: 'reddit_title' }) || copy($('#redditTitle').value, 'Title copied.'),
-    copyCaption: () => PS.track('copy', { what: 'post_text', network: S.capTab || 'linkedin' }) || copy($('#postCaption').value, 'Post text copied.'),
+    copyCaption: () => PS.track('copy', { what: 'post_text', network: S.capTabShown || 'linkedin' }) || copy($('#postCaption').value, 'Post text copied.'),
     saveProject: () => PS.download(new Blob([JSON.stringify({ plainsight: 1, dataset: S.ds.id, options: o }, null, 1)], { type: 'application/json' }), PS.slug(o.title) + '.plainsight.json'),
     openProject: () => $('#projFile').click(),
     applyCheck: t => {
@@ -944,7 +944,9 @@
     const link = PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts());
     const ds = S.comboDs || viewOf(S.ds);
     const caps = PS.postCaptions(ds.combo ? { ...ds, topic: S.ds.topic } : { ...S.ds, topic: S.ds.topic }, S.analysis, { ...o, title: o.title || S.ds.title }, link);
-    const capTab = S.capTab || 'linkedin';
+    // A tab picked by hand sticks for this size; otherwise the post text matches the size's network.
+    const capTab = (S.capTabFor === o.platform && S.capTab) || PS.POST_FOR[o.platform] || 'linkedin';
+    S.capTabShown = capTab;
     const dis = blocked() ? 'disabled' : '';
     // Websites want landscape: a phone-shaped size embeds as 16:9.
     const embedP = ['vertical', 'reels', 'pin', 'feed'].includes(o.platform) ? 'landscape' : o.platform;
