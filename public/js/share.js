@@ -58,7 +58,9 @@
         read ? `How to read it: ${read}` : ''].filter(Boolean).join('\n\n'),
       // Descriptive, not a conclusion: "[OC] Unemployment rate by state, 1976–2026".
       redditTitle: cut(`[OC] ${o.title}${(/\d{4}\s*[–-]\s*\d{4}/.exec(o.subtitle || '') || [''])[0] && !/\d{4}\s*[–-]\s*\d{4}/.test(o.title) ? ', ' + /\d{4}\s*[–-]\s*\d{4}/.exec(o.subtitle)[0] : ''}`, 300),
-      youtube: [cut(o.title, 100), '', take, '', ...facts.map(f => '• ' + f), '', src, linkLine, '', `${T} #Shorts`].join('\n').replace(/\n{3,}/g, '\n\n'),
+      // YouTube: a short descriptive title (100 max, ~40 shows on Shorts) and a separate description.
+      youtubeTitle: cut(`${o.title}${(/\d{4}\s*[–-]\s*\d{4}/.exec(o.subtitle || '') || [''])[0] && !/\d{4}\s*[–-]\s*\d{4}/.test(o.title) ? ', ' + /\d{4}\s*[–-]\s*\d{4}/.exec(o.subtitle)[0] : ''}`, 100),
+      youtube: [take, '', ...facts.map(f => '• ' + f), read ? `\nHow to read it: ${read}` : '', '', src, linkLine, '', `${T} #Shorts`].join('\n').replace(/\n{3,}/g, '\n\n'),
     };
   };
   PS.captionChunks = script => {

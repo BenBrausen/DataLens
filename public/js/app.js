@@ -660,6 +660,7 @@
       S.exporting = false; t.disabled = false; $('#cancelExport').hidden = true; bar.style.width = '0'; S.p = 1; update({ panels: false });
     },
     cancel: () => S.abort?.abort(),
+    copyYtTitle: () => PS.track('copy', { what: 'post_text', network: 'youtube_title' }) || copy($('#ytTitle').value, 'Title copied.'),
     copyRedditTitle: () => PS.track('copy', { what: 'post_text', network: 'reddit_title' }) || copy($('#redditTitle').value, 'Title copied.'),
     copyCaption: () => PS.track('copy', { what: 'post_text', network: S.capTabShown || 'linkedin' }) || copy($('#postCaption').value, 'Post text copied.'),
     saveProject: () => PS.download(new Blob([JSON.stringify({ plainsight: 1, dataset: S.ds.id, options: o }, null, 1)], { type: 'application/json' }), PS.slug(o.title) + '.plainsight.json'),
@@ -982,6 +983,9 @@
       <p class="muted">On phones and Safari this opens your apps with the file and caption attached. Elsewhere, use a button below: the caption is copied and the composer opens; attach the downloaded file.</p>
       <div class="chips">${[['linkedin', 'LinkedIn'], ['facebook', 'Facebook'], ['x', 'X'], ['threads', 'Threads'], ['bluesky', 'Bluesky'], ['reddit', 'Reddit']].map(([k, l]) => `<button class="chip" data-compose="${k}" ${dis}>${l}</button>`).join('')}</div>
       <h3>Post text</h3><div class="tabs cap-tabs">${[['linkedin', 'LinkedIn'], ['facebook', 'Facebook'], ['x', 'X'], ['instagram', 'Instagram'], ['threads', 'Threads'], ['tiktok', 'TikTok'], ['youtube', 'YouTube'], ['bluesky', 'Bluesky'], ['reddit', 'Reddit']].map(([k, l]) => `<button data-captab="${k}" class="${capTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>
+      ${capTab === 'youtube' ? `<label class="lbl small">Title</label><input type="text" id="ytTitle" readonly value="${esc(caps.youtubeTitle)}">
+        <div class="row" style="margin:6px 0 10px"><button class="btn" data-act="copyYtTitle">Copy title</button><span class="muted" style="flex:none">${caps.youtubeTitle.length}/100</span></div>
+        <label class="lbl small">Description</label>` : ''}
       ${capTab === 'reddit' ? `<label class="lbl small">Title</label><input type="text" id="redditTitle" readonly value="${esc(caps.redditTitle)}">
         <div class="row" style="margin:6px 0 10px"><button class="btn" data-act="copyRedditTitle">Copy title</button><button class="btn" data-compose="reddit">Open Reddit</button></div>
         <p class="muted">Post as an <b>image</b> (4:5 Feed or 16:9 sizes read best in Reddit's feed). On r/dataisbeautiful, the [OC] tag is required, and the comment below must be posted within an hour or the post is removed.</p>
