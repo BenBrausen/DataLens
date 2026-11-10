@@ -193,7 +193,7 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 
 - **Sizes**
   - 9:16 for TikTok and YouTube Shorts (deep bottom margin for the caption and username overlay)
-  - 9:16 for Instagram Reels and Stories and Facebook Reels (content centered in the band the Instagram feed's crop shows, clear of the account name at the top)
+  - 9:16 for Instagram Reels and Stories and Facebook Reels (margins measured from screenshots: clear of the account name and feed crop at the top, and of the Reels tab's name, caption and Reply chip at the bottom)
   - 4:5 feed for Facebook, LinkedIn and Instagram
   - 1:1 for LinkedIn, X and Threads
   - 16:9 for YouTube, slides, web and broadcast

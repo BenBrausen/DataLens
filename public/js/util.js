@@ -210,14 +210,15 @@ window.PS = window.PS || {};
       ] },
     // Instagram Reels and Stories, measured from screenshots: the feed crops ~10% off the top
     // and ~11% off the bottom of a Reel and lays the account name over the top (to ~15%);
-    // Stories put the progress bar and name over the top ~7% and the reply bar over the
-    // bottom ~11%. Margins cover all three with a little room to spare.
+    // Stories cover the top ~7% and bottom ~11%; the Reels tab, where most Reels are watched,
+    // puts name, music and caption over the bottom ~22% (the Reply chip reaches ~27%, so 28%) and the
+    // action buttons over the right ~12%. Margins cover every view.
     reels: { name: 'Instagram Reels & Stories, Facebook Reels', ratio: '9:16', w: 1080, h: 1920, dur: 20, uiOverlay: true,
-      safe: { t: 0.16, r: 0.12, b: 0.13, l: 0.06 },
+      safe: { t: 0.16, r: 0.12, b: 0.28, l: 0.06 },
       zones: [
         { side: 't', label: 'Account name, feed crop, Stories bar' },
         { side: 'r', label: 'Like, comment, share buttons' },
-        { side: 'b', label: 'Feed crop, Story reply bar' },
+        { side: 'b', label: 'Name, music, caption (Reels tab)' },
       ] },
     feed: { name: 'Feed: Facebook, LinkedIn, Instagram', ratio: '4:5', w: 1080, h: 1350, dur: 15, safe: { t: 0.05, r: 0.06, b: 0.05, l: 0.06 } },
     square: { name: 'Square: LinkedIn, X, Threads', ratio: '1:1', w: 1080, h: 1080, dur: 15, safe: { t: 0.05, r: 0.05, b: 0.05, l: 0.05 } },
