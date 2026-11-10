@@ -188,7 +188,7 @@ window.PS = window.PS || {};
     ['facebook', 'Facebook', 'https://www.facebook.com/profile.php?id=61596267393158'],
     ['instagram', 'Instagram', 'https://www.instagram.com/civiccharts/'],
     ['threads', 'Threads', 'https://www.threads.com/@civiccharts'],
-    ['tiktok', 'TikTok', ''],
+    ['tiktok', 'TikTok', 'https://www.tiktok.com/@civiccharts'],
     ['youtube', 'YouTube', 'https://www.youtube.com/@civiccharts'],
     ['linkedin', 'LinkedIn', ''],
     ['x', 'X', 'https://x.com/civiccharts'],
