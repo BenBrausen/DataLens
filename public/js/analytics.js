@@ -4,7 +4,15 @@
 // Every event goes through PS.track, so this file is the full list of what's measured.
 (function (PS) {
   const ID = window.CC_GA_ID;
-  const on = !!ID && !/^(localhost|127\.)/.test(location.hostname) && !navigator.webdriver;
+  // Owner opt-out per browser: visit /?notrack=1 once on each device (?notrack=0 undoes it).
+  let optOut = false;
+  try {
+    const nt = new URLSearchParams(location.search).get('notrack');
+    if (nt === '1') localStorage.setItem('cc-notrack', '1'); else if (nt === '0') localStorage.removeItem('cc-notrack');
+    optOut = localStorage.getItem('cc-notrack') === '1';
+  } catch { }
+  const on = !!ID && !optOut && !/^(localhost|127\.)/.test(location.hostname) && !navigator.webdriver;
+  PS.trackingOff = optOut;
   window.dataLayer = window.dataLayer || [];
   function gtag() { dataLayer.push(arguments); }
   PS.ctx = () => ({}); // app.js replaces this with the current dataset, chart and size

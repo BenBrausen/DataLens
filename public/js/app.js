@@ -1022,6 +1022,8 @@
     if (window.ResizeObserver) new ResizeObserver(setTopH).observe(topbar);
   }
 
+  if (/[?&]notrack=[01]/.test(location.search)) setTimeout(() => toast(PS.trackingOff ? 'Analytics is off for this browser. Visit ?notrack=0 to turn it back on.' : 'Analytics is on again for this browser.'), 1200);
+
   // ---------- boot ----------
   const EMBED = new URLSearchParams(location.search).get('embed') === '1';
   PS.ctx = () => ({ dataset_id: S.ds?.id, chart_type: o.chart, size: o.platform, format: o.format, state: S.state || undefined });

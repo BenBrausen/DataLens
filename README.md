@@ -232,6 +232,8 @@ Off until a measurement ID is set: `window.CC_GA_ID = 'G-…'` in `public/index.
 | `export_blocked` | the claim check stopped an export | `blocked_checks` |
 | `load_external` / `upload_data` | data loaded from a portal, or a CSV uploaded | `publisher_host`, `platform` |
 
+To exclude your own visits, open `https://civiccharts.com/?notrack=1` once in each browser and device (stored in that browser; `?notrack=0` undoes it).
+
 Every event also carries `dataset_id`, `chart_type`, `size` and `format`. To report on these in GA4, register them under Admin → Custom definitions → Create custom dimension (scope: Event).
 
 The link-preview card (`public/og.png`, 2400×1260) is rendered from `scripts/og-card.html`.
