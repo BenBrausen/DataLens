@@ -190,7 +190,7 @@ window.PS = window.PS || {};
     ['threads', 'Threads', 'https://www.threads.com/@civiccharts'],
     ['tiktok', 'TikTok', 'https://www.tiktok.com/@civiccharts'],
     ['youtube', 'YouTube', 'https://www.youtube.com/@civiccharts'],
-    ['linkedin', 'LinkedIn', ''],
+    ['linkedin', 'LinkedIn', 'https://www.linkedin.com/company/civiccharts'],
     ['x', 'X', 'https://x.com/civiccharts'],
     ['bluesky', 'Bluesky', 'https://bsky.app/profile/civiccharts.com'],
   ].filter(s => s[2]).map(([id, name, url]) => ({ id, name, url }));

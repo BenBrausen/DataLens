@@ -51,6 +51,13 @@
       // Bluesky: 300 characters including the link.
       bluesky: (() => { const tail = `\n\nData: ${ds.source.publisher}${link ? '\n' + link : ''}`; return cut(take, 300 - tail.length) + tail; })(),
       // YouTube Shorts: title line (100 max), then the description.
+      // Reddit (r/dataisbeautiful and similar): an image post titled "[OC] ...", then a first
+      // comment citing the source and the tool. This text is that comment; the title is redditTitle.
+      reddit: [`Source: ${sourceText(ds)}${ds.source.url ? ' (' + ds.source.url + ')' : ''}. Retrieved ${PS.fmtRetrieved(ds.retrieved)}.`,
+        `Tool: Civic Charts (civiccharts.com), built directly from the official data.${link ? ' Rebuild or check this exact chart: ' + link : ''}`,
+        read ? `How to read it: ${read}` : ''].filter(Boolean).join('\n\n'),
+      // Descriptive, not a conclusion: "[OC] Unemployment rate by state, 1976–2026".
+      redditTitle: cut(`[OC] ${o.title}${(/\d{4}\s*[–-]\s*\d{4}/.exec(o.subtitle || '') || [''])[0] && !/\d{4}\s*[–-]\s*\d{4}/.test(o.title) ? ', ' + /\d{4}\s*[–-]\s*\d{4}/.exec(o.subtitle)[0] : ''}`, 300),
       youtube: [cut(o.title, 100), '', take, '', ...facts.map(f => '• ' + f), '', src, linkLine, '', `${T} #Shorts`].join('\n').replace(/\n{3,}/g, '\n\n'),
     };
   };
@@ -265,6 +272,7 @@
     threads: `https://www.threads.net/intent/post?text=${encodeURIComponent(text)}`,
     bluesky: `https://bsky.app/intent/compose?text=${encodeURIComponent(text)}`,
     facebook: link ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}` : 'https://www.facebook.com/',
-    reddit: link ? `https://www.reddit.com/submit?url=${encodeURIComponent(link)}` : 'https://www.reddit.com/submit',
+    // Opens an image post with the title filled in; the user attaches the exported image.
+    reddit: `https://www.reddit.com/submit?type=IMAGE&title=${encodeURIComponent(text)}`,
   }[platform]);
 })(window.PS);

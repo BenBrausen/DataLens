@@ -232,7 +232,8 @@ details summary { cursor: pointer; font-weight: 600; font-size: 13px; padding: 8
 .integrity > b { display: block; color: var(--bad); margin-bottom: 6px; font-size: 13px; }
 .integrity p { margin: 6px 0; }
 .integrity .btn { margin-bottom: 4px; }
-.cap-tabs { margin-bottom: 6px; }
+.cap-tabs { margin-bottom: 6px; flex-wrap: wrap; }
+.cap-tabs button { flex: 1 0 auto; padding: 6px 8px; }
 
 /* ---------- presentation exports ---------- */
 .export-grid { display: grid; gap: 6px; }
