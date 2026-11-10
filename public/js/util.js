@@ -186,12 +186,12 @@ window.PS = window.PS || {};
   // Official social accounts. A link shows on the site only once its URL is filled in.
   PS.SOCIAL = [
     ['facebook', 'Facebook', 'https://www.facebook.com/profile.php?id=61596267393158'],
-    ['instagram', 'Instagram', ''],
-    ['threads', 'Threads', ''],
+    ['instagram', 'Instagram', 'https://www.instagram.com/civiccharts/'],
+    ['threads', 'Threads', 'https://www.threads.com/@civiccharts'],
     ['tiktok', 'TikTok', ''],
-    ['youtube', 'YouTube', ''],
+    ['youtube', 'YouTube', 'https://www.youtube.com/@civiccharts'],
     ['linkedin', 'LinkedIn', ''],
-    ['x', 'X', ''],
+    ['x', 'X', 'https://x.com/civiccharts'],
     ['bluesky', 'Bluesky', 'https://bsky.app/profile/civiccharts.com'],
   ].filter(s => s[2]).map(([id, name, url]) => ({ id, name, url }));
   PS.CONTACT = { hello: 'hello@civiccharts.com', corrections: 'corrections@civiccharts.com' };

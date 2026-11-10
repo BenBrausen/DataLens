@@ -4,6 +4,8 @@ Turn official public data into honest, animated charts and maps, sized for any p
 
 **Live:** https://civiccharts.com/ · Contact: hello@civiccharts.com · Corrections: corrections@civiccharts.com
 
+Follow: [X](https://x.com/civiccharts) · [Instagram](https://www.instagram.com/civiccharts/) · [Threads](https://www.threads.com/@civiccharts) · [YouTube](https://www.youtube.com/@civiccharts) · [Bluesky](https://bsky.app/profile/civiccharts.com) · [Facebook](https://www.facebook.com/profile.php?id=61596267393158)
+
 **Open data API** (no key, refreshed every 6 hours):
 - Catalog of every ready-made dataset: https://civiccharts.com/data/catalog.json
 - One dataset: `https://civiccharts.com/data/<id>.json` (for example `us-unemployment`, `county-poverty`, `disasters`)
