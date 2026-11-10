@@ -918,7 +918,7 @@
       <button class="btn primary block" data-act="shareApps" ${S.lastExport && !blocked() ? '' : 'disabled'}>Share to apps (LinkedIn, Facebook, Instagram…)</button>
       <p class="muted">On phones and Safari this opens your apps with the file and caption attached. Elsewhere, use a button below: the caption is copied and the composer opens; attach the downloaded file.</p>
       <div class="chips">${[['linkedin', 'LinkedIn'], ['facebook', 'Facebook'], ['x', 'X'], ['threads', 'Threads'], ['bluesky', 'Bluesky'], ['reddit', 'Reddit']].map(([k, l]) => `<button class="chip" data-compose="${k}" ${dis}>${l}</button>`).join('')}</div>
-      <h3>Post text</h3><div class="tabs cap-tabs">${[['linkedin', 'LinkedIn'], ['facebook', 'Facebook'], ['x', 'X'], ['instagram', 'Instagram'], ['tiktok', 'TikTok']].map(([k, l]) => `<button data-captab="${k}" class="${capTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>
+      <h3>Post text</h3><div class="tabs cap-tabs">${[['linkedin', 'LinkedIn'], ['facebook', 'Facebook'], ['x', 'X'], ['instagram', 'Instagram'], ['threads', 'Threads'], ['tiktok', 'TikTok'], ['youtube', 'YouTube'], ['bluesky', 'Bluesky']].map(([k, l]) => `<button data-captab="${k}" class="${capTab === k ? 'active' : ''}">${l}</button>`).join('')}</div>
       <textarea id="postCaption" style="min-height:170px">${esc(caps[capTab])}</textarea>
       <div class="row"><button class="btn" data-act="copyCaption">Copy text</button><span class="muted" style="flex:none">${caps[capTab].length.toLocaleString()} characters</span></div>
       <h3>Alt text</h3><textarea id="altText" style="min-height:90px">${esc(PS.altText(ds, S.analysis, { ...o, title: o.title || S.ds.title }))}</textarea>

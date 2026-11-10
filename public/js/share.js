@@ -46,6 +46,12 @@
       x: (() => { const tail = `\n\nSource: ${ds.source.publisher}${link ? '\n' + link : ''}`; const room = 280 - (link ? 23 + 1 : 0) - `\n\nSource: ${ds.source.publisher}`.length; return cut(take, room) + tail; })(),
       instagram: cut([o.title, '', take, '', ...facts, '', `Data: ${sourceText(ds)}`, '', T].join('\n'), 2200),
       tiktok: cut(`${take} Data: ${ds.source.publisher}. ${T}`, 2200),
+      // Threads: 500 characters, one topic tag works best.
+      threads: (() => { const tail = `\n\nData: ${ds.source.publisher}${link ? '\n' + link : ''}`; const extra = (a.facts || []).map(f => f.text).find(t => !/^Latest:/.test(t)); return cut([take, extra ? '\n\n' + extra : ''].join(''), 500 - tail.length) + tail; })(),
+      // Bluesky: 300 characters including the link.
+      bluesky: (() => { const tail = `\n\nData: ${ds.source.publisher}${link ? '\n' + link : ''}`; return cut(take, 300 - tail.length) + tail; })(),
+      // YouTube Shorts: title line (100 max), then the description.
+      youtube: [cut(o.title, 100), '', take, '', ...facts.map(f => '• ' + f), '', src, linkLine, '', `${T} #Shorts`].join('\n').replace(/\n{3,}/g, '\n\n'),
     };
   };
   PS.captionChunks = script => {
