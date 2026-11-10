@@ -63,7 +63,17 @@
   };
   PS.captionChunks = script => {
     const words = script.split(/\s+/).filter(Boolean), chunks = []; let cur = [];
-    for (const w of words) { cur.push(w); if (cur.length >= 7 || (/[.!?]$/.test(w) && cur.length >= 3) || (/,$/.test(w) && cur.length >= 5)) { chunks.push(cur.join(' ')); cur = []; } }
+    // Never end a caption line on a small word ("…was 4.1% in"): carry it to the next chunk.
+    const weak = /^(a|an|the|and|or|but|of|in|on|at|to|by|for|from|with|as|its|their|than|per)$/i;
+    for (const w of words) {
+      cur.push(w);
+      const ends = /[.!?]$/.test(w) && !/^([A-Za-z]\.){2,}$/.test(w); // "U.S." and "D.C." don't end a sentence
+      if (cur.length >= 7 || (ends && cur.length >= 3) || (/,$/.test(w) && cur.length >= 5)) {
+        const carry = [];
+        while (cur.length > 2 && weak.test(cur[cur.length - 1])) carry.unshift(cur.pop());
+        chunks.push(cur.join(' ')); cur = carry;
+      }
+    }
     if (cur.length) chunks.push(cur.join(' '));
     const total = chunks.reduce((s, c) => s + c.split(' ').length, 0); let acc = 0;
     return chunks.map(c => { const n = c.split(' ').length; const r = { text: c, a: acc / total, b: (acc + n) / total }; acc += n; return r; });

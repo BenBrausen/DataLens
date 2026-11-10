@@ -208,15 +208,16 @@ window.PS = window.PS || {};
         { side: 'r', label: 'Like, comment, share buttons' },
         { side: 'b', label: 'Caption, username, sound, reply bar' },
       ] },
-    // Instagram Reels and Stories: the feed shows Reels cropped to about 4:5 with the account
-    // name over the top, and Stories put the profile and progress bar there. The bottom has
-    // less overlay than TikTok, so content sits centered in the band every view shows.
+    // Instagram Reels and Stories, measured from screenshots: the feed crops ~10% off the top
+    // and ~11% off the bottom of a Reel and lays the account name over the top (to ~15%);
+    // Stories put the progress bar and name over the top ~7% and the reply bar over the
+    // bottom ~11%. Margins cover all three with a little room to spare.
     reels: { name: 'Instagram Reels & Stories, Facebook Reels', ratio: '9:16', w: 1080, h: 1920, dur: 20, uiOverlay: true,
-      safe: { t: 0.17, r: 0.12, b: 0.17, l: 0.06 },
+      safe: { t: 0.16, r: 0.12, b: 0.13, l: 0.06 },
       zones: [
         { side: 't', label: 'Account name, feed crop, Stories bar' },
         { side: 'r', label: 'Like, comment, share buttons' },
-        { side: 'b', label: 'Feed crop, caption, reply bar' },
+        { side: 'b', label: 'Feed crop, Story reply bar' },
       ] },
     feed: { name: 'Feed: Facebook, LinkedIn, Instagram', ratio: '4:5', w: 1080, h: 1350, dur: 15, safe: { t: 0.05, r: 0.06, b: 0.05, l: 0.06 } },
     square: { name: 'Square: LinkedIn, X, Threads', ratio: '1:1', w: 1080, h: 1080, dur: 15, safe: { t: 0.05, r: 0.05, b: 0.05, l: 0.05 } },
