@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080" width="1080" height="1080">
+  <!-- Civic Charts avatar: a bar chart shaped like the Capitol. Mark stays inside the
+       central ~62% so circular crops on every platform keep it whole. -->
+  <rect width="1080" height="1080" fill="#2a78d6"/>
+  <g transform="translate(540 551) scale(1.12) translate(-540 -551)">
+  <g fill="#ffffff">
+    <!-- flag pole + flag -->
+    <rect x="532" y="236" width="16" height="96" rx="8"/>
+    <path d="M548 240 h70 l-18 21 l18 21 h-70 z" fill="#ffd36e"/>
+    <!-- dome and its base -->
+    <path d="M430 432 A110 110 0 0 1 650 432 Z"/>
+    <rect x="448" y="424" width="184" height="26" rx="8"/>
+    <!-- bars rising to the center -->
+    <rect x="262" y="604" width="70" height="226" rx="14" opacity=".62"/>
+    <rect x="352" y="528" width="70" height="302" rx="14" opacity=".8"/>
+    <rect x="442" y="466" width="196" height="364" rx="16"/>
+    <rect x="658" y="528" width="70" height="302" rx="14" opacity=".8"/>
+    <rect x="748" y="604" width="70" height="226" rx="14" opacity=".62"/>
+    <!-- base line -->
+    <rect x="236" y="846" width="608" height="20" rx="10"/>
+  </g>
+  <!-- columns on the center bar -->
+  <g fill="#2a78d6"><rect x="482" y="510" width="22" height="290" rx="11"/><rect x="529" y="510" width="22" height="290" rx="11"/><rect x="576" y="510" width="22" height="290" rx="11"/></g>
+  </g>
+</svg>
