@@ -662,9 +662,19 @@
     if (diverging) { const m = Math.max(-lo, hi); lo = -m; hi = m; }
     const norm = v => (v - lo) / (hi - lo || 1);
     const colorOf = v => (diverging ? st.div(v / hi) : st.ramp(norm(v)));
-    const land = C.w > C.h * 1.6;
-    const sideW = land ? C.w * 0.27 : 0;
-    const legendH = 74 * S, listH = land ? 0 : Math.min(230 * S, C.h * 0.26);
+    // Rankings beside the map when the map, sized to the available height, leaves a column
+    // wide enough for readable names (340px at 1080 wide); otherwise two columns under it.
+    const legendH = 74 * S, avail = C.h - 70 * S - legendH;
+    // Pick whichever layout draws the bigger map: beside (map capped so the column keeps
+    // 340px for names) or stacked (map full width, shorter by the lists' height).
+    const asp = G.w / G.h, stackListH = (36 + (C.h > 1000 * S ? 5 : 3) * 38 + 8) * S;
+    const sideMapW = Math.min(C.w * 0.66, avail * asp, C.w - 370 * S);
+    const stackMapW = Math.min(C.w, (avail - stackListH) * asp);
+    const land = C.w > C.h * 1.1 && sideMapW >= stackMapW;
+    const sideW = land ? C.w - sideMapW - 30 * S : 0;
+    // As many rows as fit: beside the map the lists may run down past the legend.
+    const nList = land ? Math.max(3, Math.min(5, Math.floor(((avail + legendH - 24 * S) / 2 - 36 * S) / (38 * S)))) : C.h > 1000 * S ? 5 : 3;
+    const listH = land ? 0 : (36 + nList * 38 + 8) * S;
     const mapBox = { x: C.x, y: C.y + 70 * S, w: C.w - sideW - (land ? 30 * S : 0), h: C.h - 70 * S - legendH - listH };
     const k = Math.min(mapBox.w / G.w, mapBox.h / G.h);
     const ox = mapBox.x + (mapBox.w - G.w * k) / 2, oy = mapBox.y + (mapBox.h - G.h * k) / 2;
@@ -694,7 +704,9 @@
     for (let i = 0; i <= 10; i++) g.addColorStop(i / 10, diverging ? st.div(i / 5 - 1) : st.ramp(i / 10));
     ctx.fillStyle = g; roundRect(ctx, lgX, lgY, lgW, 18 * S, Math.min(st.r, 9 * S)); ctx.fill();
     ctx.font = font(st, 400, 21 * S * st.ts); ctx.fillStyle = T.faint; ctx.textBaseline = 'top';
-    const lts = lgW < 420 * S ? [0, 0.5, 1] : [0, 0.25, 0.5, 0.75, 1];
+    // Five scale labels only if they fit side by side; otherwise low, middle, high.
+    const lblW = Math.max(...[0, 0.25, 0.5, 0.75, 1].map(t => ctx.measureText('≥' + fmt(lo + (hi - lo) * t, ds.unit, { short: true })).width));
+    const lts = lgW / 4 > lblW * 1.15 + 8 * S ? [0, 0.25, 0.5, 0.75, 1] : [0, 0.5, 1];
     lts.forEach((t, i) => {
       const last = i === lts.length - 1;
       ctx.textAlign = i === 0 ? 'left' : last ? 'right' : 'center';
@@ -705,7 +717,7 @@
     ctx.fillStyle = T.faint; ctx.fillText('No data', lgX + lgW + 56 * S, lgY - 2 * S);
     // ranked lists
     const ranked = ds.entities.filter(PS.rankable(o)).map(e => ({ e, v: vals.get(String(e.id)) })).filter(r => r.v != null).sort((a, b) => b.v - a.v);
-    const n = land ? 5 : 3;
+    const n = nList;
     const lists = [[ds.election ? 'Most Democratic' : 'Highest', ranked.slice(0, n)], [ds.election ? 'Most Republican' : 'Lowest', ranked.slice(-n).reverse()]];
     const drawList = (title, items, x, y, w) => {
       ctx.font = font(st, 700, 22 * S * st.ts); ctx.fillStyle = T.muted; spaced(ctx, 1.5 * S); ctx.fillText(title.toUpperCase(), x, y); spaced(ctx, 0);
@@ -716,10 +728,17 @@
         // Tight on space: "Madison County" -> "Madison" before truncating with an ellipsis.
         const valTxt = fmt(r.v, ds.unit, { short: true });
         ctx.font = font(st, 700, 24 * S * st.ts); const valW = ctx.measureText(valTxt).width;
-        ctx.font = font(st, 500, 24 * S * st.ts);
         const room = w - 30 * S - valW - 14 * S, full = r.e.name;
-        const nm = ctx.measureText(full).width <= room ? full : PS.fit(ctx, full.replace(/ (County|Parish|Borough|Census Area|Municipality|city)(?=,|$)/, ''), room);
-        ctx.fillText(nm, x + 30 * S, y);
+        // Readable before short: drop "County", then step the size down (to 19px), and only
+        // then truncate.
+        const short = full.replace(/ (County|Parish|Borough|Census Area|Municipality|city)(?=,|$)/, '');
+        let nm = null;
+        for (let fs = 24; fs >= 19 && !nm; fs--) {
+          ctx.font = font(st, 500, fs * S * st.ts);
+          if (ctx.measureText(full).width <= room) nm = full; else if (ctx.measureText(short).width <= room) nm = short;
+        }
+        if (!nm) nm = PS.fit(ctx, short, room);
+        ctx.fillText(nm, x + 30 * S, y + 2 * S);
         ctx.textAlign = 'right'; ctx.font = font(st, 700, 24 * S * st.ts); ctx.fillText(fmt(r.v, ds.unit, { short: true }), x + w, y);
         ctx.textAlign = 'left'; y += 38 * S;
       });

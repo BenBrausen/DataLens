@@ -4,6 +4,7 @@
   const esc = PS.esc;
   const canvas = $('#canvas');
   const renderer = new PS.Renderer(canvas);
+  PS._renderer = renderer; // handle for tests and debugging
 
   const S = {
     compareDs: new Map(), combo: null, comboKey: '', picker: null,
