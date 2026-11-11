@@ -211,6 +211,10 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 
 A switch in the top bar. **Simple** (the default for new visitors, remembered per browser) has three steps: Data (Popular, Topics, Search), Design (best-fit chart plus up to three alternatives, four looks, four palettes, title, subtitle, takeaway, captions, handle) and Share (five main sizes, video or image, share kit; slides, PDF, CSV and embed under "More formats"). **Advanced** has every control: comparisons, time ranges, fonts, custom colors, map ramps, motion, voiceover, uploads, all sizes and projects. The source line, claim check and trust panel are the same in both. `?mode=simple` or `?mode=advanced` in a link opens a mode directly.
 
+## Picking up where you left off
+
+The chart being worked on (dataset, every setting, step, comparisons, post-text tab and scroll position) is saved in the browser as you go and restored on the next load, so a phone that reloads a backgrounded tab doesn't lose work. Share links and `?d=` links always take priority; embeds never overwrite it; saved state expires after 7 days. "Start over" (bottom of the Popular tab) clears it. Uploaded CSVs aren't saved.
+
 ## Finding data
 
 - **Popular** (the default tab): 16 plain-language questions ("How big is the national debt?", "Are prices still rising?"), each with its latest number and source, one tap to a ready-made chart. Picking a state turns state and county questions local. The list lives in `FEATURED` in `scripts/sources/catalog.mjs`. A "New data in the last two weeks" row appears when a dataset gets a new observation; the refresh job records when each dataset's latest observation first appeared (`released` in the catalog).

@@ -76,6 +76,7 @@
   // ---------- core update ----------
   function update({ relayout = true, panels = true } = {}) {
     if (!S.ds) return;
+    queueSave();
     let ds = viewOf(S.ds);
     // Overlay: combine the main dataset with the ones chosen to compare.
     S.combo = null; S.comboDs = null;
@@ -215,6 +216,7 @@
     $('#stepBody').innerHTML = STEPS[S.step]();
     $('#controls').scrollTop = 0;
     AFTER[S.step]?.();
+    queueSave();
   }
 
   const field = (label, inner, out = '') => `<div class="field"><label>${label}${out ? `<output>${out}</output>` : ''}</label>${inner}</div>`;
@@ -324,6 +326,7 @@
         return `<button class="pop ${active ? 'active' : ''}" data-ds="${c.id}"><b>${esc(st && c.geo ? q.replace('your state', st.name).replace('your county', `your ${st.name} county`) : q)}</b><span class="pop-val">${esc(latestText(c))}</span><span class="pop-src">${esc(c.source.publisher)}${local ? ' · ' + local : ''}</span></button>`;
       }).join('')}</div></div>`;
       body += `<button class="btn block" data-tab="search">Search all ${S.catalog.length} ready-made datasets, plus data.gov and state portals</button>`;
+      body += `<p class="muted" style="margin-top:10px">Your current chart and settings are saved in this browser. <button class="linkbtn" data-act="startOver">Start over</button></p>`;
     }
 
     else if (S.dataTab === 'topics') {
@@ -1084,6 +1087,27 @@
   if (/[?&]notrack=[01]/.test(location.search)) setTimeout(() => toast(PS.trackingOff ? 'Analytics is off for this browser. Visit ?notrack=0 to turn it back on.' : 'Analytics is on again for this browser.'), 1200);
 
   // ---------- boot ----------
+  // ---------- session: survive reloads ----------
+  // iOS Safari reloads tabs it put to sleep; keep the chart being worked on (dataset, every
+  // setting, step, compare picks, post-text tab, scroll) and restore it on the next load.
+  const SESSION_KEY = 'cc-session', SESSION_TTL = 7 * 864e5;
+  let saveT = null, sessionReady = false;
+  function saveSession() {
+    if (!sessionReady || EMBED || !S.ds || String(S.ds.id).startsWith('custom-')) return;
+    try {
+      const keep = { ...o }; delete keep.showSafe;
+      localStorage.setItem(SESSION_KEY, JSON.stringify({ v: 1, at: Date.now(), d: S.ds.id, s: S.state || '', o: keep, step: S.step, dataTab: S.dataTab, topic: S.topic,
+        capTab: S.capTab, capTabFor: S.capTabFor, q: S.search.q, scroll: $('#controls').scrollTop, winScroll: window.scrollY }));
+    } catch { }
+  }
+  function queueSave() { clearTimeout(saveT); saveT = setTimeout(saveSession, 400); }
+  addEventListener('pagehide', saveSession);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) saveSession(); });
+  function readSession() {
+    try { const j = JSON.parse(localStorage.getItem(SESSION_KEY)); return j && Date.now() - j.at < SESSION_TTL ? j : null; } catch { return null; }
+  }
+  ACTIONS.startOver = () => { sessionReady = false; clearTimeout(saveT); try { localStorage.removeItem(SESSION_KEY); } catch { } location.href = location.pathname; };
+
   const EMBED = new URLSearchParams(location.search).get('embed') === '1';
   PS.ctx = () => ({ ui_mode: S.mode, dataset_id: S.ds?.id, chart_type: o.chart, size: o.platform, format: o.format, state: S.state || undefined });
   if (EMBED) document.body.classList.add('embed');
@@ -1094,10 +1118,27 @@
     S.catalog = await PS.loadCatalog();
     const fonts = ['Inter', 'Source Serif 4', 'Archivo', 'IBM Plex Mono'].flatMap(f => [400, 600, 700, 800].map(w => document.fonts.load(`${w} 40px "${f}"`)));
     await Promise.race([Promise.allSettled(fonts), new Promise(r => setTimeout(r, 2500))]);
-    const shared = PS.readShareLink();
-    const start = shared?.d || new URLSearchParams(location.search).get('d') || 'us-unemployment';
+    const shared = PS.readShareLink(), qd = new URLSearchParams(location.search).get('d');
+    // A share link or ?d= always wins; otherwise pick up the last chart from this browser.
+    const saved = !shared && !qd && !EMBED ? readSession() : null;
+    const resume = saved && S.catalog.some(c => c.id === saved.d) ? saved : null;
+    const start = shared?.d || qd || resume?.d || 'us-unemployment';
     if (shared?.s) S.state = shared.s;
+    if (resume) S.state = resume.s || '';
     await selectDataset(S.catalog.some(c => c.id === start) ? start : S.catalog[0]?.id);
+    if (resume && S.ds?.id === resume.d) {
+      Object.assign(o, resume.o);
+      for (const id of o.compare || []) { try { S.compareDs.set(id, await PS.loadDataset(id)); } catch { } }
+      const steps = NAV[S.mode].map(([k]) => k);
+      S.step = steps.includes(resume.step) ? resume.step : SIMPLE() && ['chart', 'style', 'story'].includes(resume.step) ? 'design' : !SIMPLE() && resume.step === 'design' ? 'chart' : 'data';
+      Object.assign(S, { dataTab: resume.dataTab || S.dataTab, topic: resume.topic || S.topic, capTab: resume.capTab, capTabFor: resume.capTabFor });
+      S.search.q = resume.q || '';
+      if (SIMPLE() && ['sources', 'upload'].includes(S.dataTab)) S.dataTab = 'popular';
+      renderPlatforms(); update(); renderStep();
+      requestAnimationFrame(() => { $('#controls').scrollTop = resume.scroll || 0; if (resume.winScroll) scrollTo(0, resume.winScroll); });
+      toast(`Picked up where you left off: ${o.title || S.ds.title}`);
+    }
+    sessionReady = true; saveSession();
     if (shared && S.ds?.id === shared.d) {
       // Rebuild exactly what was shared, from the official data: settings only, never data.
       Object.assign(o, shared.o);
