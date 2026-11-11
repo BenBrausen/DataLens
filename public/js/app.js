@@ -164,7 +164,7 @@
   };
 
   // ---------- dataset selection ----------
-  async function selectDataset(id, { keepStory = false } = {}) {
+  async function selectDataset(id, { keepStory = false, keepUrl = false } = {}) {
     pause();
     let ds = S.custom.find(d => d.id === id);
     if (!ds) { try { ds = await PS.loadDataset(id); } catch (e) { toast(e.message); return; } }
@@ -187,6 +187,43 @@
     S.p = o.format === 'image' ? 1 : 1;
     $('#freshness').textContent = `${ds.source.publisher.replace(/^U\.S\. /, '')} · data through ${PS.fmtDate(ds.lastObservation, ds.frequency === 'real-time' ? 'daily' : ds.frequency)}`;
     update(); renderStep();
+    // Keep the address bar on the dataset's own page so reloads and copied URLs land here.
+    if (!keepUrl && !EMBED && !RENDER && !String(id).startsWith('custom-') && history.replaceState && location.pathname !== `/${id}/`) {
+      try { history.replaceState(null, '', `/${id}/` + location.search.replace(/([?&])d=[^&]*&?/, '$1').replace(/[?&]$/, '')); } catch { }
+      document.title = `${o.title || ds.title} | Civic Charts`;
+    }
+  }
+
+  // ---------- render hook (automation: ?render=1&d=<id>&size=<size>&format=image|video) ----------
+  // Exposes window.CC_RENDER with the chart's text kit and exports, produced by the same code
+  // and checks as a hand-made chart. Used by the dataset-page build and the auto-poster.
+  async function setupRender() {
+    const qs = new URLSearchParams(location.search), size = qs.get('size'), fmt = qs.get('format');
+    if (PS.PLATFORMS[size]) { o.platform = size; o.duration = PS.PLATFORMS[size].dur; }
+    if (fmt === 'image' || fmt === 'video') o.format = fmt;
+    if (PS.THEMES[qs.get('theme')]) o.theme = qs.get('theme');
+    o.showSafe = false; pause(); S.p = 1; update();
+    await document.fonts.ready; renderer.layout = null; update({ panels: false });
+    const ds = S.comboDs || S.ds, link = PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts());
+    const caps = PS.postCaptions(ds.combo ? { ...ds, topic: S.ds.topic } : { ...S.ds, topic: S.ds.topic }, S.analysis, { ...o, title: o.title || S.ds.title }, link);
+    const cat = S.catalog.find(c => c.id === S.ds.id) || {};
+    window.CC_RENDER = {
+      ready: true,
+      info: {
+        id: S.ds.id, title: o.title, subtitle: o.subtitle, headline: S.analysis.headline, facts: (S.analysis.facts || []).map(f => f.text),
+        howToRead: S.ds.howToRead || [], description: S.ds.description, topic: S.ds.topic, category: S.ds.category, geo: S.ds.geo || null,
+        source: S.ds.source, retrieved: S.ds.retrieved, lastObservation: S.ds.lastObservation, firstObservation: cat.firstObservation || null,
+        latestText: latestText(cat), released: cat.released || null, page: `${location.origin}/${S.ds.id}/`, link,
+        captions: caps, altText: PS.altText(ds, S.analysis, { ...o, title: o.title || S.ds.title }), blocked: (S.integrity?.blocks || []).map(b => b.title),
+        size: o.platform, width: PS.PLATFORMS[o.platform].w, height: PS.PLATFORMS[o.platform].h,
+      },
+      image: () => { renderer.draw(1); return renderer.canvas.toDataURL('image/png'); },
+      video: async () => {
+        const { blob, ext } = await PS.exportVideo({ renderer, duration: o.duration });
+        const b64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(String(fr.result).split(',')[1]); fr.readAsDataURL(blob); });
+        return { base64: b64, ext, type: blob.type };
+      },
+    };
   }
 
   // ---------- steps ----------
@@ -1093,7 +1130,7 @@
   const SESSION_KEY = 'cc-session', SESSION_TTL = 7 * 864e5;
   let saveT = null, sessionReady = false;
   function saveSession() {
-    if (!sessionReady || EMBED || !S.ds || String(S.ds.id).startsWith('custom-')) return;
+    if (!sessionReady || EMBED || RENDER || !S.ds || String(S.ds.id).startsWith('custom-')) return;
     try {
       const keep = { ...o }; delete keep.showSafe;
       localStorage.setItem(SESSION_KEY, JSON.stringify({ v: 1, at: Date.now(), d: S.ds.id, s: S.state || '', o: keep, step: S.step, dataTab: S.dataTab, topic: S.topic,
@@ -1106,9 +1143,12 @@
   function readSession() {
     try { const j = JSON.parse(localStorage.getItem(SESSION_KEY)); return j && Date.now() - j.at < SESSION_TTL ? j : null; } catch { return null; }
   }
-  ACTIONS.startOver = () => { sessionReady = false; clearTimeout(saveT); try { localStorage.removeItem(SESSION_KEY); } catch { } location.href = location.pathname; };
+  ACTIONS.startOver = () => { sessionReady = false; clearTimeout(saveT); try { localStorage.removeItem(SESSION_KEY); } catch { } location.href = '/'; };
 
   const EMBED = new URLSearchParams(location.search).get('embed') === '1';
+  const RENDER = new URLSearchParams(location.search).get('render') === '1';
+  // Dataset pages live at /<dataset-id>/ (built in CI; the dev server falls back to the app).
+  const PAGE_D = window.CC_PAGE?.d || (/^\/([a-z0-9-]+)\/?$/.exec(location.pathname) || [])[1] || null;
   PS.ctx = () => ({ ui_mode: S.mode, dataset_id: S.ds?.id, chart_type: o.chart, size: o.platform, format: o.format, state: S.state || undefined });
   if (EMBED) document.body.classList.add('embed');
   (async function boot() {
@@ -1118,14 +1158,16 @@
     S.catalog = await PS.loadCatalog();
     const fonts = ['Inter', 'Source Serif 4', 'Archivo', 'IBM Plex Mono'].flatMap(f => [400, 600, 700, 800].map(w => document.fonts.load(`${w} 40px "${f}"`)));
     await Promise.race([Promise.allSettled(fonts), new Promise(r => setTimeout(r, 2500))]);
-    const shared = PS.readShareLink(), qd = new URLSearchParams(location.search).get('d');
+    const shared = PS.readShareLink(), qd = new URLSearchParams(location.search).get('d') || (S.catalog.some(c => c.id === PAGE_D) ? PAGE_D : null);
     // A share link or ?d= always wins; otherwise pick up the last chart from this browser.
-    const saved = !shared && !qd && !EMBED ? readSession() : null;
-    const resume = saved && S.catalog.some(c => c.id === saved.d) ? saved : null;
+    // A dataset page restores your saved settings only if they're for that same dataset.
+    const saved = !shared && !EMBED && !RENDER ? readSession() : null;
+    const resume = saved && S.catalog.some(c => c.id === saved.d) && (!qd || saved.d === qd) ? saved : null;
     const start = shared?.d || qd || resume?.d || 'us-unemployment';
     if (shared?.s) S.state = shared.s;
     if (resume) S.state = resume.s || '';
-    await selectDataset(S.catalog.some(c => c.id === start) ? start : S.catalog[0]?.id);
+    // The homepage stays at / until a dataset is picked; links and saved work open their own page.
+    await selectDataset(S.catalog.some(c => c.id === start) ? start : S.catalog[0]?.id, { keepUrl: !shared && !qd && !resume });
     if (resume && S.ds?.id === resume.d) {
       Object.assign(o, resume.o);
       for (const id of o.compare || []) { try { S.compareDs.set(id, await PS.loadDataset(id)); } catch { } }
@@ -1138,13 +1180,14 @@
       requestAnimationFrame(() => { $('#controls').scrollTop = resume.scroll || 0; if (resume.winScroll) scrollTo(0, resume.winScroll); });
       toast(`Picked up where you left off: ${o.title || S.ds.title}`);
     }
+    if (RENDER) await setupRender();
     sessionReady = true; saveSession();
     if (shared && S.ds?.id === shared.d) {
       // Rebuild exactly what was shared, from the official data: settings only, never data.
       Object.assign(o, shared.o);
       for (const id of o.compare || []) { try { S.compareDs.set(id, await PS.loadDataset(id)); } catch { } }
       renderPlatforms(); update(); renderStep();
-      if (!EMBED) toast('Rebuilt from the official data.');
+      if (!EMBED && !RENDER) toast('Rebuilt from the official data.');
     }
     if (EMBED) {
       const ds = S.comboDs || S.ds, full = location.href.replace(/[?&]embed=1/, '');

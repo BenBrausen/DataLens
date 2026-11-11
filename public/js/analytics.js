@@ -11,7 +11,7 @@
     if (nt === '1') localStorage.setItem('cc-notrack', '1'); else if (nt === '0') localStorage.removeItem('cc-notrack');
     optOut = localStorage.getItem('cc-notrack') === '1';
   } catch { }
-  const on = !!ID && !optOut && !/^(localhost|127\.)/.test(location.hostname) && !navigator.webdriver;
+  const on = !!ID && !optOut && new URLSearchParams(location.search).get('render') !== '1' && !/^(localhost|127\.)/.test(location.hostname) && !navigator.webdriver;
   PS.trackingOff = optOut;
   window.dataLayer = window.dataLayer || [];
   function gtag() { dataLayer.push(arguments); }
@@ -37,7 +37,9 @@
   gtag('config', ID, {
     allow_google_signals: false, allow_ad_personalization_signals: false,
     // Share links carry chart settings in the hash; never send them. Keep only the path.
-    page_location: location.origin + location.pathname + (qs.get('d') ? `?d=${qs.get('d')}` : '') + (entry === 'embed' ? (qs.get('d') ? '&' : '?') + 'embed=1' : ''),
+    // Keep the dataset, embed flag and campaign tags (utm_*) so GA4 can attribute traffic by network.
+    page_location: (() => { const keep = new URLSearchParams(); for (const [k, v] of qs) if (k === 'd' || k === 'embed' || k.startsWith('utm_')) keep.set(k, v);
+      const q = keep.toString(); return location.origin + location.pathname + (q ? '?' + q : ''); })(),
     entry_type: entry, embed_host: entry === 'embed' ? refHost : undefined,
   });
   const s = document.createElement('script'); s.async = true; s.src = `https://www.googletagmanager.com/gtag/js?id=${ID}`; document.head.appendChild(s);

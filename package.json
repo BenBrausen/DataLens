@@ -22,5 +22,8 @@
     "us-atlas": "^3.0.1",
     "world-atlas": "^2.0.2"
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "playwright": "^1.63.0"
+  }
 }

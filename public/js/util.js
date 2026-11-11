@@ -185,7 +185,7 @@ window.PS = window.PS || {};
   PS.SITE = 'civiccharts.com';
   // Official social accounts, in display order (X deliberately last). A link shows only once its URL is set.
   PS.SOCIAL = [
-    ['facebook', 'Facebook', 'https://www.facebook.com/profile.php?id=61596267393158'],
+    ['facebook', 'Facebook', 'https://www.facebook.com/CivicCharts'],
     ['instagram', 'Instagram', 'https://www.instagram.com/civiccharts/'],
     ['threads', 'Threads', 'https://www.threads.com/@civiccharts'],
     ['tiktok', 'TikTok', 'https://www.tiktok.com/@civiccharts'],

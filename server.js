@@ -11,7 +11,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
-const PUB = path.join(ROOT, 'public');
+const PUB = process.env.SITE_DIR ? path.resolve(process.env.SITE_DIR) : path.join(ROOT, 'public');
 const PORT = +(process.env.PORT || 8080);
 const REFRESH_HOURS = +(process.env.REFRESH_HOURS ?? 6);
 const MAX_BYTES = 40 * 1024 * 1024;
@@ -72,8 +72,13 @@ const server = http.createServer(async (req, res) => {
     if (p.endsWith('/')) p += 'index.html';
     const file = path.join(PUB, p);
     if (!file.startsWith(PUB)) return send(res, 403, 'Forbidden');
-    let body = await fs.readFile(file);
-    if (p === '/index.html') body = Buffer.from(body.toString().replace('<!--INLINE_HEAD-->', '<script>window.PS_HAS_SERVER=true</script>'));
+    let body;
+    try { body = await fs.readFile(file); }
+    catch (e) {
+      // Dataset pages (/federal-debt/) are generated in CI; locally, serve the app for them.
+      if (e.code === 'ENOENT' && /^[\/\\][a-z0-9-]+[\/\\]index\.html$/.test(p)) body = await fs.readFile(path.join(PUB, 'index.html')); else throw e;
+    }
+    if (p.endsWith('/index.html')) body = Buffer.from(body.toString().replace('<!--INLINE_HEAD-->', '<script>window.PS_HAS_SERVER=true</script>'));
     send(res, 200, body, { 'Content-Type': TYPES[path.extname(file)] || 'application/octet-stream', 'Cache-Control': p.startsWith('/data/') ? 'no-cache' : 'public, max-age=300' });
   } catch (e) {
     if (e.code === 'ENOENT') return send(res, 404, 'Not found');

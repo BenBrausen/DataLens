@@ -1175,16 +1175,36 @@ function latestOf(ds) {
   }
   return null;
 }
-for (const f of (await fs.readdir(OUT)).filter(f => f.endsWith('.json') && f !== 'catalog.json')) {
+// A release is a new reporting period, not a later date in the same one (the Treasury debt
+// series moves daily within a month). Real-time feeds never count as releases.
+function periodKey(t, freq) {
+  const d = String(t || '');
+  if (freq === 'real-time') return null;
+  if (freq === 'monthly') return d.slice(0, 7);
+  if (freq === 'quarterly') return d.slice(0, 4) + 'Q' + (Math.floor((+d.slice(5, 7) - 1) / 3) + 1);
+  if (['annual', 'fiscal', 'quadrennial'].includes(freq)) return d.slice(0, 4);
+  return d.slice(0, 10);
+}
+// releases.json: a running list of genuinely new data (a new latest observation), newest first.
+// The site's RSS feed and the auto-poster read it.
+let releases = [];
+try { releases = JSON.parse(await fs.readFile(path.join(OUT, 'releases.json'), 'utf8')); } catch { }
+for (const f of (await fs.readdir(OUT)).filter(f => f.endsWith('.json') && f !== 'catalog.json' && f !== 'releases.json')) {
   const ds = JSON.parse(await fs.readFile(path.join(OUT, f), 'utf8'));
   const { series, entities, events, times, national, ...meta } = ds;
   const tag = DATASET_TAGS[meta.id] || {};
   const src = [...FEDERAL.map(f => ({ ...f, tier: 'federal' })), ...THIRD_PARTY].find(x => x.id === tag.source);
   const prev = prevById.get(meta.id);
-  const released = prev && prev.lastObservation !== meta.lastObservation ? NOW : prev?.released ?? null;
+  const pk = periodKey(meta.lastObservation, meta.frequency), isNew = !!(prev && pk && periodKey(prev.lastObservation, meta.frequency) !== pk);
+  const released = isNew ? NOW : pk ? prev?.released ?? null : null;
+  if (isNew) {
+    releases.unshift({ id: meta.id, title: meta.title, released: NOW, lastObservation: meta.lastObservation, previousObservation: prev.lastObservation,
+      latest: latestOf(ds), previous: prev.latest || null, unit: meta.unit, frequency: meta.frequency, topic: tag.topic || null, publisher: meta.source?.publisher || null });
+  }
   catalog.push({ ...meta, latest: latestOf(ds), released, hasNational: !!national, topic: tag.topic || 'economy', sourceId: tag.source || null, tier: tag.tier || src?.tier || 'federal', nSeries: series?.length, nEntities: entities?.length, nEvents: events?.length,
     firstObservation: times?.[0] ?? series?.[0]?.points?.[0]?.[0] ?? events?.[0]?.t });
 }
 catalog.sort((a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title));
 await fs.writeFile(path.join(OUT, 'catalog.json'), JSON.stringify(catalog, null, 1));
+await fs.writeFile(path.join(OUT, 'releases.json'), JSON.stringify(releases.slice(0, 200), null, 1));
 console.log(`catalog: ${catalog.length} datasets`);

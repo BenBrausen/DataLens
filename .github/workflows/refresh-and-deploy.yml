@@ -56,8 +56,16 @@ jobs:
           exit 1
       # Publishing is opt-in: enable Pages (Settings > Pages > Source: GitHub Actions),
       # then add a repository variable PAGES_ENABLED = true.
+      # Dataset pages (/federal-debt/ etc.), link-preview images, sitemap and RSS feed, built
+      # from the real app via its render hook. If this fails, the plain app still deploys.
+      - name: Build dataset pages, previews, sitemap and feed
+        continue-on-error: true
+        run: |
+          npx playwright install --with-deps chromium
+          node scripts/build-pages.mjs
+      - run: '[ -f _site/index.html ] || cp -r public _site'
       - if: vars.PAGES_ENABLED == 'true'
         uses: actions/upload-pages-artifact@v3
-        with: { path: public }
+        with: { path: _site }
       - if: vars.PAGES_ENABLED == 'true'
         uses: actions/deploy-pages@v4

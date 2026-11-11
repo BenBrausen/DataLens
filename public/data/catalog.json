@@ -685,16 +685,16 @@
   "caveats": [
    "Small quakes are detected far more often near dense sensor networks (like the U.S.), so the map over-represents those regions at low magnitudes."
   ],
-  "retrieved": "2026-11-11T16:01:52.048Z",
-  "lastObservation": "2026-11-11T15:39:25.949Z",
+  "retrieved": "2026-11-11T22:45:05.464Z",
+  "lastObservation": "2026-11-11T22:03:42.610Z",
   "latest": null,
-  "released": "2026-11-11T16:01:52.048Z",
+  "released": null,
   "hasNational": false,
   "topic": "environment",
   "sourceId": "usgs",
   "tier": "federal",
-  "nEvents": 1990,
-  "firstObservation": "2026-10-12T16:12:25.341Z"
+  "nEvents": 2001,
+  "firstObservation": "2026-10-12T23:20:36.005Z"
  },
  {
   "id": "county-disasters",
@@ -1381,7 +1381,7 @@
    "A growing economy and inflation make nominal debt rise almost every year. Debt as a share of GDP is the measure economists use to judge whether it is getting harder to carry."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-11T16:01:52.048Z",
+  "retrieved": "2026-11-11T22:44:56.902Z",
   "lastObservation": "2026-11-09",
   "latest": {
    "t": "2026-11-09",
@@ -1425,7 +1425,7 @@
    "GDP collapsed briefly in 2020, which spiked the ratio even before new borrowing showed up."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-11T16:01:52.048Z",
+  "retrieved": "2026-11-11T22:44:56.902Z",
   "lastObservation": "2026-04-01",
   "latest": {
    "t": "2026-04-01",
@@ -1468,7 +1468,7 @@
    "Inflation adjustment computed by Civic Charts with CPI-U."
   ],
   "kind": "timeseries",
-  "retrieved": "2026-11-11T16:01:52.048Z",
+  "retrieved": "2026-11-11T22:44:56.902Z",
   "lastObservation": "2026-10-30",
   "latest": {
    "t": "2026-10-30",

@@ -4,7 +4,7 @@ Turn official public data into honest, animated charts and maps, sized for any p
 
 **Live:** https://civiccharts.com/ · Contact: hello@civiccharts.com · Corrections: corrections@civiccharts.com
 
-Follow: [Instagram](https://www.instagram.com/civiccharts/) · [Threads](https://www.threads.com/@civiccharts) · [YouTube](https://www.youtube.com/@civiccharts) · [TikTok](https://www.tiktok.com/@civiccharts) · [LinkedIn](https://www.linkedin.com/company/civiccharts) · [Bluesky](https://bsky.app/profile/civiccharts.com) · [Facebook](https://www.facebook.com/profile.php?id=61596267393158) · [X](https://x.com/civiccharts)
+Follow: [Instagram](https://www.instagram.com/civiccharts/) · [Threads](https://www.threads.com/@civiccharts) · [YouTube](https://www.youtube.com/@civiccharts) · [TikTok](https://www.tiktok.com/@civiccharts) · [LinkedIn](https://www.linkedin.com/company/civiccharts) · [Bluesky](https://bsky.app/profile/civiccharts.com) · [Facebook](https://www.facebook.com/CivicCharts) · [X](https://x.com/civiccharts)
 
 **Open data API** (no key, refreshed every 6 hours):
 - Catalog of every ready-made dataset: https://civiccharts.com/data/catalog.json
@@ -210,6 +210,13 @@ Someone determined to mislead can still edit a file in another app. The goal is 
 ## Simple and Advanced modes
 
 A switch in the top bar. **Simple** (the default for new visitors, remembered per browser) has three steps: Data (Popular, Topics, Search), Design (best-fit chart plus up to three alternatives, four looks, four palettes, title, subtitle, takeaway, captions, handle) and Share (five main sizes, video or image, share kit; slides, PDF, CSV and embed under "More formats"). **Advanced** has every control: comparisons, time ranges, fonts, custom colors, map ramps, motion, voiceover, uploads, all sizes and projects. The source line, claim check and trust panel are the same in both. `?mode=simple` or `?mode=advanced` in a link opens a mode directly.
+
+## Dataset pages, render hook, releases feed
+
+- **Dataset pages.** Every dataset has its own address (`/federal-debt/`, `/state-unemployment/`), built in CI by `scripts/build-pages.mjs` into `_site/` after each refresh: its own title with the latest value, description, link-preview image (`/<id>/og.png`), schema.org Dataset markup for Google Dataset Search, and crawlable text (summary, facts, how to read it, source, related charts) that the app replaces once it loads. The homepage gets a crawlable list of every chart. `sitemap.xml` lists every page. The address bar follows the dataset you pick; share links point at the page and add `#c=` only for settings that differ.
+- **Render hook.** `/?d=<id>&render=1&size=<size>&format=image|video` loads a chart without analytics or saved state and exposes `window.CC_RENDER`: `info` (title, headline, facts, source, latest value, page URL, post text for every network, YouTube and Reddit titles, alt text, any claim-check blocks), `image()` (PNG data URL) and `video()` (base64 MP4/WebM). The page build and the auto-poster both use it.
+- **Releases feed.** `data/releases.json` lists genuinely new data (a new reporting period, not a later day in the same month; real-time feeds excluded), newest first, with the new and previous values. `/feed.xml` is the same as RSS.
+- **Campaign tags.** `utm_*` parameters reach GA4 (other query parameters are dropped), so links like `/federal-debt/?utm_source=instagram&utm_medium=social` attribute traffic by network.
 
 ## Picking up where you left off
 

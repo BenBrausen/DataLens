@@ -23,7 +23,9 @@
     const same = (a, b) => JSON.stringify(a ?? null) === JSON.stringify(b ?? null);
     const keep = k => o[k] !== undefined && !same(o[k], defaults[k]) && !(k in auto && same(o[k], auto[k])) && !(Array.isArray(o[k]) && !o[k].length) && o[k] !== '';
     const cfg = { d: dsId, ...(state ? { s: state } : {}), o: Object.fromEntries(LINK_KEYS.filter(keep).map(k => [k, o[k]])) };
-    return `${location.origin}${location.pathname}#c=${b64(JSON.stringify(cfg))}`;
+    // Every dataset has its own page (/federal-debt/); the hash carries only settings that differ.
+    const page = `${location.origin}/${encodeURIComponent(dsId)}/`;
+    return Object.keys(cfg.o).length || cfg.s ? `${page}#c=${b64(JSON.stringify(cfg))}` : page;
   };
   PS.readShareLink = () => { const m = /#c=([\w-]+)/.exec(location.hash); if (!m) return null; try { return JSON.parse(unb64(m[1])); } catch { return null; } };
 
@@ -272,7 +274,8 @@
   // Embed: same share link, chart-only view, re-checked against the latest data on every load.
   PS.embedCode = (link, P, title) => {
     if (!link) return null;
-    const url = link.replace('#', (link.includes('?') ? '&' : '?') + 'embed=1#');
+    const [base, hash] = link.split('#');
+    const url = base + (base.includes('?') ? '&' : '?') + 'embed=1' + (hash ? '#' + hash : '');
     return `<iframe src="${url}" title="${String(title || 'Chart').replace(/"/g, '&quot;')}" style="width:100%;aspect-ratio:${P.w}/${P.h + Math.round(P.w * 0.06)};border:0" loading="lazy" allowfullscreen></iframe>`;
   };
 
