@@ -241,7 +241,7 @@ To exclude your own visits, open `https://civiccharts.com/?notrack=1` once in ea
 
 Every event also carries `ui_mode` (simple or advanced), `dataset_id`, `chart_type`, `size` and `format`; switching modes sends `ui_mode`. To report on these in GA4, register them under Admin → Custom definitions → Create custom dimension (scope: Event).
 
-The link-preview card (`public/og.png`, 2400×1260) is rendered from `scripts/og-card.html`.
+The link-preview card (`public/og.png`, 2400×1260) is rendered from `scripts/og-card.html`. Announcement cards (`public/brand/announce/`, 4:5, 9:16 and 1:1) come from `node scripts/announce-cards.cjs public/brand/announce`.
 
 ## Presentations, reports and websites
 
