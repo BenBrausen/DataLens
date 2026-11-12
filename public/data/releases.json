@@ -1,5 +1,59 @@
 [
  {
+  "id": "mortgage-rate",
+  "title": "30-year mortgage rate",
+  "released": "2026-11-12T23:34:13.099Z",
+  "lastObservation": "2026-11-12",
+  "previousObservation": "2026-11-05",
+  "latest": {
+   "t": "2026-11-12",
+   "v": 7.11,
+   "series": "30-year fixed"
+  },
+  "previous": {
+   "t": "2026-11-05",
+   "v": 7.18,
+   "series": "30-year fixed"
+  },
+  "unit": {
+   "label": "Average rate",
+   "format": "pct",
+   "decimals": 2
+  },
+  "frequency": "weekly",
+  "topic": "housing",
+  "publisher": "Freddie Mac"
+ },
+ {
+  "id": "federal-deficit-12mo",
+  "title": "U.S. federal budget deficit, last 12 months",
+  "released": "2026-11-12T23:34:13.099Z",
+  "lastObservation": "2026-10-01",
+  "previousObservation": "2026-09-01",
+  "latest": {
+   "t": "2026-10-01",
+   "v": -2.1122
+  },
+  "previous": {
+   "t": "2026-09-01",
+   "v": -1.9925
+  },
+  "unit": {
+   "label": "Surplus or deficit (-), trailing 12 months",
+   "format": "usdT",
+   "decimals": 2,
+   "signWords": {
+    "neg": "deficit",
+    "pos": "surplus",
+    "subject": "The federal government",
+    "trailing": true
+   }
+  },
+  "frequency": "monthly",
+  "topic": "government",
+  "publisher": "U.S. Department of the Treasury"
+ },
+ {
   "id": "job-postings",
   "title": "Job postings on Indeed",
   "released": "2026-11-12T15:06:16.280Z",
