@@ -364,6 +364,10 @@
   "sourceId": "bls",
   "tier": "federal",
   "nSeries": 2,
+  "seriesNames": [
+   "All items",
+   "Core (ex. food & energy)"
+  ],
   "firstObservation": "1948-01-01"
  },
  {
@@ -407,6 +411,10 @@
   "sourceId": "bls",
   "tier": "federal",
   "nSeries": 2,
+  "seriesNames": [
+   "Unemployment rate (U-3)",
+   "Broader rate (U-6)"
+  ],
   "firstObservation": "1948-01-01"
  },
  {
@@ -956,6 +964,13 @@
   "sourceId": "fema",
   "tier": "federal",
   "nSeries": 5,
+  "seriesNames": [
+   "All major disasters",
+   "Severe Storm",
+   "Flood",
+   "Hurricane",
+   "Tornado"
+  ],
   "firstObservation": "1953-12-31"
  },
  {
@@ -1101,6 +1116,10 @@
   "sourceId": "omb",
   "tier": "federal",
   "nSeries": 2,
+  "seriesNames": [
+   "Spending (outlays)",
+   "Revenue (receipts)"
+  ],
   "firstObservation": "1929-09-30"
  },
  {
@@ -1758,6 +1777,11 @@
   "sourceId": "fda",
   "tier": "federal",
   "nSeries": 3,
+  "seriesNames": [
+   "Class I",
+   "Class II",
+   "Class III"
+  ],
   "firstObservation": "2013-01-01"
  },
  {
@@ -1800,6 +1824,11 @@
   "sourceId": "fda",
   "tier": "federal",
   "nSeries": 3,
+  "seriesNames": [
+   "Class I",
+   "Class II",
+   "Class III"
+  ],
   "firstObservation": "2013-01-01"
  },
  {
@@ -1880,6 +1909,10 @@
   "sourceId": "fred",
   "tier": "federal",
   "nSeries": 2,
+  "seriesNames": [
+   "30-year fixed",
+   "15-year fixed"
+  ],
   "firstObservation": "1971-04-02"
  },
  {
@@ -1921,6 +1954,146 @@
   "tier": "federal",
   "nEntities": 51,
   "firstObservation": "1975-01-01"
+ },
+ {
+  "category": "Housing",
+  "frequency": "annual",
+  "unit": {
+   "label": "Median home value ÷ median household income",
+   "format": "number",
+   "decimals": 1,
+   "suffix": "×"
+  },
+  "description": "Median home value divided by median household income: how many years of the typical household's income the typical home costs.",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Tables B25077 and B19013 (2020–2024)",
+   "url": "https://www.census.gov/programs-surveys/acs"
+  },
+  "howToRead": [
+   "A ratio of 3 is traditionally seen as affordable; above 5 means the typical home costs more than five years of the typical household's pay.",
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap for the clearest trend."
+  ],
+  "isRate": true,
+  "lens": "Price to income",
+  "id": "county-price-to-income",
+  "title": "Home price to income by county",
+  "geo": "us-counties",
+  "caveats": [
+   "Uses income for all households (renters and owners), so it shows how a typical local household would fare buying the typical local home. Ratio computed by Civic Charts.",
+   "Survey estimates: small counties have wide margins of error, so modest differences there are often noise.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "reframes": [
+   "county-home-value",
+   "county-price-to-income"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-12T01:50:36.798Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 4.1,
+   "series": "United States"
+  },
+  "released": null,
+  "hasNational": true,
+  "topic": "housing",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2021-12-31"
+ },
+ {
+  "category": "Housing",
+  "frequency": "annual",
+  "unit": {
+   "label": "Median home value ÷ median household income",
+   "format": "number",
+   "decimals": 1,
+   "suffix": "×"
+  },
+  "description": "Median home value divided by median household income: how many years of the typical household's income the typical home costs.",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Tables B25077 and B19013 (2020–2024)",
+   "url": "https://www.census.gov/programs-surveys/acs"
+  },
+  "howToRead": [
+   "A ratio of 3 is traditionally seen as affordable; above 5 means the typical home costs more than five years of the typical household's pay.",
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap for the clearest trend."
+  ],
+  "isRate": true,
+  "lens": "Price to income",
+  "id": "state-price-to-income",
+  "title": "Home price to income by state",
+  "geo": "us-states",
+  "caveats": [
+   "Uses income for all households (renters and owners), so it shows how a typical local household would fare buying the typical local home. Ratio computed by Civic Charts."
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-12T01:50:36.798Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 4.1,
+   "series": "United States"
+  },
+  "released": null,
+  "hasNational": true,
+  "topic": "housing",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "2021-12-31"
+ },
+ {
+  "category": "Housing",
+  "frequency": "annual",
+  "unit": {
+   "label": "Median home value (owner estimate)",
+   "format": "usd",
+   "decimals": 0
+  },
+  "description": "Median value of owner-occupied homes, as estimated by the people who own them.",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Table B25077 (2020–2024)",
+   "url": "https://www.census.gov/programs-surveys/acs"
+  },
+  "howToRead": [
+   "Owners' own estimates, not sale prices. They track market prices but tend to run a little high.",
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap for the clearest trend."
+  ],
+  "isRate": true,
+  "lens": "Home value",
+  "id": "county-home-value",
+  "title": "Median home value by county",
+  "geo": "us-counties",
+  "caveats": [
+   "Dollar amounts are in each period's final-year dollars, not adjusted to today.",
+   "Survey estimates: small counties have wide margins of error, so modest differences there are often noise.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "reframes": [
+   "county-home-value",
+   "county-price-to-income"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-12T01:50:36.798Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 332700,
+   "series": "United States"
+  },
+  "released": null,
+  "hasNational": true,
+  "topic": "housing",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2021-12-31"
  },
  {
   "category": "Housing",
@@ -2011,6 +2184,100 @@
  {
   "category": "Housing",
   "frequency": "annual",
+  "unit": {
+   "label": "Median gross rent per month",
+   "format": "usd",
+   "decimals": 0
+  },
+  "description": "Median monthly rent paid by renter households, including utilities the renter pays (gross rent).",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Table B25064 (2020–2024)",
+   "url": "https://www.census.gov/programs-surveys/acs"
+  },
+  "howToRead": [
+   "Gross rent includes utilities and fuels the renter pays, so it is higher than contract rent alone.",
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap for the clearest trend."
+  ],
+  "isRate": true,
+  "lens": "Rent",
+  "id": "county-rent",
+  "title": "Median rent by county",
+  "geo": "us-counties",
+  "caveats": [
+   "Covers all renters, including long-time tenants on older leases, so it runs below current asking rents.",
+   "Survey estimates: small counties have wide margins of error, so modest differences there are often noise.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "reframes": [
+   "county-rent",
+   "county-rent-burden"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-12T01:50:36.798Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 1413,
+   "series": "United States"
+  },
+  "released": null,
+  "hasNational": true,
+  "topic": "housing",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2021-12-31"
+ },
+ {
+  "category": "Housing",
+  "frequency": "annual",
+  "unit": {
+   "label": "Median gross rent per month",
+   "format": "usd",
+   "decimals": 0
+  },
+  "description": "Median monthly rent paid by renter households, including utilities the renter pays (gross rent).",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Table B25064 (2020–2024)",
+   "url": "https://www.census.gov/programs-surveys/acs"
+  },
+  "howToRead": [
+   "Gross rent includes utilities and fuels the renter pays, so it is higher than contract rent alone.",
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap for the clearest trend."
+  ],
+  "isRate": true,
+  "lens": "Rent",
+  "id": "state-rent",
+  "title": "Median rent by state",
+  "geo": "us-states",
+  "caveats": [
+   "Covers all renters, including long-time tenants on older leases, so it runs below current asking rents."
+  ],
+  "reframes": [
+   "state-rent",
+   "state-rent-burden"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-12T01:50:36.798Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 1413,
+   "series": "United States"
+  },
+  "released": null,
+  "hasNational": true,
+  "topic": "housing",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "2021-12-31"
+ },
+ {
+  "category": "Housing",
+  "frequency": "annual",
   "geo": "us-states",
   "source": {
    "publisher": "U.S. Census Bureau",
@@ -2093,6 +2360,100 @@
   "tier": "federal",
   "nEntities": 51,
   "firstObservation": "1980-12-31"
+ },
+ {
+  "category": "Housing",
+  "frequency": "annual",
+  "unit": {
+   "label": "Median gross rent as % of household income",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "For the typical renter household, the share of its income that goes to rent and utilities. Above 30% is the federal definition of \"cost-burdened.\"",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Table B25071 (2020–2024)",
+   "url": "https://www.census.gov/programs-surveys/acs"
+  },
+  "howToRead": [
+   "Above 30% counts as cost-burdened by federal housing standards; above 50% is severely cost-burdened.",
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap for the clearest trend."
+  ],
+  "isRate": true,
+  "lens": "Share of income",
+  "id": "county-rent-burden",
+  "title": "Rent as a share of income by county",
+  "geo": "us-counties",
+  "caveats": [
+   "Measured for renter households only; homeowners are not included.",
+   "Survey estimates: small counties have wide margins of error, so modest differences there are often noise.",
+   "Connecticut replaced its counties with planning regions in 2022, so it appears as no data on the county map."
+  ],
+  "reframes": [
+   "county-rent",
+   "county-rent-burden"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-12T01:50:36.798Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 30.6,
+   "series": "United States"
+  },
+  "released": null,
+  "hasNational": true,
+  "topic": "housing",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 3144,
+  "firstObservation": "2021-12-31"
+ },
+ {
+  "category": "Housing",
+  "frequency": "annual",
+  "unit": {
+   "label": "Median gross rent as % of household income",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "For the typical renter household, the share of its income that goes to rent and utilities. Above 30% is the federal definition of \"cost-burdened.\"",
+  "source": {
+   "publisher": "U.S. Census Bureau",
+   "dataset": "American Community Survey 5-year estimates, Table B25071 (2020–2024)",
+   "url": "https://www.census.gov/programs-surveys/acs"
+  },
+  "howToRead": [
+   "Above 30% counts as cost-burdened by federal housing standards; above 50% is severely cost-burdened.",
+   "Each year is a 5-year average: \"2024\" covers 2020–2024. Compare periods that don't overlap for the clearest trend."
+  ],
+  "isRate": true,
+  "lens": "Share of income",
+  "id": "state-rent-burden",
+  "title": "Rent as a share of income by state",
+  "geo": "us-states",
+  "caveats": [
+   "Measured for renter households only; homeowners are not included."
+  ],
+  "reframes": [
+   "state-rent",
+   "state-rent-burden"
+  ],
+  "kind": "panel",
+  "retrieved": "2026-11-12T01:50:36.798Z",
+  "lastObservation": "2024-12-31",
+  "latest": {
+   "t": "2024-12-31",
+   "v": 30.6,
+   "series": "United States"
+  },
+  "released": null,
+  "hasNational": true,
+  "topic": "housing",
+  "sourceId": "census",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "2021-12-31"
  },
  {
   "id": "state-home-values",
@@ -2471,6 +2832,336 @@
   "tier": "federal",
   "nEntities": 3144,
   "firstObservation": "2021-07-01"
+ },
+ {
+  "category": "Prices",
+  "frequency": "monthly",
+  "source": {
+   "publisher": "U.S. Bureau of Labor Statistics",
+   "dataset": "Current Employment Statistics, Average Hourly Earnings of All Private Employees (CES0500000003); CPI-U",
+   "url": "https://www.bls.gov/ces/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "reframes": [
+   "wages-vs-inflation",
+   "real-wages"
+  ],
+  "id": "wages-vs-inflation",
+  "title": "Are wages keeping up with prices?",
+  "shortTitle": "Wage growth",
+  "lens": "Raises vs. prices",
+  "unit": {
+   "label": "Change from a year earlier",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "How fast average hourly pay is rising compared with consumer prices, each measured against the same month a year earlier.",
+  "howToRead": [
+   "When the pay line is above the prices line, the typical paycheck is gaining buying power; below it, workers are falling behind.",
+   "Averages shift when the mix of jobs changes: in spring 2020 millions of low-wage workers lost jobs, so the average jumped even though few people got raises."
+  ],
+  "caveats": [
+   "Covers private-sector employees, not government workers or the self-employed, and averages, not the typical (median) worker.",
+   "Year-over-year rates computed by Civic Charts from BLS levels."
+  ],
+  "defaultSeries": [
+   "AHE_YOY",
+   "CPI_YOY"
+  ],
+  "zeroLine": true,
+  "gap": {
+   "a": "AHE_YOY",
+   "b": "CPI_YOY",
+   "aName": "wage growth",
+   "bName": "inflation",
+   "posWord": "real raise",
+   "negWord": "real pay cut",
+   "points": true,
+   "posPhrase": "pay outpaced prices by {v}",
+   "negPhrase": "prices outpaced pay by {v}"
+  },
+  "kind": "timeseries",
+  "retrieved": "2026-11-12T01:54:07.199Z",
+  "lastObservation": "2026-10-01",
+  "latest": {
+   "t": "2026-10-01",
+   "v": 3.12,
+   "series": "Hourly pay"
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "prices",
+  "sourceId": "bls",
+  "tier": "federal",
+  "nSeries": 2,
+  "seriesNames": [
+   "Hourly pay",
+   "Prices (CPI)"
+  ],
+  "firstObservation": "2007-03-01"
+ },
+ {
+  "category": "Prices",
+  "frequency": "monthly",
+  "geo": "us-states",
+  "source": {
+   "publisher": "U.S. Energy Information Administration",
+   "dataset": "Form EIA-861M, Sales and Revenue by State (residential)",
+   "url": "https://www.eia.gov/electricity/data/eia861m/"
+  },
+  "reframes": [
+   "state-electricity",
+   "state-electricity-change"
+  ],
+  "isRate": true,
+  "id": "state-electricity",
+  "title": "Home electricity prices by state",
+  "lens": "Price",
+  "unit": {
+   "label": "Residential price, cents per kWh (12-month average)",
+   "format": "number",
+   "decimals": 1,
+   "suffix": "¢"
+  },
+  "description": "Average price households pay for electricity in each state, in cents per kilowatt-hour, over the latest 12 months.",
+  "howToRead": [
+   "Each point averages the latest 12 months, weighted by how much electricity was sold, so summer and winter rate swings even out.",
+   "Price is total residential revenue divided by kilowatt-hours sold, so it includes fixed customer charges spread across usage."
+  ],
+  "caveats": [
+   "The most recent months are preliminary and are revised when EIA publishes final annual data.",
+   "A higher price per kWh does not always mean a higher bill: homes in mild or efficient states may use far less power."
+  ],
+  "releaseLagDays": 75,
+  "kind": "panel",
+  "retrieved": "2026-11-12T01:54:07.199Z",
+  "lastObservation": "2026-08-01",
+  "latest": {
+   "t": "2026-08-01",
+   "v": 18.04,
+   "series": "United States"
+  },
+  "released": null,
+  "hasNational": true,
+  "topic": "prices",
+  "sourceId": "eia",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "2010-12-01"
+ },
+ {
+  "category": "Prices",
+  "frequency": "monthly",
+  "geo": "us-states",
+  "source": {
+   "publisher": "U.S. Energy Information Administration",
+   "dataset": "Form EIA-861M, Sales and Revenue by State (residential)",
+   "url": "https://www.eia.gov/electricity/data/eia861m/"
+  },
+  "reframes": [
+   "state-electricity",
+   "state-electricity-change"
+  ],
+  "isRate": true,
+  "id": "state-electricity-change",
+  "title": "How much home electricity prices rose by state",
+  "lens": "Change over a year",
+  "zeroLine": true,
+  "unit": {
+   "label": "Change in residential price from a year earlier (12-month average)",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "How much the average residential electricity price in each state changed compared with the 12 months before.",
+  "howToRead": [
+   "Each point averages the latest 12 months, weighted by how much electricity was sold, so summer and winter rate swings even out.",
+   "Compares the latest 12 months with the 12 months before them."
+  ],
+  "caveats": [
+   "The most recent months are preliminary and are revised when EIA publishes final annual data.",
+   "A higher price per kWh does not always mean a higher bill: homes in mild or efficient states may use far less power.",
+   "Percent change computed by Civic Charts."
+  ],
+  "releaseLagDays": 75,
+  "kind": "panel",
+  "retrieved": "2026-11-12T01:54:07.199Z",
+  "lastObservation": "2026-08-01",
+  "latest": {
+   "t": "2026-08-01",
+   "v": 3.9,
+   "series": "United States"
+  },
+  "released": null,
+  "hasNational": true,
+  "topic": "prices",
+  "sourceId": "eia",
+  "tier": "federal",
+  "nEntities": 51,
+  "firstObservation": "2011-12-01"
+ },
+ {
+  "id": "cpi-categories",
+  "title": "Inflation by category",
+  "category": "Prices",
+  "frequency": "monthly",
+  "unit": {
+   "label": "Year-over-year change in prices",
+   "format": "pct",
+   "decimals": 1
+  },
+  "description": "How fast prices are rising for groceries, rent, electricity, gas and other everyday costs, compared with the same month a year earlier.",
+  "source": {
+   "publisher": "U.S. Bureau of Labor Statistics",
+   "url": "https://www.bls.gov/cpi/",
+   "via": "FRED, Federal Reserve Bank of St. Louis",
+   "dataset": "Consumer Price Index for All Urban Consumers (CPI-U), seasonally adjusted, by item"
+  },
+  "howToRead": [
+   "Each line is the rate prices for that category are rising, not the price itself. Below zero means prices fell over the year.",
+   "Compare a category with \"All items\" to see whether it is pushing overall inflation up or holding it down."
+  ],
+  "caveats": [
+   "Rent and shelter are measured for all renters and owners, not just new leases, so they move months behind market rents.",
+   "Year-over-year rates computed by Civic Charts from the BLS index levels."
+  ],
+  "defaultSeries": [
+   "CUSR0000SAF11",
+   "CPIAUCSL"
+  ],
+  "seriesTitle": "Inflation for {s}",
+  "chartTitle": "U.S. inflation for {s}",
+  "seriesBaseline": "CPIAUCSL",
+  "itemLabel": "Category",
+  "zeroLine": true,
+  "kind": "timeseries",
+  "retrieved": "2026-11-12T01:54:07.199Z",
+  "lastObservation": "2026-10-01",
+  "latest": {
+   "t": "2026-10-01",
+   "v": 2.22,
+   "series": "Groceries (food at home)"
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "prices",
+  "sourceId": "bls",
+  "tier": "federal",
+  "nSeries": 10,
+  "seriesNames": [
+   "Groceries (food at home)",
+   "Restaurants (food away from home)",
+   "Shelter",
+   "Rent",
+   "Electricity",
+   "Utility (piped) gas",
+   "Gasoline",
+   "Used cars and trucks",
+   "Medical care",
+   "All items"
+  ],
+  "firstObservation": "1953-01-01"
+ },
+ {
+  "category": "Prices",
+  "frequency": "monthly",
+  "source": {
+   "publisher": "U.S. Bureau of Labor Statistics",
+   "dataset": "Current Employment Statistics, Average Hourly Earnings of All Private Employees (CES0500000003); CPI-U",
+   "url": "https://www.bls.gov/ces/",
+   "via": "FRED, Federal Reserve Bank of St. Louis"
+  },
+  "reframes": [
+   "wages-vs-inflation",
+   "real-wages"
+  ],
+  "id": "real-wages",
+  "title": "U.S. average hourly pay, adjusted for inflation",
+  "shortTitle": "Inflation-adjusted hourly pay",
+  "lens": "Buying power",
+  "unit": {
+   "label": "Average hourly earnings (2026-10 dollars)",
+   "format": "usd",
+   "decimals": 2
+  },
+  "description": "Average hourly earnings of private-sector employees, converted into today's dollars so every month buys the same basket of goods.",
+  "howToRead": [
+   "A rising line means pay is buying more than it used to; a falling line means prices outran raises.",
+   "Averages shift when the mix of jobs changes: in spring 2020 millions of low-wage workers lost jobs, so the average jumped even though few people got raises."
+  ],
+  "caveats": [
+   "Inflation adjustment computed by Civic Charts with CPI-U.",
+   "Covers private-sector employees and is an average, not the typical (median) worker."
+  ],
+  "kind": "timeseries",
+  "retrieved": "2026-11-12T01:54:07.199Z",
+  "lastObservation": "2026-10-01",
+  "latest": {
+   "t": "2026-10-01",
+   "v": 38
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "economy",
+  "sourceId": "bls",
+  "tier": "federal",
+  "nSeries": 1,
+  "firstObservation": "2006-03-01"
+ },
+ {
+  "id": "grocery-prices",
+  "title": "U.S. grocery prices",
+  "category": "Prices",
+  "frequency": "monthly",
+  "unit": {
+   "label": "Average retail price",
+   "format": "usd",
+   "decimals": 2
+  },
+  "description": "Average prices U.S. shoppers paid for everyday groceries, collected monthly by the Bureau of Labor Statistics in cities nationwide.",
+  "source": {
+   "publisher": "U.S. Bureau of Labor Statistics",
+   "url": "https://www.bls.gov/cpi/factsheets/average-prices.htm",
+   "via": "FRED, Federal Reserve Bank of St. Louis",
+   "dataset": "Average Price Data, U.S. city average (CPI program)"
+  },
+  "howToRead": [
+   "Each line is one item at one size: eggs per dozen, most others per pound, milk per gallon. Pick one item to see its full story.",
+   "Prices are in dollars of each month, not adjusted for inflation."
+  ],
+  "caveats": [
+   "Averages across stores, brands and cities; your local store can differ a lot.",
+   "Egg prices swing with bird flu outbreaks, which cut supply suddenly and then recover."
+  ],
+  "defaultSeries": [
+   "APU0000708111"
+  ],
+  "seriesTitle": "The average price of {s}",
+  "chartTitle": "U.S. price of {s}",
+  "itemLabel": "Item",
+  "kind": "timeseries",
+  "retrieved": "2026-11-12T01:50:36.798Z",
+  "lastObservation": "2026-10-01",
+  "latest": {
+   "t": "2026-10-01",
+   "v": 2.32,
+   "series": "Eggs (dozen)"
+  },
+  "released": null,
+  "hasNational": false,
+  "topic": "prices",
+  "sourceId": "bls",
+  "tier": "federal",
+  "nSeries": 7,
+  "seriesNames": [
+   "Eggs (dozen)",
+   "Ground beef (lb)",
+   "Whole chicken (lb)",
+   "Whole milk (gallon)",
+   "White bread (lb)",
+   "Ground coffee (lb)",
+   "Bananas (lb)"
+  ],
+  "firstObservation": "1980-01-01"
  },
  {
   "id": "state-homicide",

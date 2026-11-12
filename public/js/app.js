@@ -42,10 +42,17 @@
   }
   const comboOpts = () => ({ ...o, focus: o.focus || stateInfo()?.fips || '' });
   const stateInfo = () => { const r = PS.STATE_LIST.find(x => x[0] === S.state); return r ? { code: r[0], fips: r[1], name: r[2] } : null; };
+  // Multi-item datasets (grocery prices, inflation by category): name the item when one is picked.
+  function itemTitle(ds) {
+    if (!ds.chartTitle || ds.kind !== 'timeseries') return '';
+    const sel = (o.series.length ? o.series : ds.defaultSeries || []).filter(id => id !== ds.seriesBaseline);
+    const s = sel.length === 1 && ds.series.find(x => x.id === sel[0]);
+    return s?.noun ? ds.chartTitle.replace('{s}', s.noun) : '';
+  }
   function autoTitle(ds) {
     const st = stateInfo();
     const t = o.focus && st && o.chart === 'line' ? `${ds.title.replace(/ by state$/i, '')} in ${st.name}`
-      : st && ds.geo === 'us-counties' ? `${ds.title} in ${st.name}` : ds.title;
+      : st && ds.geo === 'us-counties' ? `${ds.title} in ${st.name}` : itemTitle(ds) || ds.title;
     return o.titleStyle === 'sentence' ? t : PS.titleCase(t);
   }
   function palette() {
@@ -293,17 +300,19 @@
   // ---------- ready-made dataset search (instant, local) ----------
   const SYN = { jobs: ['unemploy', 'employ', 'job'], job: ['unemploy', 'employ'], work: ['unemploy', 'employ', 'job'], prices: ['inflation', 'price'], cpi: ['inflation'], cost: ['price', 'inflation'],
     spending: ['outlay', 'spending'], taxes: ['revenue', 'receipt'], tax: ['revenue', 'receipt'], borrowing: ['debt', 'deficit'], budget: ['deficit', 'budget', 'debt'],
-    homes: ['home', 'housing'], housing: ['home', 'house', 'mortgage', 'permit'], rent: ['home', 'housing'], climate: ['temperature', 'co2', 'warming', 'heat'], warming: ['temperature'],
+    homes: ['home', 'housing'], housing: ['home', 'house', 'mortgage', 'permit'], rent: ['rent', 'renter'], climate: ['temperature', 'co2', 'warming', 'heat'], warming: ['temperature'],
     crime: ['crime', 'homicide'], murder: ['homicide'], vote: ['president', 'election'], voting: ['president', 'election'], election: ['president', 'election'], elections: ['president', 'election'],
-    drugs: ['overdose', 'drug'], opioid: ['overdose'], money: ['income'], wages: ['income', 'wage'], pay: ['income', 'wage'], salary: ['income', 'wage'], moving: ['migration'], movers: ['migration'],
+    drugs: ['overdose', 'drug'], opioid: ['overdose'], money: ['income'], wages: ['income', 'wage', 'pay'], pay: ['income', 'wage', 'pay'], salary: ['income', 'wage', 'pay'], moving: ['migration'], movers: ['migration'],
     disaster: ['disaster', 'risk', 'fema'], weather: ['disaster', 'heat', 'hurricane', 'flood'], storms: ['hurricane', 'disaster'], fire: ['wildfire'], gdp: ['gdp'], interest: ['interest', 'mortgage'],
-    old: ['65', 'age'], elderly: ['65', 'age'], seniors: ['65'], poor: ['poverty'], insurance: ['uninsured'], pollution: ['air', 'co2'], quake: ['earthquake'], internet: ['broadband', 'internet'], wifi: ['broadband', 'internet'], online: ['broadband', 'internet'], connectivity: ['broadband'] };
+    old: ['65', 'age'], elderly: ['65', 'age'], seniors: ['65'], poor: ['poverty'], insurance: ['uninsured'], pollution: ['air', 'co2'], quake: ['earthquake'], internet: ['broadband', 'internet'], wifi: ['broadband', 'internet'], online: ['broadband', 'internet'], connectivity: ['broadband'],
+    groceries: ['grocer', 'food'], grocery: ['grocer', 'food'], food: ['grocer', 'food'], egg: ['egg'], electricity: ['electric'], power: ['electric'], utilities: ['electric', 'utility'], utility: ['electric', 'utility'],
+    affordable: ['income', 'rent', 'afford'], affordability: ['income', 'rent', 'afford'], afford: ['income', 'rent', 'afford'], earnings: ['pay', 'wage'], raises: ['wage', 'pay'], paycheck: ['wage', 'pay'], landlord: ['rent'] };
   const GEO_WORDS = { 'us-states': 'state states by-state', 'us-counties': 'county counties local', world: 'world country countries global international' };
   function hay(c) {
     if (c._hay) return c._hay;
     const topic = PS.REGISTRY?.topics.find(t => t.id === c.topic);
     const lo = x => String(x || '').toLowerCase();
-    c._hay = { title: lo(c.title + ' ' + (c.lens || '')), rest: lo([c.id, c.description, c.category, topic?.name, c.source?.publisher, c.source?.dataset, c.unit?.label, (c.howToRead || []).join(' '), GEO_WORDS[c.geo] || 'national united states u.s.', c.frequency].join(' ')) };
+    c._hay = { title: lo(c.title + ' ' + (c.lens || '')), rest: lo([c.id, (c.seriesNames || []).join(' '), c.description, c.category, topic?.name, c.source?.publisher, c.source?.dataset, c.unit?.label, (c.howToRead || []).join(' '), GEO_WORDS[c.geo] || 'national united states u.s.', c.frequency].join(' ')) };
     return c._hay;
   }
   function searchLocal(q, { geo = 'any', topic = '', sort = 'relevance' } = {}) {
@@ -317,7 +326,9 @@
         const alts = [t, ...(SYN[t] || []), t.endsWith('s') ? t.slice(0, -1) : null].filter(Boolean);
         const inTitle = alts.some(a => h.title.includes(a)), inRest = inTitle || alts.some(a => h.rest.includes(a));
         if (!inRest) { ok = false; break; }
-        score += inTitle ? 3 : 1;
+        // The typed word itself in the title, as a whole word, beats a synonym or a substring ("rent" in "current").
+        const exact = [t, t.replace(/ies$/, 'y').replace(/s$/, '')].some(w => new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`).test(h.title));
+        score += (inTitle ? 3 : 1) + (exact ? 2 : 0);
       }
       if (ok) out.push({ c, score: score + (c.reframes && c.reframes[0] !== c.id ? -0.5 : 0) });
     }
@@ -579,6 +590,13 @@
       } catch (err) { toast(err.message); t.disabled = false; t.textContent = 'Load data'; }
       return;
     }
+    if (t.dataset.seriesOne) {
+      const id = t.dataset.seriesOne, b = S.ds.seriesBaseline;
+      o.series = b && id !== b ? [id, b] : [id];
+      if (!['line', 'area'].includes(o.chart)) o.chart = 'line';
+      Object.assign(o, { takeawayText: '' }); if (!o.titleEdited) o.title = autoTitle(S.ds);
+      update(); renderStep(); return;
+    }
     if (t.dataset.chart) { PS.track('select_chart', { chart_type: t.dataset.chart }); o.chart = t.dataset.chart; Object.assign(o, { takeawayText: '' }); if (!o.titleEdited) o.title = autoTitle(S.ds); update(); renderStep(); return; }
     if (t.dataset.theme) { o.theme = t.dataset.theme; o.bg = ''; update(); renderStep(); return; }
     if (t.dataset.pal) { o.palette = t.dataset.pal; update(); renderStep(); return; }
@@ -747,6 +765,7 @@
     if (el.dataset.multi) {
       const k = el.dataset.multi;
       o[k] = [...document.querySelectorAll(`[data-multi="${k}"]:checked`)].map(x => x.value).slice(0, 4);
+      if (k === 'series' && !o.titleEdited) o.title = autoTitle(S.ds);
       update(); return;
     }
   });
@@ -875,6 +894,10 @@
     let html = integrityBox();
     if (S.combo) html += `<p class="muted">This chart compares datasets. Switch to <button class="linkbtn" data-mode-go="advanced">Advanced</button> to change how they're combined.</p>`;
     else html += `<h3>Chart</h3><div class="chart-mini">${charts.map(c => `<button class="chart-opt ${o.chart === c.id ? 'active' : ''}" data-chart="${c.id}"><svg viewBox="0 0 24 24"><path d="${c.icon}"/></svg><b>${c.name}${best === c.id ? ' <span class="badge">Best fit</span>' : ''}</b></button>`).join('')}</div>`;
+    if (!S.combo && ds.chartTitle && ds.kind === 'timeseries') {
+      const sel = (o.series.length ? o.series : ds.defaultSeries || []).filter(id => id !== ds.seriesBaseline);
+      html += `<h3>${esc(ds.itemLabel || 'Show')}</h3><div class="chips">${ds.series.filter(x => x.id !== ds.seriesBaseline).map(x => `<button class="chip ${sel.length === 1 && sel[0] === x.id ? 'active' : ''}" data-series-one="${x.id}">${esc(x.name)}</button>`).join('')}</div>`;
+    }
     html += `<h3>Look</h3><div class="grid3 grid4">${SIMPLE_THEMES.filter(id => PS.THEMES[id]).map(id => { const t = PS.THEMES[id], pal = PS.PALETTES[o.palette === 'custom' ? 'plainsight' : o.palette][t.mode === 'dark' ? 'dark' : 'colors'];
       return `<button class="theme-opt ${o.theme === id ? 'active' : ''}" data-theme="${id}"><div class="sw" style="background:${t.bg}">${pal.slice(0, 4).map((c, i) => `<i style="background:${c};height:${10 + i * 5}px"></i>`).join('')}</div><b style="font-family:'${t.head}'">${t.name}</b></button>`; }).join('')}</div>`;
     html += `<h3>Colors</h3><div class="pal-mini">${SIMPLE_PALS.filter(id => PS.PALETTES[id]).map(id => { const p = PS.PALETTES[id], cs = p[T.mode === 'dark' ? 'dark' : 'colors'];

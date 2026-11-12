@@ -12,6 +12,7 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 const isoCountries = require('i18n-iso-countries');
 
+import { unzipSync, strFromU8 } from 'fflate';
 import { DATASET_TAGS, THIRD_PARTY, FEDERAL, TIERS } from './sources/catalog.mjs';
 const OUT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../public/data');
 const NOW = new Date().toISOString();
@@ -37,6 +38,7 @@ async function get(url, type = 'json', tries = 3) {
       const r = await fetch(url, { headers: { 'User-Agent': 'civiccharts-data-refresh/1.0' } });
       if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
       if (type === 'latin1') return new TextDecoder('latin1').decode(await r.arrayBuffer());
+      if (type === 'binary') return new Uint8Array(await r.arrayBuffer());
       return type === 'json' ? await r.json() : await r.text();
     } catch (e) {
       if (i === tries - 1) throw e;
@@ -1138,6 +1140,241 @@ builders['crime'] = async () => {
   return out;
 };
 
+// ---------- cost of living ----------
+const BLS_CPI = { publisher: 'U.S. Bureau of Labor Statistics', url: 'https://www.bls.gov/cpi/', via: 'FRED, Federal Reserve Bank of St. Louis' };
+
+// BLS average retail prices, U.S. city average. One dataset, one series per item; the
+// headline names the item (`noun`) rather than the dataset.
+const GROCERIES = [
+  ['APU0000708111', 'Eggs (dozen)', 'a dozen eggs', 'Grade A large eggs, per dozen'],
+  ['APU0000703112', 'Ground beef (lb)', 'a pound of ground beef', '100% ground beef, per pound'],
+  ['APU0000706111', 'Whole chicken (lb)', 'a pound of whole chicken', 'Whole fresh chicken, per pound'],
+  ['APU0000709112', 'Whole milk (gallon)', 'a gallon of milk', 'Fortified whole milk, per gallon'],
+  ['APU0000702111', 'White bread (lb)', 'a pound of white bread', 'White pan bread, per pound'],
+  ['APU0000717311', 'Ground coffee (lb)', 'a pound of coffee', '100% ground roast coffee, per pound'],
+  ['APU0000711211', 'Bananas (lb)', 'a pound of bananas', 'Bananas, per pound'],
+];
+builders['grocery-prices'] = async () => {
+  const d = await fred([...GROCERIES.map(g => g[0]), 'CPIAUCSL']);
+  return ts({ id: 'grocery-prices', title: 'U.S. grocery prices', category: 'Prices', frequency: 'monthly',
+    unit: { label: 'Average retail price', format: 'usd', decimals: 2 },
+    description: 'Average prices U.S. shoppers paid for everyday groceries, collected monthly by the Bureau of Labor Statistics in cities nationwide.',
+    source: { ...BLS_CPI, dataset: 'Average Price Data, U.S. city average (CPI program)', url: 'https://www.bls.gov/cpi/factsheets/average-prices.htm' },
+    howToRead: ['Each line is one item at one size: eggs per dozen, most others per pound, milk per gallon. Pick one item to see its full story.',
+      'Prices are in dollars of each month, not adjusted for inflation.'],
+    caveats: ['Averages across stores, brands and cities; your local store can differ a lot.', 'Egg prices swing with bird flu outbreaks, which cut supply suddenly and then recover.'],
+    defaultSeries: ['APU0000708111'], seriesTitle: 'The average price of {s}', chartTitle: 'U.S. price of {s}', itemLabel: 'Item' },
+    GROCERIES.map(([id, name, noun]) => ({ id, name, noun, points: d[id] })).filter(s => s.points.length));
+};
+
+// What is driving inflation: 12-month change by CPI category.
+const CPI_CATS = [
+  ['CUSR0000SAF11', 'Groceries (food at home)', 'groceries'],
+  ['CUSR0000SEFV', 'Restaurants (food away from home)', 'restaurant meals'],
+  ['CUSR0000SAH1', 'Shelter', 'shelter'],
+  ['CUSR0000SEHA', 'Rent', 'rent'],
+  ['CUSR0000SEHF01', 'Electricity', 'electricity'],
+  ['CUSR0000SEHF02', 'Utility (piped) gas', 'utility gas'],
+  ['CUSR0000SETB01', 'Gasoline', 'gasoline'],
+  ['CUSR0000SETA02', 'Used cars and trucks', 'used cars and trucks'],
+  ['CPIMEDSL', 'Medical care', 'medical care'],
+  ['CPIAUCSL', 'All items', 'all items'], // baseline: listed last so headlines lead with the category picked
+];
+builders['cpi-categories'] = async () => {
+  const d = await fred(CPI_CATS.map(c => c[0]));
+  return ts({ id: 'cpi-categories', title: 'Inflation by category', category: 'Prices', frequency: 'monthly',
+    unit: { label: 'Year-over-year change in prices', format: 'pct', decimals: 1 },
+    description: 'How fast prices are rising for groceries, rent, electricity, gas and other everyday costs, compared with the same month a year earlier.',
+    source: { ...BLS_CPI, dataset: 'Consumer Price Index for All Urban Consumers (CPI-U), seasonally adjusted, by item' },
+    howToRead: ['Each line is the rate prices for that category are rising, not the price itself. Below zero means prices fell over the year.',
+      'Compare a category with "All items" to see whether it is pushing overall inflation up or holding it down.'],
+    caveats: ['Rent and shelter are measured for all renters and owners, not just new leases, so they move months behind market rents.', 'Year-over-year rates computed by Civic Charts from the BLS index levels.'],
+    defaultSeries: ['CUSR0000SAF11', 'CPIAUCSL'], seriesTitle: 'Inflation for {s}', chartTitle: 'U.S. inflation for {s}', seriesBaseline: 'CPIAUCSL', itemLabel: 'Category', zeroLine: true },
+    CPI_CATS.map(([id, name, noun]) => ({ id, name, noun, points: yoy(d[id] || [], 12) })).filter(s => s.points.length));
+};
+
+// Wages vs. prices. Average hourly earnings, all private employees (BLS CES, from 2006).
+builders['wages-vs-inflation'] = async () => {
+  const d = await fred(['CES0500000003', 'CPIAUCSL']);
+  const ahe = d.CES0500000003, cpi = d.CPIAUCSL;
+  // Start CPI where pay starts so both year-over-year lines begin the same month.
+  const start = ahe[0][0];
+  const src = { publisher: 'U.S. Bureau of Labor Statistics', dataset: 'Current Employment Statistics, Average Hourly Earnings of All Private Employees (CES0500000003); CPI-U', url: 'https://www.bls.gov/ces/', via: 'FRED, Federal Reserve Bank of St. Louis' };
+  const comp = 'Averages shift when the mix of jobs changes: in spring 2020 millions of low-wage workers lost jobs, so the average jumped even though few people got raises.';
+  const base = { category: 'Prices', frequency: 'monthly', source: src, reframes: ['wages-vs-inflation', 'real-wages'] };
+  return [
+    ts({ ...base, id: 'wages-vs-inflation', title: 'Are wages keeping up with prices?', shortTitle: 'Wage growth', lens: 'Raises vs. prices',
+      unit: { label: 'Change from a year earlier', format: 'pct', decimals: 1 },
+      description: 'How fast average hourly pay is rising compared with consumer prices, each measured against the same month a year earlier.',
+      howToRead: ['When the pay line is above the prices line, the typical paycheck is gaining buying power; below it, workers are falling behind.', comp],
+      caveats: ['Covers private-sector employees, not government workers or the self-employed, and averages, not the typical (median) worker.', 'Year-over-year rates computed by Civic Charts from BLS levels.'],
+      defaultSeries: ['AHE_YOY', 'CPI_YOY'], zeroLine: true,
+      gap: { a: 'AHE_YOY', b: 'CPI_YOY', aName: 'wage growth', bName: 'inflation', posWord: 'real raise', negWord: 'real pay cut', points: true, posPhrase: 'pay outpaced prices by {v}', negPhrase: 'prices outpaced pay by {v}' } },
+      [{ id: 'AHE_YOY', name: 'Hourly pay', points: yoy(ahe, 12) }, { id: 'CPI_YOY', name: 'Prices (CPI)', points: yoy(cpi.filter(([t]) => t >= start), 12) }]),
+    ts({ ...base, id: 'real-wages', title: 'U.S. average hourly pay, adjusted for inflation', shortTitle: 'Inflation-adjusted hourly pay', lens: 'Buying power',
+      unit: { label: `Average hourly earnings (${cpi.at(-1)[0].slice(0, 7)} dollars)`, format: 'usd', decimals: 2 },
+      description: 'Average hourly earnings of private-sector employees, converted into today\'s dollars so every month buys the same basket of goods.',
+      howToRead: ['A rising line means pay is buying more than it used to; a falling line means prices outran raises.', comp],
+      caveats: ['Inflation adjustment computed by Civic Charts with CPI-U.', 'Covers private-sector employees and is an average, not the typical (median) worker.'] },
+      [{ id: 'AHE_REAL', name: 'Hourly pay (inflation-adjusted)', points: deflate(ahe, cpi) }]),
+  ];
+};
+
+// Minimal .xlsx reader: first sheet, shared strings, values only.
+function xlsxRows(buf) {
+  const z = unzipSync(buf);
+  const ss = z['xl/sharedStrings.xml'] ? [...strFromU8(z['xl/sharedStrings.xml']).matchAll(/<si>([\s\S]*?)<\/si>/g)].map(m => [...m[1].matchAll(/<t[^>]*>([^<]*)<\/t>/g)].map(x => x[1]).join('')) : [];
+  const rows = [];
+  for (const r of strFromU8(z['xl/worksheets/sheet1.xml']).matchAll(/<row [^>]*>([\s\S]*?)<\/row>/g)) {
+    const row = [];
+    for (const c of r[1].matchAll(/<c r="([A-Z]+)\d+"([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)) {
+      const col = [...c[1]].reduce((a, ch) => a * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+      const v = (c[3] || '').match(/<v>([^<]*)<\/v>/)?.[1] ?? (c[3] || '').match(/<t[^>]*>([^<]*)<\/t>/)?.[1];
+      row[col] = / t="s"/.test(c[2]) ? ss[+v] : v;
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
+const ABBR_BY_CODE = Object.fromEntries(STATES.map(([ab, fips]) => [ab, fips]));
+// EIA-861M: monthly residential revenue and sales by state. Price = revenue / sales.
+// Monthly prices swing with the seasons (summer and winter tiers), so the map uses a
+// 12-month average, weighted by sales, which is what a household's bills average out to.
+builders['state-electricity'] = async () => {
+  const rec = new Map(); // `${ab}|${YYYY-MM}` -> [revenue $k, sales MWh]
+  for (const url of ['https://www.eia.gov/electricity/data/eia861m/xls/sales_revenue.xlsx']) {
+    let rows;
+    try { rows = xlsxRows(await get(url, 'binary')); } catch (e) { console.warn(`  (EIA file unavailable: ${url})`); continue; }
+    const h = rows.findIndex(r => r[0] === 'Year' && r[2] === 'State');
+    if (h < 0) continue;
+    for (const r of rows.slice(h + 1)) {
+      const y = +r[0], m = +r[1], ab = r[2], rev = parseFloat(r[4]), mwh = parseFloat(r[5]);
+      if (!y || !m || !ABBR_BY_CODE[ab] || !(mwh > 0) || !(rev >= 0)) continue;
+      rec.set(`${ab}|${y}-${String(m).padStart(2, '0')}`, [rev, mwh]);
+    }
+  }
+  const months = [...new Set([...rec.keys()].map(k => k.split('|')[1]))].sort();
+  // Only months every state reported, so the national figure is complete.
+  const full = months.filter(mo => STATES.every(([ab]) => rec.has(`${ab}|${mo}`)));
+  if (full.length < 24) throw new Error('EIA-861M: not enough monthly data');
+  const times = full.slice(11).map(mo => `${mo}-01`);
+  const avg12 = keys => {
+    let rev = 0, mwh = 0;
+    for (const k of keys) { const x = rec.get(k); if (!x) return null; rev += x[0]; mwh += x[1]; }
+    return mwh > 0 ? round(rev * 100 / mwh, 2) : null; // $k*1000*100 cents / (MWh*1000 kWh)
+  };
+  const win = i => full.slice(i, i + 12);
+  const stateSeries = ab => full.slice(11).map((_, i) => avg12(win(i).map(mo => `${ab}|${mo}`)));
+  const natSeries = full.slice(11).map((_, i) => avg12(win(i).flatMap(mo => STATES.map(([ab]) => `${ab}|${mo}`))));
+  const chg = vals => vals.map((v, i) => (i >= 12 && v != null && vals[i - 12] ? round((v / vals[i - 12] - 1) * 100, 1) : null));
+  const src = { publisher: 'U.S. Energy Information Administration', dataset: 'Form EIA-861M, Sales and Revenue by State (residential)', url: 'https://www.eia.gov/electricity/data/eia861m/' };
+  const how = ['Each point averages the latest 12 months, weighted by how much electricity was sold, so summer and winter rate swings even out.',
+    'Price is total residential revenue divided by kilowatt-hours sold, so it includes fixed customer charges spread across usage.'];
+  const cav = ['The most recent months are preliminary and are revised when EIA publishes final annual data.', 'A higher price per kWh does not always mean a higher bill: homes in mild or efficient states may use far less power.'];
+  const base = { category: 'Prices', frequency: 'monthly', geo: 'us-states', source: src, reframes: ['state-electricity', 'state-electricity-change'], isRate: true };
+  const st = STATES.map(([ab, fips, name]) => ({ ab, fips, name, vals: stateSeries(ab) }));
+  return [
+    panel({ ...base, id: 'state-electricity', title: 'Home electricity prices by state', lens: 'Price',
+      unit: { label: 'Residential price, cents per kWh (12-month average)', format: 'number', decimals: 1, suffix: '¢' },
+      description: 'Average price households pay for electricity in each state, in cents per kilowatt-hour, over the latest 12 months.',
+      howToRead: how, caveats: cav, releaseLagDays: 75, national: { name: 'United States', values: natSeries } },
+      times, st.map(s => ({ id: s.fips, code: s.ab, name: s.name, values: s.vals }))),
+    panel({ ...base, id: 'state-electricity-change', title: 'How much home electricity prices rose by state', lens: 'Change over a year', zeroLine: true,
+      unit: { label: 'Change in residential price from a year earlier (12-month average)', format: 'pct', decimals: 1 },
+      description: 'How much the average residential electricity price in each state changed compared with the 12 months before.',
+      howToRead: [how[0], 'Compares the latest 12 months with the 12 months before them.'], caveats: [...cav, 'Percent change computed by Civic Charts.'], releaseLagDays: 75,
+      national: { name: 'United States', values: chg(natSeries) } },
+      times.slice(12), st.map(s => ({ id: s.fips, code: s.ab, name: s.name, values: chg(s.vals).slice(12) }))),
+  ];
+};
+
+// Census ACS 5-year: rent, rent burden, home value and price-to-income, for states and
+// counties. Same keyless bulk files as broadband; years already in a snapshot are reused.
+async function acsYears(table, skip) {
+  const out = new Map();
+  for (let y = 2021; y <= new Date().getUTCFullYear(); y++) {
+    if (skip.has(y)) continue;
+    let text;
+    try { text = await get(`https://www2.census.gov/programs-surveys/acs/summary_file/${y}/table-based-SF/data/5YRData/acsdt5y${y}-${table}.dat`, 'text', 1); }
+    catch { continue; }
+    if (!text.startsWith('GEO_ID|')) continue;
+    const lines = text.split('\n'), iE = lines[0].split('|').indexOf(`${table.toUpperCase()}_E001`), m = new Map();
+    for (const ln of lines) {
+      if (!/^(0100000US\||0400000US\d\d\||0500000US\d{5}\|)/.test(ln)) continue;
+      const c = ln.split('|'), v = parseFloat(c[iE]);
+      m.set(c[0].startsWith('01') ? 'US' : c[0].slice(9), Number.isFinite(v) && v >= 0 ? v : null); // negative = Census "not available" codes
+    }
+    if (m.size > 3000) { out.set(y, m); console.log(`  ACS ${y} ${table}: ${m.size} geographies`); }
+  }
+  return out;
+}
+builders['acs-housing-costs'] = async () => {
+  const ids = ['county-rent', 'county-rent-burden', 'county-home-value', 'county-price-to-income', 'state-rent', 'state-rent-burden', 'state-price-to-income'];
+  const prev = {};
+  for (const id of ids) { try { prev[id] = JSON.parse(await fs.readFile(path.join(OUT, id + '.json'), 'utf8')); } catch { } }
+  // Reuse a year only if every dataset already has it.
+  const have = ids.map(id => new Set((prev[id]?.times || []).map(t => +t.slice(0, 4))));
+  const skip = new Set([...have[0]].filter(y => have.every(s => s.has(y))));
+  const T = {};
+  for (const t of ['b25064', 'b25071', 'b25077', 'b19013']) T[t] = await acsYears(t, skip);
+  const years = [...new Set([...skip, ...T.b25064.keys()])].sort();
+  if (!years.length) throw new Error('No ACS housing files found');
+  const fresh = y => T.b25064.has(y);
+  const prevVal = (id, key, y) => {
+    const d = prev[id]; if (!d) return null;
+    const i = d.times.findIndex(t => +t.slice(0, 4) === y); if (i < 0) return null;
+    return key === 'US' ? d.national?.values[i] ?? null : d.entities.find(e => e.id === key)?.values[i] ?? null;
+  };
+  const get1 = (t, y, key) => T[t].get(y)?.get(key) ?? null;
+  const METRICS = {
+    'rent': { calc: (y, k) => get1('b25064', y, k), unit: { label: 'Median gross rent per month', format: 'usd', decimals: 0 }, short: 'Median rent', lens: 'Rent',
+      desc: 'Median monthly rent paid by renter households, including utilities the renter pays (gross rent).' },
+    'rent-burden': { calc: (y, k) => get1('b25071', y, k), unit: { label: 'Median gross rent as % of household income', format: 'pct', decimals: 1 }, short: 'Rent as a share of income', lens: 'Share of income',
+      desc: 'For the typical renter household, the share of its income that goes to rent and utilities. Above 30% is the federal definition of "cost-burdened."' },
+    'home-value': { calc: (y, k) => get1('b25077', y, k), unit: { label: 'Median home value (owner estimate)', format: 'usd', decimals: 0 }, short: 'Median home value', lens: 'Home value',
+      desc: 'Median value of owner-occupied homes, as estimated by the people who own them.' },
+    'price-to-income': { calc: (y, k) => { const v = get1('b25077', y, k), i = get1('b19013', y, k); return v && i ? round(v / i, 1) : null; },
+      unit: { label: 'Median home value ÷ median household income', format: 'number', decimals: 1, suffix: '×' }, short: 'Home price to income', lens: 'Price to income',
+      desc: 'Median home value divided by median household income: how many years of the typical household\'s income the typical home costs.' },
+  };
+  const last = years.at(-1);
+  const times = years.map(y => `${y}-12-31`);
+  const src = t => ({ publisher: 'U.S. Census Bureau', dataset: `American Community Survey 5-year estimates, ${t} (${last - 4}–${last})`, url: 'https://www.census.gov/programs-surveys/acs' });
+  const tables = { 'rent': 'Table B25064', 'rent-burden': 'Table B25071', 'home-value': 'Table B25077', 'price-to-income': 'Tables B25077 and B19013' };
+  const how5 = 'Each year is a 5-year average: "2024" covers 2020–2024. Compare periods that don\'t overlap for the clearest trend.';
+  const extraHow = {
+    'rent': 'Gross rent includes utilities and fuels the renter pays, so it is higher than contract rent alone.',
+    'rent-burden': 'Above 30% counts as cost-burdened by federal housing standards; above 50% is severely cost-burdened.',
+    'home-value': 'Owners\' own estimates, not sale prices. They track market prices but tend to run a little high.',
+    'price-to-income': 'A ratio of 3 is traditionally seen as affordable; above 5 means the typical home costs more than five years of the typical household\'s pay.',
+  };
+  const extraCav = {
+    'rent': ['Covers all renters, including long-time tenants on older leases, so it runs below current asking rents.'],
+    'rent-burden': ['Measured for renter households only; homeowners are not included.'],
+    'home-value': ['Dollar amounts are in each period\'s final-year dollars, not adjusted to today.'],
+    'price-to-income': ['Uses income for all households (renters and owners), so it shows how a typical local household would fare buying the typical local home. Ratio computed by Civic Charts.'],
+  };
+  const svy = 'Survey estimates: small counties have wide margins of error, so modest differences there are often noise.';
+  const { vintage, recs } = await censusCountyFile();
+  const out = [];
+  for (const [slug, M] of Object.entries(METRICS)) {
+    const grp = slug.startsWith('rent') ? ['rent', 'rent-burden'] : ['home-value', 'price-to-income'];
+    const val = (id, key, y) => (fresh(y) ? M.calc(y, key) : prevVal(id, key, y));
+    const cid = `county-${slug}`, sid = `state-${slug}`;
+    const common = { category: 'Housing', frequency: 'annual', unit: M.unit, description: M.desc, source: src(tables[slug]), howToRead: [extraHow[slug], how5], isRate: true, lens: M.lens };
+    const national = id => ({ name: 'United States', values: years.map(y => val(id, 'US', y)) });
+    out.push(panel({ ...common, id: cid, title: `${M.short} by county`, geo: 'us-counties', caveats: [...extraCav[slug], svy, COUNTY_CAVEAT], reframes: grp.map(g => `county-${g}`), national: national(cid) }, times,
+      recs.map(r => { const id = r.STATE + r.COUNTY; return { id, code: ABBR[r.STATE], name: `${r.CTYNAME}, ${ABBR[r.STATE]}`, short: r.CTYNAME, pop: +r[`POPESTIMATE${vintage}`], values: years.map(y => val(cid, id, y)) }; })));
+    // State home values already come from Zillow (state-home-values), so the state level skips the Census version.
+    if (slug === 'home-value') continue;
+    const sGrp = grp.filter(g => g !== 'home-value');
+    out.push(panel({ ...common, id: sid, title: `${M.short} by state`, geo: 'us-states', caveats: extraCav[slug], reframes: sGrp.length > 1 ? sGrp.map(g => `state-${g}`) : undefined, national: national(sid) }, times,
+      STATES.map(([ab, fips, name]) => ({ id: fips, code: ab, name, values: years.map(y => val(sid, fips, y)) }))));
+  }
+  return out;
+};
+
 // ---------- run ----------
 await fs.mkdir(OUT, { recursive: true });
 const only = process.argv.slice(2);
@@ -1201,7 +1438,7 @@ for (const f of (await fs.readdir(OUT)).filter(f => f.endsWith('.json') && f !==
     releases.unshift({ id: meta.id, title: meta.title, released: NOW, lastObservation: meta.lastObservation, previousObservation: prev.lastObservation,
       latest: latestOf(ds), previous: prev.latest || null, unit: meta.unit, frequency: meta.frequency, topic: tag.topic || null, publisher: meta.source?.publisher || null });
   }
-  catalog.push({ ...meta, latest: latestOf(ds), released, hasNational: !!national, topic: tag.topic || 'economy', sourceId: tag.source || null, tier: tag.tier || src?.tier || 'federal', nSeries: series?.length, nEntities: entities?.length, nEvents: events?.length,
+  catalog.push({ ...meta, latest: latestOf(ds), released, hasNational: !!national, topic: tag.topic || 'economy', sourceId: tag.source || null, tier: tag.tier || src?.tier || 'federal', nSeries: series?.length, seriesNames: series?.length > 1 ? series.map(x => x.name) : undefined, nEntities: entities?.length, nEvents: events?.length,
     firstObservation: times?.[0] ?? series?.[0]?.points?.[0]?.[0] ?? events?.[0]?.t });
 }
 catalog.sort((a, b) => a.category.localeCompare(b.category) || a.title.localeCompare(b.title));

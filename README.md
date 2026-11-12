@@ -59,6 +59,12 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 | New home price, nominal and inflation-adjusted | Census/HUD via FRED | time series | quarterly |
 | National debt: nominal, % of GDP, inflation-adjusted | Treasury Fiscal Data, OMB | time series | daily / quarterly |
 | Households with broadband / with no internet, by county and state | Census ACS 5-year, Table B28002 (bulk files, keyless) | county + state maps | annual (5-year periods) |
+| Grocery prices: eggs, ground beef, chicken, milk, bread, coffee, bananas | BLS Average Price Data, U.S. city average (via FRED) | U.S. line, one item at a time | monthly |
+| Inflation by category: groceries, restaurants, shelter, rent, electricity, utility gas, gasoline, used cars, medical care | BLS CPI-U by item (via FRED), year-over-year computed here | U.S. line vs. all items | monthly |
+| Wages vs. inflation; inflation-adjusted hourly pay | BLS CES average hourly earnings, private (from 2006) and CPI-U | U.S. line | monthly |
+| Home electricity prices by state, and change over a year | EIA Form 861M sales and revenue (xlsx, keyless), residential, 12-month sales-weighted average | state map | monthly (~2.5-month lag) |
+| Median rent, rent as a share of income | Census ACS 5-year, Tables B25064 and B25071 | county + state maps | annual (5-year periods) |
+| Median home value; home price to income | Census ACS 5-year, Tables B25077 and B19013 | county map (value), county + state maps (ratio) | annual (5-year periods) |
 | Federal budget deficit: by fiscal year, % of GDP, rolling 12 months | OMB, Treasury Monthly Treasury Statement | time series | fiscal year / monthly |
 | Federal revenue vs. spending, % of GDP | OMB | time series (2 lines) | fiscal year |
 | Interest on the national debt: dollars, % of GDP | BEA, OMB | time series | quarterly / fiscal year |
@@ -93,6 +99,8 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 | Life expectancy by country | World Bank / UN | panel, world map | annual |
 
 To add a source, write one builder function in `scripts/refresh-data.mjs` that returns one of the three shapes. Charts, explanations and trust checks work automatically.
+
+Multi-item datasets (grocery prices, inflation by category) set `seriesTitle`/`chartTitle` and give each series a `noun`, so the headline and title name the item picked ("The average price of a dozen eggs..."). In Simple mode an Item/Category row picks one; `seriesBaseline` keeps "All items" alongside for comparison. Sources that publish late set `releaseLagDays` so the freshness check doesn't flag them as stale.
 
 ## Sources: federal, state and vetted third parties
 

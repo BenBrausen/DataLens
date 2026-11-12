@@ -59,14 +59,21 @@
     const g = ds.gap, A = view.series.find(s => s.id === g.a), B = view.series.find(s => s.id === g.b), u = ds.unit, f = ds.frequency, d = t => PS.fmtDate(t, f, true), v = x => PS.fmt(x, u);
     const bMap = new Map(B.pts.map(p => [p.t, p.v])), both = A.pts.filter(p => bMap.has(p.t)).map(p => ({ t: p.t, a: p.v, b: bMap.get(p.t) }));
     const last = both.at(-1), gap = last.a - last.b;
-    const headline = `In ${d(last.t)}, ${g.aName} was ${v(last.a)}${g.of || ''} and ${g.bName} ${v(last.b)}: ${gap > 0 ? `a ${g.posWord} of ${v(gap)}${g.of || ''}` : gap < 0 ? `a ${g.negWord} of ${v(-gap)}${g.of || ''}` : 'balanced'}.`;
+    // Gaps between two rates are percentage points, not percent ("1.0 percentage points").
+    const gv = x => (u.format === 'pct' && g.points ? `${PS.fmt(x, { format: 'number', decimals: u.decimals ?? 1 })} percentage point${Math.abs(x).toFixed(u.decimals ?? 1) === (1).toFixed(u.decimals ?? 1) ? '' : 's'}` : v(x) + (g.of || ''));
+    const gapText = gap > 0 ? (g.posPhrase ? g.posPhrase.replace('{v}', gv(gap)) : `a ${g.posWord} of ${gv(gap)}`) : gap < 0 ? (g.negPhrase ? g.negPhrase.replace('{v}', gv(-gap)) : `a ${g.negWord} of ${gv(-gap)}`) : 'balanced';
+    const headline = `In ${d(last.t)}, ${g.aName} was ${v(last.a)}${g.of || ''} and ${g.bName} ${v(last.b)}: ${gapText}.`;
     const facts = [];
     const avgA = both.reduce((s, p) => s + p.a, 0) / both.length, avgB = both.reduce((s, p) => s + p.b, 0) / both.length;
     facts.push({ k: 'avg', text: `Averages since ${yr(both[0].t)}: ${g.aName} ${v(avgA)}, ${g.bName} ${v(avgB)}.` });
     const pkA = both.reduce((m, p) => (p.a > m.a ? p : m)); facts.push({ k: 'peak', text: `Highest ${g.aName}: ${v(pkA.a)} in ${d(pkA.t)}.` });
     const pkB = both.reduce((m, p) => (p.b > m.b ? p : m)); facts.push({ k: 'peak2', text: `Highest ${g.bName}: ${v(pkB.b)} in ${d(pkB.t)}.` });
-    const lastNeg = [...both].reverse().find(p => p.a < p.b);
-    facts.push({ k: 'count', text: lastNeg ? `${g.bName[0].toUpperCase() + g.bName.slice(1)} last exceeded ${g.aName} in ${d(lastNeg.t)}.` : `${g.aName[0].toUpperCase() + g.aName.slice(1)} exceeded ${g.bName} in every year shown.` });
+    const lastNeg = [...both].reverse().find(p => p.a < p.b), cap = x => x[0].toUpperCase() + x.slice(1);
+    // If the latest point is itself one where b leads, describe the current streak instead of "last exceeded ... [this month]".
+    let streak = null;
+    if (lastNeg === last) { let i = both.length - 1; while (i > 0 && both[i - 1].a < both[i - 1].b) i--; streak = both[i]; }
+    if (streak) facts.push({ k: 'count', text: streak === both[0] ? `${cap(g.bName)} exceeded ${g.aName} in every period shown.` : `${cap(g.bName)} has exceeded ${g.aName} since ${d(streak.t)}.` });
+    else facts.push({ k: 'count', text: lastNeg ? `${g.bName[0].toUpperCase() + g.bName.slice(1)} last exceeded ${g.aName} in ${d(lastNeg.t)}.` : `${g.aName[0].toUpperCase() + g.aName.slice(1)} exceeded ${g.bName} in every year shown.` });
     return { headline, facts, trend: Math.sign(gap), stats: { first: { t: both[0].t, v: both[0].a }, last: { t: last.t, v: last.a }, peak: { t: pkA.t, v: pkA.a }, trough: { t: last.t, v: last.a }, avg: avgA } };
   }
 
@@ -82,7 +89,9 @@
     const yearAgo = pts.reduce((best, p) => (Math.abs(p.t - (last.t - 365 * DAY)) < Math.abs(best.t - (last.t - 365 * DAY)) ? p : best), first);
     const d = t => PS.fmtDate(t, f, true), v = x => PS.fmt(x, u);
     const at = ['weekly', 'daily', 'real-time'].includes(f) ? 'on' : 'in'; // "on November 2, 2026", "in October 2026"
-    const name = short(ds), startY = yr(first.t);
+    // Multi-item datasets (grocery prices, inflation by category) name the item: "The average price of a dozen eggs".
+    const noun = ds.seriesTitle && ds.series?.find(x => x.id === s.id)?.noun;
+    const name = noun ? ds.seriesTitle.replace('{s}', noun) : short(ds), startY = yr(first.t);
     const facts = [];
     let headline;
     if (last.t === peak.t && pts.length > 10) headline = `${name} hit ${v(last.v)} ${at} ${d(last.t)}, the highest on record since ${startY}.`;
@@ -240,7 +249,8 @@
     // Freshness
     if (ds.lastObservation) {
       const age = (Date.now() - +PS.parseDate(ds.lastObservation)) / DAY;
-      const allowed = { 'real-time': 2, daily: 7, weekly: 21, monthly: 75, quarterly: 200, annual: 730, fiscal: 730, quadrennial: 4 * 365 + 120 }[ds.frequency] || 400;
+      // releaseLagDays: sources that publish well after the period ends (EIA-861M runs ~2.5 months behind).
+      const allowed = ({ 'real-time': 2, daily: 7, weekly: 21, monthly: 75, quarterly: 200, annual: 730, fiscal: 730, quadrennial: 4 * 365 + 120 }[ds.frequency] || 400) + (ds.releaseLagDays || 0);
       if (age > allowed) add('warn', 'Data may be out of date', `Latest observation is ${PS.fmtDate(ds.lastObservation, ds.frequency, true)}. Check the publisher for a newer release before publishing.`);
       else add('pass', 'Data is current', `Latest observation: ${PS.fmtDate(ds.lastObservation, ds.frequency, true)} (${ds.frequency} release).`);
     }

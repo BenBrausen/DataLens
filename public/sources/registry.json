@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-11T22:56:23.184Z",
+ "generated": "2026-11-12T01:51:02.902Z",
  "tiers": [
   {
    "id": "federal",
@@ -244,6 +244,26 @@
   {
    "id": "us-inflation",
    "q": "Are prices still rising?"
+  },
+  {
+   "id": "grocery-prices",
+   "q": "What does a dozen eggs cost now?"
+  },
+  {
+   "id": "wages-vs-inflation",
+   "q": "Are wages keeping up with prices?"
+  },
+  {
+   "id": "county-rent",
+   "q": "What does rent cost near you?"
+  },
+  {
+   "id": "county-price-to-income",
+   "q": "Can people near you afford a home?"
+  },
+  {
+   "id": "state-electricity",
+   "q": "Where is electricity most expensive?"
   },
   {
    "id": "us-unemployment",
@@ -613,6 +633,58 @@
   },
   "state-no-internet": {
    "topic": "technology",
+   "source": "census"
+  },
+  "grocery-prices": {
+   "topic": "prices",
+   "source": "bls"
+  },
+  "cpi-categories": {
+   "topic": "prices",
+   "source": "bls"
+  },
+  "wages-vs-inflation": {
+   "topic": "prices",
+   "source": "bls"
+  },
+  "real-wages": {
+   "topic": "economy",
+   "source": "bls"
+  },
+  "state-electricity": {
+   "topic": "prices",
+   "source": "eia"
+  },
+  "state-electricity-change": {
+   "topic": "prices",
+   "source": "eia"
+  },
+  "county-rent": {
+   "topic": "housing",
+   "source": "census"
+  },
+  "county-rent-burden": {
+   "topic": "housing",
+   "source": "census"
+  },
+  "state-rent": {
+   "topic": "housing",
+   "source": "census"
+  },
+  "state-rent-burden": {
+   "topic": "housing",
+   "source": "census"
+  },
+  "county-home-value": {
+   "topic": "housing",
+   "source": "census"
+  },
+  "county-price-to-income": {
+   "topic": "housing",
+   "source": "census"
+  },
+  "state-price-to-income": {
+   "topic": "housing",
    "source": "census"
   },
   "federal-deficit": {
