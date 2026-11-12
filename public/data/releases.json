@@ -1,1 +1,50 @@
-[]
+[
+ {
+  "id": "job-postings",
+  "title": "Job postings on Indeed",
+  "released": "2026-11-12T15:06:16.280Z",
+  "lastObservation": "2026-11-06",
+  "previousObservation": "2026-10-30",
+  "latest": {
+   "t": "2026-11-06",
+   "v": 104.56
+  },
+  "previous": {
+   "t": "2026-10-30",
+   "v": 103.79
+  },
+  "unit": {
+   "label": "Job postings index (Feb 1, 2020 = 100)",
+   "format": "number",
+   "decimals": 1
+  },
+  "frequency": "weekly",
+  "topic": "economy",
+  "publisher": "Indeed Hiring Lab"
+ },
+ {
+  "id": "business-applications",
+  "title": "New business applications by state",
+  "released": "2026-11-12T15:06:16.280Z",
+  "lastObservation": "2026-10-01",
+  "previousObservation": "2026-09-01",
+  "latest": {
+   "t": "2026-10-01",
+   "v": 146.8,
+   "series": "United States"
+  },
+  "previous": {
+   "t": "2026-09-01",
+   "v": 156.5,
+   "series": "United States"
+  },
+  "unit": {
+   "label": "Business applications per 100,000 residents (monthly)",
+   "format": "number",
+   "decimals": 1
+  },
+  "frequency": "monthly",
+  "topic": "economy",
+  "publisher": "U.S. Census Bureau"
+ }
+]
