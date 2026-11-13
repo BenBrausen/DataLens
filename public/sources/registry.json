@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-13T21:25:48.337Z",
+ "generated": "2026-11-13T22:35:31.189Z",
  "tiers": [
   {
    "id": "federal",
@@ -997,7 +997,7 @@
      "platform": "website",
      "host": "open.alabama.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=ecupH7bxameyeamw",
@@ -1007,7 +1007,7 @@
      "host": "hub.arcgis.com",
      "orgId": "ecupH7bxameyeamw",
      "datasets": 229,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1023,7 +1023,7 @@
      "platform": "arcgis",
      "host": "data-soa-dnr.opendata.arcgis.com",
      "datasets": 144,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1039,7 +1039,7 @@
      "platform": "arcgis",
      "host": "azgeo-data-hub-agic.hub.arcgis.com",
      "datasets": 731,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gisdata.tucsonaz.gov/",
@@ -1050,7 +1050,7 @@
      "platform": "arcgis",
      "host": "gisdata.tucsonaz.gov",
      "datasets": 161,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://www.phoenixopendata.com/",
@@ -1061,7 +1061,7 @@
      "platform": "ckan",
      "host": "www.phoenixopendata.com",
      "datasets": 145,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-maricopa.opendata.arcgis.com/",
@@ -1072,7 +1072,7 @@
      "platform": "arcgis",
      "host": "data-maricopa.opendata.arcgis.com",
      "datasets": 61,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gis.pima.gov/",
@@ -1083,7 +1083,7 @@
      "platform": "website",
      "host": "gis.pima.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1099,7 +1099,7 @@
      "platform": "arcgis",
      "host": "geodata.gis.arkansas.gov",
      "datasets": 294,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1115,7 +1115,7 @@
      "platform": "ckan",
      "host": "data.ca.gov",
      "datasets": 4696,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://bythenumbers.sco.ca.gov/",
@@ -1124,7 +1124,7 @@
      "platform": "socrata",
      "host": "bythenumbers.sco.ca.gov",
      "datasets": 101,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.lacity.org/",
@@ -1135,7 +1135,7 @@
      "platform": "socrata",
      "host": "data.lacity.org",
      "datasets": 361,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://geohub.lacity.org/",
@@ -1146,7 +1146,7 @@
      "platform": "arcgis",
      "host": "geohub.lacity.org",
      "datasets": 990,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.sfgov.org/",
@@ -1157,7 +1157,7 @@
      "platform": "socrata",
      "host": "data.sfgov.org",
      "datasets": 4,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.oaklandca.gov/",
@@ -1168,7 +1168,7 @@
      "platform": "socrata",
      "host": "data.oaklandca.gov",
      "datasets": 313,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.sanjoseca.gov/",
@@ -1179,7 +1179,7 @@
      "platform": "ckan",
      "host": "data.sanjoseca.gov",
      "datasets": 171,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.cityofsacramento.org/",
@@ -1190,7 +1190,7 @@
      "platform": "arcgis",
      "host": "data.cityofsacramento.org",
      "datasets": 127,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.longbeach.gov/",
@@ -1201,7 +1201,7 @@
      "platform": "website",
      "host": "data.longbeach.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.sandiegocounty.gov/",
@@ -1212,7 +1212,7 @@
      "platform": "socrata",
      "host": "data.sandiegocounty.gov",
      "datasets": 1,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.lacounty.gov/",
@@ -1223,7 +1223,7 @@
      "platform": "arcgis",
      "host": "data.lacounty.gov",
      "datasets": 621,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://ocpublicworks-data-ocpw.opendata.arcgis.com/",
@@ -1234,7 +1234,7 @@
      "platform": "website",
      "host": "ocpublicworks-data-ocpw.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.sccgov.org/",
@@ -1245,7 +1245,7 @@
      "platform": "socrata",
      "host": "data.sccgov.org",
      "datasets": 131,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.smcgov.org/",
@@ -1256,7 +1256,7 @@
      "platform": "socrata",
      "host": "data.smcgov.org",
      "datasets": 45,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.marincounty.gov/",
@@ -1267,7 +1267,7 @@
      "platform": "socrata",
      "host": "data.marincounty.gov",
      "datasets": 42,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.sonomacounty.ca.gov/",
@@ -1278,7 +1278,7 @@
      "platform": "socrata",
      "host": "data.sonomacounty.ca.gov",
      "datasets": 24,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.countyofriverside.us/",
@@ -1289,7 +1289,7 @@
      "platform": "socrata",
      "host": "data.countyofriverside.us",
      "datasets": 28,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-sacog.opendata.arcgis.com/",
@@ -1300,7 +1300,7 @@
      "platform": "arcgis",
      "host": "data-sacog.opendata.arcgis.com",
      "datasets": 510,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://opendata.mtc.ca.gov/",
@@ -1311,7 +1311,7 @@
      "platform": "arcgis",
      "host": "opendata.mtc.ca.gov",
      "datasets": 106,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gisdata-scag.opendata.arcgis.com/",
@@ -1322,7 +1322,7 @@
      "platform": "arcgis",
      "host": "gisdata-scag.opendata.arcgis.com",
      "datasets": 34,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://controllerdata.lacity.org/",
@@ -1333,7 +1333,7 @@
      "platform": "socrata",
      "host": "controllerdata.lacity.org",
      "datasets": 87,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1349,7 +1349,7 @@
      "platform": "socrata",
      "host": "data.colorado.gov",
      "datasets": 640,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://www.denvergov.org/opendata",
@@ -1360,7 +1360,7 @@
      "platform": "arcgis",
      "host": "opendata-geospatialdenver.hub.arcgis.com",
      "datasets": 304,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://open-data.bouldercolorado.gov/",
@@ -1371,7 +1371,7 @@
      "platform": "arcgis",
      "host": "open-data.bouldercolorado.gov",
      "datasets": 160,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1387,7 +1387,7 @@
      "platform": "socrata",
      "host": "data.ct.gov",
      "datasets": 590,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.hartford.gov/",
@@ -1398,7 +1398,7 @@
      "platform": "arcgis",
      "host": "data.hartford.gov",
      "datasets": 127,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1414,7 +1414,7 @@
      "platform": "socrata",
      "host": "data.delaware.gov",
      "datasets": 181,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1431,7 +1431,7 @@
      "host": "hub.arcgis.com",
      "orgId": "neT9SoYxizqTHZPH",
      "datasets": 5523,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1458,7 +1458,7 @@
      "platform": "arcgis",
      "host": "city-tampa.opendata.arcgis.com",
      "datasets": 133,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gis-mdc.opendata.arcgis.com/",
@@ -1469,7 +1469,7 @@
      "platform": "arcgis",
      "host": "gis-mdc.opendata.arcgis.com",
      "datasets": 588,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://geohub-bcgis.opendata.arcgis.com/",
@@ -1480,7 +1480,7 @@
      "platform": "arcgis",
      "host": "geohub-bcgis.opendata.arcgis.com",
      "datasets": 174,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=nRHtyn3uE1kyzoYc",
@@ -1490,7 +1490,7 @@
      "host": "hub.arcgis.com",
      "orgId": "nRHtyn3uE1kyzoYc",
      "datasets": 1418,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=O1JpcwDW8sjYuddV",
@@ -1500,7 +1500,7 @@
      "host": "hub.arcgis.com",
      "orgId": "O1JpcwDW8sjYuddV",
      "datasets": 1320,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=z6TmTIyYXEYhuNM0",
@@ -1510,7 +1510,7 @@
      "host": "hub.arcgis.com",
      "orgId": "z6TmTIyYXEYhuNM0",
      "datasets": 1133,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1536,7 +1536,7 @@
      "host": "hub.arcgis.com",
      "orgId": "6RaeG1zfsIoM9Lze",
      "datasets": 532,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=Za9Nk6CPIPbvR1t7",
@@ -1546,7 +1546,7 @@
      "host": "hub.arcgis.com",
      "orgId": "Za9Nk6CPIPbvR1t7",
      "datasets": 199,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=Gqyymy5JISeLzyNM",
@@ -1556,7 +1556,7 @@
      "host": "hub.arcgis.com",
      "orgId": "Gqyymy5JISeLzyNM",
      "datasets": 185,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1572,7 +1572,7 @@
      "platform": "ckan",
      "host": "opendata.hawaii.gov",
      "datasets": 963,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://highways.hidot.hawaii.gov/",
@@ -1581,7 +1581,7 @@
      "platform": "socrata",
      "host": "highways.hidot.hawaii.gov",
      "datasets": 304,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://honolulu-cchnl.opendata.arcgis.com/",
@@ -1591,8 +1591,8 @@
      "examples": "GIS; services; environment",
      "platform": "arcgis",
      "host": "honolulu-cchnl.opendata.arcgis.com",
-     "datasets": 138,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "datasets": 139,
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1608,7 +1608,7 @@
      "platform": "website",
      "host": "data.gis.idaho.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=CNPdEkvnGl65jCX8",
@@ -1618,7 +1618,7 @@
      "host": "hub.arcgis.com",
      "orgId": "CNPdEkvnGl65jCX8",
      "datasets": 1250,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=Qqv4dYPC8Vv8e3c3",
@@ -1628,7 +1628,7 @@
      "host": "hub.arcgis.com",
      "orgId": "Qqv4dYPC8Vv8e3c3",
      "datasets": 345,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=iRCkLgFRU45VAYn3",
@@ -1638,7 +1638,7 @@
      "host": "hub.arcgis.com",
      "orgId": "iRCkLgFRU45VAYn3",
      "datasets": 248,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1654,7 +1654,7 @@
      "platform": "website",
      "host": "data.illinois.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.cityofchicago.org/",
@@ -1665,7 +1665,7 @@
      "platform": "socrata",
      "host": "data.cityofchicago.org",
      "datasets": 928,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://datacatalog.cookcountyil.gov/",
@@ -1676,7 +1676,7 @@
      "platform": "socrata",
      "host": "datacatalog.cookcountyil.gov",
      "datasets": 523,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://datahub.cmap.illinois.gov/",
@@ -1687,7 +1687,7 @@
      "platform": "arcgis",
      "host": "datahub.cmap.illinois.gov",
      "datasets": 55,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=aIrBD8yn1TDTEXoz",
@@ -1697,7 +1697,7 @@
      "host": "hub.arcgis.com",
      "orgId": "aIrBD8yn1TDTEXoz",
      "datasets": 222,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=b9DHj1BjfdLLFv11",
@@ -1707,7 +1707,7 @@
      "host": "hub.arcgis.com",
      "orgId": "b9DHj1BjfdLLFv11",
      "datasets": 188,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1723,7 +1723,7 @@
      "platform": "arcgis",
      "host": "www.indianamap.org",
      "datasets": 432,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.indy.gov/",
@@ -1734,7 +1734,7 @@
      "platform": "website",
      "host": "data.indy.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1750,7 +1750,7 @@
      "platform": "website",
      "host": "data.iowa.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=vPD5PVLI6sfkZ5E4",
@@ -1760,7 +1760,7 @@
      "host": "hub.arcgis.com",
      "orgId": "vPD5PVLI6sfkZ5E4",
      "datasets": 269,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=8lRhdTsQyJpO52F1",
@@ -1770,7 +1770,7 @@
      "host": "hub.arcgis.com",
      "orgId": "8lRhdTsQyJpO52F1",
      "datasets": 292,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=r6iFVcMJeA4kB4GC",
@@ -1780,7 +1780,7 @@
      "host": "hub.arcgis.com",
      "orgId": "r6iFVcMJeA4kB4GC",
      "datasets": 264,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1796,7 +1796,7 @@
      "platform": "arcgis",
      "host": "hub.kansasgis.org",
      "datasets": 300,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1812,7 +1812,7 @@
      "platform": "website",
      "host": "kygeonet.ky.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.louisvilleky.gov/",
@@ -1823,7 +1823,7 @@
      "platform": "arcgis",
      "host": "data.louisvilleky.gov",
      "datasets": 419,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://opendata-kygeonet.opendata.arcgis.com/",
@@ -1832,8 +1832,8 @@
      "platform": "arcgis-org",
      "host": "hub.arcgis.com",
      "orgId": "ghsX9CKghMvyYjBU",
-     "datasets": 484,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "datasets": 485,
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1849,7 +1849,7 @@
      "platform": "website",
      "host": "data-ladotd.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.nola.gov/",
@@ -1860,7 +1860,7 @@
      "platform": "socrata",
      "host": "data.nola.gov",
      "datasets": 210,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=PLiuXYMBpMK5h36e",
@@ -1870,7 +1870,7 @@
      "host": "hub.arcgis.com",
      "orgId": "PLiuXYMBpMK5h36e",
      "datasets": 248,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1886,7 +1886,7 @@
      "platform": "website",
      "host": "www.maine.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=RbMX0mRVOFNTdLzd",
@@ -1896,7 +1896,7 @@
      "host": "hub.arcgis.com",
      "orgId": "RbMX0mRVOFNTdLzd",
      "datasets": 1183,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1912,7 +1912,7 @@
      "platform": "socrata",
      "host": "opendata.maryland.gov",
      "datasets": 1518,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.baltimorecity.gov/",
@@ -1923,7 +1923,7 @@
      "platform": "arcgis",
      "host": "data.baltimorecity.gov",
      "datasets": 344,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.montgomerycountymd.gov/",
@@ -1934,7 +1934,7 @@
      "platform": "socrata",
      "host": "data.montgomerycountymd.gov",
      "datasets": 471,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.princegeorgescountymd.gov/",
@@ -1945,7 +1945,7 @@
      "platform": "socrata",
      "host": "data.princegeorgescountymd.gov",
      "datasets": 139,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gis-bmc.opendata.arcgis.com/",
@@ -1956,7 +1956,7 @@
      "platform": "website",
      "host": "gis-bmc.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -1972,7 +1972,7 @@
      "platform": "website",
      "host": "www.mass.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.boston.gov/",
@@ -1983,7 +1983,7 @@
      "platform": "ckan",
      "host": "data.boston.gov",
      "datasets": 235,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.cambridgema.gov/",
@@ -1994,7 +1994,7 @@
      "platform": "socrata",
      "host": "data.cambridgema.gov",
      "datasets": 291,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://open-data-massgis.hub.arcgis.com/",
@@ -2004,7 +2004,7 @@
      "host": "hub.arcgis.com",
      "orgId": "hGdibHYSPO59RG1h",
      "datasets": 601,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2020,7 +2020,7 @@
      "platform": "socrata",
      "host": "data.michigan.gov",
      "datasets": 242,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.detroitmi.gov/",
@@ -2031,7 +2031,7 @@
      "platform": "arcgis",
      "host": "data.detroitmi.gov",
      "datasets": 227,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://maps-semcog.opendata.arcgis.com/",
@@ -2042,7 +2042,7 @@
      "platform": "website",
      "host": "maps-semcog.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2058,7 +2058,7 @@
      "platform": "arcgis",
      "host": "gis.data.mn.gov",
      "datasets": 913,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://opendata.minneapolismn.gov/",
@@ -2069,7 +2069,7 @@
      "platform": "arcgis",
      "host": "opendata.minneapolismn.gov",
      "datasets": 253,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://information.stpaul.gov/",
@@ -2080,7 +2080,7 @@
      "platform": "arcgis",
      "host": "information.stpaul.gov",
      "datasets": 96,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gis-hennepin.hub.arcgis.com/",
@@ -2091,7 +2091,7 @@
      "platform": "arcgis",
      "host": "gis-hennepin.hub.arcgis.com",
      "datasets": 32,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gis-ramseygis.opendata.arcgis.com/",
@@ -2102,7 +2102,7 @@
      "platform": "website",
      "host": "gis-ramseygis.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2118,7 +2118,7 @@
      "platform": "arcgis",
      "host": "www.gis.ms.gov",
      "datasets": 18,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2134,7 +2134,7 @@
      "platform": "socrata",
      "host": "data.mo.gov",
      "datasets": 262,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.kcmo.org/",
@@ -2145,7 +2145,7 @@
      "platform": "socrata",
      "host": "data.kcmo.org",
      "datasets": 197,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2161,7 +2161,7 @@
      "platform": "website",
      "host": "data.mt.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=qnjIrwR8z5Izc0ij",
@@ -2171,7 +2171,7 @@
      "host": "hub.arcgis.com",
      "orgId": "qnjIrwR8z5Izc0ij",
      "datasets": 588,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=DRQySz3VhPgOv7Bo",
@@ -2181,7 +2181,7 @@
      "host": "hub.arcgis.com",
      "orgId": "DRQySz3VhPgOv7Bo",
      "datasets": 292,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=dKlvxNSUvl36IGMp",
@@ -2190,8 +2190,8 @@
      "platform": "arcgis-org",
      "host": "hub.arcgis.com",
      "orgId": "dKlvxNSUvl36IGMp",
-     "datasets": 274,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "datasets": 275,
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2207,7 +2207,7 @@
      "platform": "website",
      "host": "www.ne.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=Sj9eBhzWwOMzQCfI",
@@ -2217,7 +2217,7 @@
      "host": "hub.arcgis.com",
      "orgId": "Sj9eBhzWwOMzQCfI",
      "datasets": 156,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2233,7 +2233,7 @@
      "platform": "website",
      "host": "goed.nv.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://opendata.gis.clarkcountynv.gov/",
@@ -2254,7 +2254,7 @@
      "host": "hub.arcgis.com",
      "orgId": "RyxlXSfFi87rAosq",
      "datasets": 389,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=9Y4hSlLf13E9S0Eo",
@@ -2264,7 +2264,7 @@
      "host": "hub.arcgis.com",
      "orgId": "9Y4hSlLf13E9S0Eo",
      "datasets": 71,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=hKjkLA70e5yLFrt0",
@@ -2274,7 +2274,7 @@
      "host": "hub.arcgis.com",
      "orgId": "hKjkLA70e5yLFrt0",
      "datasets": 34,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2290,7 +2290,7 @@
      "platform": "arcgis",
      "host": "granit.unh.edu",
      "datasets": 309,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2306,7 +2306,7 @@
      "platform": "socrata",
      "host": "data.nj.gov",
      "datasets": 116,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2332,7 +2332,7 @@
      "host": "hub.arcgis.com",
      "orgId": "qXZbWTdPDbTjl7Dy",
      "datasets": 87,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2348,7 +2348,7 @@
      "platform": "socrata",
      "host": "data.ny.gov",
      "datasets": 1036,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.cityofnewyork.us/",
@@ -2359,7 +2359,7 @@
      "platform": "socrata",
      "host": "data.cityofnewyork.us",
      "datasets": 2410,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.buffalony.gov/",
@@ -2370,7 +2370,7 @@
      "platform": "socrata",
      "host": "data.buffalony.gov",
      "datasets": 1,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://www.nyc.gov/site/planning/data-maps/open-data.page",
@@ -2381,7 +2381,7 @@
      "platform": "website",
      "host": "www.nyc.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://www.nyc.gov/site/finance/property/property.page",
@@ -2392,7 +2392,7 @@
      "platform": "website",
      "host": "www.nyc.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://www.checkbooknyc.com/",
@@ -2403,7 +2403,7 @@
      "platform": "website",
      "host": "www.checkbooknyc.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2419,7 +2419,7 @@
      "platform": "arcgis",
      "host": "www.nconemap.gov",
      "datasets": 255,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-ral.opendata.arcgis.com/",
@@ -2429,8 +2429,8 @@
      "examples": "Planning; utilities; transportation",
      "platform": "arcgis",
      "host": "data-ral.opendata.arcgis.com",
-     "datasets": 195,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "datasets": 194,
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.charlottenc.gov/",
@@ -2441,7 +2441,7 @@
      "platform": "arcgis",
      "host": "data.charlottenc.gov",
      "datasets": 332,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-wake.opendata.arcgis.com/",
@@ -2451,8 +2451,8 @@
      "examples": "Parcels; boundaries; infrastructure",
      "platform": "arcgis",
      "host": "data-wake.opendata.arcgis.com",
-     "datasets": 288,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "datasets": 287,
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://maps.mecknc.gov/openmapping/",
@@ -2479,7 +2479,7 @@
      "platform": "website",
      "host": "www.gis.nd.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=GOcSXpzwBHyk2nog",
@@ -2489,7 +2489,7 @@
      "host": "hub.arcgis.com",
      "orgId": "GOcSXpzwBHyk2nog",
      "datasets": 205,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2505,7 +2505,7 @@
      "platform": "website",
      "host": "data.ohio.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.cincinnati-oh.gov/",
@@ -2516,7 +2516,7 @@
      "platform": "socrata",
      "host": "data.cincinnati-oh.gov",
      "datasets": 82,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://opendata.columbus.gov/",
@@ -2527,7 +2527,7 @@
      "platform": "arcgis",
      "host": "opendata.columbus.gov",
      "datasets": 67,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-morpc.opendata.arcgis.com/",
@@ -2538,7 +2538,7 @@
      "platform": "website",
      "host": "data-morpc.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=1AlElnGrgBM62OSj",
@@ -2548,7 +2548,7 @@
      "host": "hub.arcgis.com",
      "orgId": "1AlElnGrgBM62OSj",
      "datasets": 549,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=ajRlmtxbNBjZggOT",
@@ -2558,7 +2558,7 @@
      "host": "hub.arcgis.com",
      "orgId": "ajRlmtxbNBjZggOT",
      "datasets": 128,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=MlJ0G8iWUyC7jAmu",
@@ -2568,7 +2568,7 @@
      "host": "hub.arcgis.com",
      "orgId": "MlJ0G8iWUyC7jAmu",
      "datasets": 87,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2584,7 +2584,7 @@
      "platform": "ckan",
      "host": "data.ok.gov",
      "datasets": 398,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2600,7 +2600,7 @@
      "platform": "socrata",
      "host": "data.oregon.gov",
      "datasets": 541,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gis-pdx.opendata.arcgis.com/",
@@ -2611,7 +2611,7 @@
      "platform": "arcgis",
      "host": "gis-pdx.opendata.arcgis.com",
      "datasets": 349,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gis-multco.opendata.arcgis.com/",
@@ -2622,7 +2622,7 @@
      "platform": "arcgis",
      "host": "gis-multco.opendata.arcgis.com",
      "datasets": 3,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2638,7 +2638,7 @@
      "platform": "socrata",
      "host": "data.pa.gov",
      "datasets": 352,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://opendataphilly.org/",
@@ -2649,7 +2649,7 @@
      "platform": "website",
      "host": "opendataphilly.org",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.wprdc.org/",
@@ -2660,7 +2660,7 @@
      "platform": "ckan",
      "host": "data.wprdc.org",
      "datasets": 375,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2676,7 +2676,7 @@
      "platform": "website",
      "host": "www.ri.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.providenceri.gov/",
@@ -2687,7 +2687,7 @@
      "platform": "socrata",
      "host": "data.providenceri.gov",
      "datasets": 122,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=EOvMKOFaeiXUzBcH",
@@ -2697,7 +2697,7 @@
      "host": "hub.arcgis.com",
      "orgId": "EOvMKOFaeiXUzBcH",
      "datasets": 42,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=7arM4WYbUOtKu3Zq",
@@ -2707,7 +2707,7 @@
      "host": "hub.arcgis.com",
      "orgId": "7arM4WYbUOtKu3Zq",
      "datasets": 40,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2723,7 +2723,7 @@
      "platform": "website",
      "host": "www.sc.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=VaY7cY9pvUYUP1Lf",
@@ -2733,7 +2733,7 @@
      "host": "hub.arcgis.com",
      "orgId": "VaY7cY9pvUYUP1Lf",
      "datasets": 891,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=acgZYxoN5Oj8pDLa",
@@ -2743,7 +2743,7 @@
      "host": "hub.arcgis.com",
      "orgId": "acgZYxoN5Oj8pDLa",
      "datasets": 256,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=OMDIQXm11z4wcK26",
@@ -2753,7 +2753,7 @@
      "host": "hub.arcgis.com",
      "orgId": "OMDIQXm11z4wcK26",
      "datasets": 89,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2769,7 +2769,7 @@
      "platform": "website",
      "host": "open.sd.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2785,7 +2785,7 @@
      "platform": "arcgis",
      "host": "geodata.tn.gov",
      "datasets": 93,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://healthdata.tn.gov/",
@@ -2794,7 +2794,7 @@
      "platform": "socrata",
      "host": "healthdata.tn.gov",
      "datasets": 296,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.nashville.gov/",
@@ -2805,7 +2805,7 @@
      "platform": "arcgis",
      "host": "data.nashville.gov",
      "datasets": 138,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.memphistn.gov/",
@@ -2816,7 +2816,7 @@
      "platform": "arcgis",
      "host": "data.memphistn.gov",
      "datasets": 41,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2832,7 +2832,7 @@
      "platform": "socrata",
      "host": "data.texas.gov",
      "datasets": 808,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.austintexas.gov/",
@@ -2843,7 +2843,7 @@
      "platform": "website",
      "host": "data.austintexas.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://www.dallasopendata.com/",
@@ -2854,7 +2854,7 @@
      "platform": "socrata",
      "host": "www.dallasopendata.com",
      "datasets": 342,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.sanantonio.gov/",
@@ -2865,7 +2865,7 @@
      "platform": "ckan",
      "host": "data.sanantonio.gov",
      "datasets": 166,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.fortworthtexas.gov/",
@@ -2876,7 +2876,7 @@
      "platform": "socrata",
      "host": "data.fortworthtexas.gov",
      "datasets": 10,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://cohgis-mycity.opendata.arcgis.com/",
@@ -2887,7 +2887,7 @@
      "platform": "website",
      "host": "cohgis-mycity.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://geo-harriscounty.opendata.arcgis.com/",
@@ -2898,7 +2898,7 @@
      "platform": "website",
      "host": "geo-harriscounty.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-traviscountytx.opendata.arcgis.com/",
@@ -2909,7 +2909,7 @@
      "platform": "website",
      "host": "data-traviscountytx.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://gis.dallascounty.org/",
@@ -2931,7 +2931,7 @@
      "platform": "website",
      "host": "data-h-gac.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-nctcoggis.opendata.arcgis.com/",
@@ -2942,7 +2942,7 @@
      "platform": "website",
      "host": "data-nctcoggis.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -2958,7 +2958,7 @@
      "platform": "website",
      "host": "gis.utah.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-wfrc.opendata.arcgis.com/",
@@ -2969,7 +2969,7 @@
      "platform": "arcgis",
      "host": "data-wfrc.opendata.arcgis.com",
      "datasets": 50,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=KaHXE9OkiB9e63uE",
@@ -2979,7 +2979,7 @@
      "host": "hub.arcgis.com",
      "orgId": "KaHXE9OkiB9e63uE",
      "datasets": 288,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://opendata.gis.utah.gov/",
@@ -2989,7 +2989,7 @@
      "host": "hub.arcgis.com",
      "orgId": "99lidPhWCzftIe9K",
      "datasets": 877,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -3005,7 +3005,7 @@
      "platform": "socrata",
      "host": "data.vermont.gov",
      "datasets": 172,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -3021,7 +3021,7 @@
      "platform": "ckan",
      "host": "data.virginia.gov",
      "datasets": 32102,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.richmondgov.com/",
@@ -3032,7 +3032,7 @@
      "platform": "socrata",
      "host": "data.richmondgov.com",
      "datasets": 31,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-fairfaxcountygis.opendata.arcgis.com/",
@@ -3043,7 +3043,7 @@
      "platform": "arcgis",
      "host": "data-fairfaxcountygis.opendata.arcgis.com",
      "datasets": 146,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-arlingtonva.opendata.arcgis.com/",
@@ -3054,7 +3054,7 @@
      "platform": "website",
      "host": "data-arlingtonva.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -3070,7 +3070,7 @@
      "platform": "socrata",
      "host": "data.wa.gov",
      "datasets": 1076,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.seattle.gov/",
@@ -3081,7 +3081,7 @@
      "platform": "website",
      "host": "data.seattle.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.kingcounty.gov/",
@@ -3092,7 +3092,7 @@
      "platform": "socrata",
      "host": "data.kingcounty.gov",
      "datasets": 270,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-psrc.opendata.arcgis.com/",
@@ -3103,7 +3103,7 @@
      "platform": "website",
      "host": "data-psrc.opendata.arcgis.com",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -3119,7 +3119,7 @@
      "platform": "website",
      "host": "dep.wv.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=3iZGO9lgMHNG1V3R",
@@ -3129,7 +3129,7 @@
      "host": "hub.arcgis.com",
      "orgId": "3iZGO9lgMHNG1V3R",
      "datasets": 227,
-     "checked": "2026-11-13T18:04:07.941Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -3145,7 +3145,7 @@
      "platform": "website",
      "host": "sagic.wi.gov",
      "datasets": null,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data.milwaukee.gov/",
@@ -3156,7 +3156,7 @@
      "platform": "ckan",
      "host": "data.milwaukee.gov",
      "datasets": 187,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://data-cityofmadison.opendata.arcgis.com/",
@@ -3167,7 +3167,7 @@
      "platform": "arcgis",
      "host": "data-cityofmadison.opendata.arcgis.com",
      "datasets": 144,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=Ul9AyFFeFTjf08DW",
@@ -3176,8 +3176,8 @@
      "platform": "arcgis-org",
      "host": "hub.arcgis.com",
      "orgId": "Ul9AyFFeFTjf08DW",
-     "datasets": 416,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "datasets": 417,
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=0pgGLzT0Nh7FVjon",
@@ -3187,7 +3187,7 @@
      "host": "hub.arcgis.com",
      "orgId": "0pgGLzT0Nh7FVjon",
      "datasets": 154,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     },
     {
      "url": "https://hub.arcgis.com/search?q=&orgId=o4NJgD3NfeHnWy06",
@@ -3197,7 +3197,7 @@
      "host": "hub.arcgis.com",
      "orgId": "o4NJgD3NfeHnWy06",
      "datasets": 74,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   },
@@ -3213,7 +3213,7 @@
      "platform": "arcgis",
      "host": "data.geospatialhub.org",
      "datasets": 116,
-     "checked": "2026-11-13T21:25:48.337Z"
+     "checked": "2026-11-13T22:35:31.189Z"
     }
    ]
   }
