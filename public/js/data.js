@@ -6,6 +6,7 @@
   // Same-origin server.js when present; otherwise (GitHub Pages, single-file build)
   // the Cloudflare Worker in worker/proxy.js, set as PS_PROXY in index.html.
   const API = window.PS_API_BASE ?? (window.PS_HAS_SERVER ? '' : (window.PS_PROXY || ''));
+  PS.API_BASE = API;
   const DATA = window.PS_DATA_BASE ?? '';
   const hasServer = () => PS._serverOk === true;
 

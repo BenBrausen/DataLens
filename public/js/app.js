@@ -17,7 +17,7 @@
     customColors: ['#1d4e89', '#e4572e', '#29a36a', '#f2a541', '#7d5ba6', '#5c5c5c'], ramp: 'auto', headFont: 'theme', bodyFont: 'theme',
     accent: '', bg: '', bgGradient: false, radius: 6, lineWidth: 5, grid: 'light', textScale: 1, titleStyle: 'title', annotate: true, zeroBase: true,
     series: [], entities: [], topN: 10, highlight: '', sortAsc: false, rangeStart: null, rangeEnd: null, handle: '', brand: true,
-    motion: 'steady', takeaway: true, takeawayText: '', captions: true, script: '', scriptEdited: false, voice: '', speakPreview: false,
+    motion: 'steady', takeaway: true, takeawayText: '', captions: true, script: '', scriptEdited: false, voice: '', speakPreview: false, music: 'auto', aiVoice: 'en-US-Chirp3-HD-Charon',
     kicker: '', title: '', subtitle: '', note: '', colorZero: false, focus: '', compareNational: true, titleEdited: false, minPop: 0, scope: '', compare: [], combineMethod: '',
   };
   let o = { ...DEFAULTS };
@@ -127,21 +127,37 @@
 
   // ---------- playback ----------
   let audioCtx, audioSrc;
+  // Music mood actually used. "Auto": none for TikTok/Reels (trending in-app sounds help reach
+  // there), building music when the story is a record, laid back otherwise.
+  function musicMood() {
+    if (o.format !== 'video') return 'none';
+    if (o.music !== 'auto') return o.music;
+    if (['vertical', 'reels'].includes(o.platform)) return 'none';
+    return /on record|highest since|lowest since|record high|record low/i.test(S.analysis?.headline || '') ? 'build' : 'chill';
+  }
+  const soundtrackOpts = () => ({ voice: S.audio?.buffer || null, mood: musicMood(), duration: o.duration, seed: S.ds?.id || 'civic', revealAt: o.duration * (o.takeaway ? 0.8 : 0.92) });
+  function soundtrack() { return PS.soundtrack(soundtrackOpts()); }
   function play(from = 0) {
     if (o.format === 'image') { toast('Switch format to Video to preview animation.'); return; }
     S.playing = true; S.p = from; S.t0 = performance.now() - from * o.duration * 1000;
     $('#playBtn').textContent = '❚❚'; $('#playBtn').setAttribute('aria-label', 'Pause');
     if (from === 0) {
-      if (S.audio?.buffer) {
-        audioCtx = audioCtx || new AudioContext();
-        audioSrc = audioCtx.createBufferSource(); audioSrc.buffer = S.audio.buffer; audioSrc.connect(audioCtx.destination); audioSrc.start();
+      if (S.audio?.buffer || musicMood() !== 'none') {
+        // Music is composed on the fly (well under a second); start it in step with the picture.
+        const started = S.t0, gen = (S.playGen = (S.playGen || 0) + 1);
+        soundtrack().then(buf => {
+          if (!buf || !S.playing || gen !== S.playGen) return;
+          audioCtx = audioCtx || new AudioContext();
+          audioSrc = audioCtx.createBufferSource(); audioSrc.buffer = buf; audioSrc.connect(audioCtx.destination);
+          audioSrc.start(0, Math.max(0, (performance.now() - started) / 1000));
+        }).catch(() => {});
       } else if (o.speakPreview) PS.speak(o.script, { voice: o.voice, duration: o.duration });
     }
     requestAnimationFrame(loop);
   }
   function pause() {
     S.playing = false; $('#playBtn').textContent = '▶'; $('#playBtn').setAttribute('aria-label', 'Play');
-    PS.stopSpeaking(); try { audioSrc?.stop(); } catch { } audioSrc = null;
+    S.playGen = (S.playGen || 0) + 1; PS.stopSpeaking(); try { audioSrc?.stop(); } catch { } audioSrc = null;
   }
   function loop(now) {
     if (!S.playing || S.exporting) return;
@@ -212,7 +228,7 @@
     o.showSafe = false; pause(); S.p = 1; update();
     await document.fonts.ready; renderer.layout = null; update({ panels: false });
     const ds = S.comboDs || S.ds, link = PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts());
-    const caps = PS.postCaptions(ds.combo ? { ...ds, topic: S.ds.topic } : { ...S.ds, topic: S.ds.topic }, S.analysis, { ...o, title: o.title || S.ds.title }, link);
+    const caps = aiNote(PS.postCaptions(ds.combo ? { ...ds, topic: S.ds.topic } : { ...S.ds, topic: S.ds.topic }, S.analysis, { ...o, title: o.title || S.ds.title }, link));
     const cat = S.catalog.find(c => c.id === S.ds.id) || {};
     window.CC_RENDER = {
       ready: true,
@@ -266,6 +282,27 @@
   const field = (label, inner, out = '') => `<div class="field"><label>${label}${out ? `<output>${out}</output>` : ''}</label>${inner}</div>`;
   const check = (k, label) => `<label class="chk"><input type="checkbox" data-k="${k}" ${o[k] ? 'checked' : ''}> ${label}</label>`;
   const range = (k, min, max, step = 1) => `<input type="range" data-k="${k}" data-num min="${min}" max="${max}" step="${step}" value="${o[k]}">`;
+  // ---------- sound: music and AI voice controls (shared by Simple and Advanced) ----------
+  // Disclose AI narration in the longer post texts (short ones like X and Bluesky have no room).
+  function aiNote(caps) {
+    if (!(S.audio?.ai && o.format === 'video')) return caps;
+    for (const k of ['linkedin', 'facebook', 'instagram', 'tiktok', 'threads', 'youtube']) if (typeof caps[k] === 'string') caps[k] = caps[k].replace(/\s*$/, '') + '\n\nNarration: AI voice.';
+    return caps;
+  }
+  function musicHTML() {
+    const auto = o.music === 'auto' ? `Auto: ${PS.moodName(musicMood())}` : 'Auto';
+    const tiktok = ['vertical', 'reels'].includes(o.platform);
+    return `<h3>Music</h3><div class="chips">${[['auto', auto], ...PS.MOODS].map(([k, l]) => `<button class="chip ${o.music === k ? 'active' : ''}" data-music="${k}">${esc(l)}</button>`).join('')}</div>
+      <p class="muted">Original music composed for this chart, so it can't be copyright-claimed. It drops back automatically while a voiceover speaks.${tiktok ? ' On TikTok and Reels, a trending sound added in the app can help reach, so Auto leaves music off for this size.' : ''}</p>`;
+  }
+  function aiVoiceHTML() {
+    if (!S.ttsOn) return '';
+    const stale = S.audio?.ai && S.audio.text !== o.script;
+    return `<div class="field"><div class="lbl">AI voiceover</div><div class="row">${select('aiVoice', PS.TTS_VOICES)}<button class="btn" data-act="aiVoice" style="flex:none">${S.audio?.ai ? 'Remake' : 'Make voiceover'}</button></div>
+      ${stale ? '<p class="muted" style="color:var(--warn)">The script changed since this voiceover was made. Remake it so they match.</p>' : ''}
+      <p class="muted">Reads the script in a natural AI voice. The post text notes AI narration.</p></div>`;
+  }
+  const audioRow = () => (S.audio ? `<div class="row"><span class="muted">${esc(S.audio.name)} · ${S.audio.buffer.duration.toFixed(1)}s</span><button class="btn" data-act="removeAudio" style="flex:none">Remove</button></div>` : '');
   const select = (k, opts) => `<select data-k="${k}">${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(o[k]) === String(v) ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
 
   const STEPS = {};
@@ -601,6 +638,7 @@
     if (t.dataset.chart) { PS.track('select_chart', { chart_type: t.dataset.chart }); o.chart = t.dataset.chart; Object.assign(o, { takeawayText: '' }); if (!o.titleEdited) o.title = autoTitle(S.ds); update(); renderStep(); return; }
     if (t.dataset.theme) { o.theme = t.dataset.theme; o.bg = ''; update(); renderStep(); return; }
     if (t.dataset.pal) { o.palette = t.dataset.pal; update(); renderStep(); return; }
+    if (t.dataset.music) { o.music = t.dataset.music; pause(); renderStep(); if (o.music !== 'none') play(0); return; }
     if (t.dataset.ramp) { o.ramp = t.dataset.ramp; update(); renderStep(); return; }
     if (t.dataset.fmt) { o.format = t.dataset.fmt; S.p = 1; update(); renderStep(); return; }
     const act = t.dataset.act; if (!act) return;
@@ -652,6 +690,21 @@
       renderStep();
     },
     removeAudio: () => { S.audio = null; renderStep(); },
+    aiVoice: async t => {
+      if (o.format === 'image') { toast('Voiceover is for video. Switch format to Video.'); return; }
+      const label = t.textContent; t.disabled = true; t.textContent = 'Making the voiceover…';
+      try {
+        const buffer = await PS.aiVoice(o.script, o.aiVoice);
+        const vName = (PS.TTS_VOICES.find(v => v[0] === o.aiVoice)?.[1] || 'AI voice').split(' (')[0];
+        S.audio = { buffer, name: `AI voice · ${vName}`, ai: true, text: o.script };
+        PS.track('ai_voice', { voice: vName, chars: o.script.length });
+        // Fit the video to the voice: never cut the narration off.
+        if (buffer.duration + 0.8 > o.duration) { o.duration = Math.min(90, Math.ceil(buffer.duration + 1.5)); toast(`Voiceover added. Video lengthened to ${o.duration}s to fit it.`); }
+        else toast('Voiceover added. Music, if any, drops back while it speaks.');
+        update();
+      } catch (e) { toast(e.message); }
+      t.disabled = false; t.textContent = label; renderStep();
+    },
     png: async () => {
       if (gate()) return;
       const prev = o.format; o.format = 'image'; update({ panels: false });
@@ -710,7 +763,9 @@
       $('#cancelExport').hidden = false;
       try {
         const prev = o.format; o.format = 'video'; update({ panels: false });
-        const { blob, ext } = await PS.exportVideo({ renderer, duration: o.duration, audioBuffer: S.audio?.buffer, signal: ctrl.signal, onProgress: p => (bar.style.width = (p * 100).toFixed(1) + '%') });
+        const audioBuffer = await soundtrack();
+        if (musicMood() !== 'none') PS.track('add_music', { mood: musicMood(), with_voice: !!S.audio });
+        const { blob, ext } = await PS.exportVideo({ renderer, duration: o.duration, audioBuffer, signal: ctrl.signal, onProgress: p => (bar.style.width = (p * 100).toFixed(1) + '%') });
         o.format = prev;
         S.lastExport = { blob, name: `${PS.slug(o.title)}-${o.platform}.${ext}`, type: blob.type };
         await PS.download(blob, S.lastExport.name);
@@ -909,6 +964,7 @@
       ${check('takeaway', 'Show the takeaway (what the data shows)')}
       <details class="mini-details"><summary>Edit the takeaway wording</summary>${field('', `<textarea data-k="takeawayText" placeholder="${esc(S.analysis?.headline || '')}">${esc(o.takeawayText)}</textarea><p class="muted">Leave blank to use the computed takeaway. Every number must match the data.</p>`)}</details>
       ${o.format === 'video' ? check('captions', 'Captions on the video (most people watch muted)') : ''}
+      ${o.format === 'video' ? `${S.ttsOn ? `<h3>Voiceover</h3>${aiVoiceHTML()}${audioRow()}` : ''}${musicHTML()}` : ''}
       ${field('Your handle (optional)', `<input type="text" data-k="handle" value="${esc(o.handle)}" placeholder="@yourhandle">`)}
       <button class="btn" data-act="resetStory">Reset words to suggested</button>
       <p class="muted" style="margin-top:14px">The source is always shown on the chart. Want fonts, custom colors, time ranges, voiceover or comparisons? <button class="linkbtn" data-mode-go="advanced">Switch to Advanced</button></p>
@@ -936,12 +992,14 @@
       <h3>Captions &amp; voiceover</h3>${check('captions', 'Burn in captions (most social video is watched muted)')}
       ${field('Script', `<textarea data-k="script" style="min-height:130px">${esc(o.script)}</textarea><p class="muted" id="scriptFit">${fitText()}</p>`)}
       <div class="row"><button class="btn" data-act="regenScript">Regenerate</button><button class="btn" data-act="speak">Listen</button></div>
-      ${voices.length ? field('Preview voice', select('voice', [['', 'System default'], ...voices.map(v => [v.name, v.name])])) : ''}
+      ${aiVoiceHTML()}
+      ${voices.length ? field('Preview voice (browser)', select('voice', [['', 'System default'], ...voices.map(v => [v.name, v.name])])) : ''}
       ${check('speakPreview', 'Read the script aloud during preview')}
       <div class="field"><div class="lbl">Voiceover track for export</div>
         ${S.audio ? `<div class="row"><span class="muted">${esc(S.audio.name)} · ${S.audio.buffer.duration.toFixed(1)}s</span><button class="btn" data-act="removeAudio" style="flex:none">Remove</button></div>` :
         `<div class="row"><button class="btn" data-act="record">Record (reads along with captions)</button></div><label class="muted" style="display:block;margin-top:6px">or upload audio <input type="file" id="audioFile" accept="audio/*"></label>`}
-        <p class="muted">Browser voices can preview but can't be embedded in video. Recorded or uploaded audio is mixed into the export.</p></div>
+        <p class="muted">Browser voices can preview but can't be embedded in video. ${S.ttsOn ? 'AI voiceovers, recordings' : 'Recordings'} and uploaded audio are mixed into the export.</p></div>
+      ${o.format === 'video' ? musicHTML() : ''}
       <h3>Credit</h3>${field('Your handle or outlet', `<input type="text" data-k="handle" value="${esc(o.handle)}" placeholder="@yourhandle">`)}
       ${field('Extra note (appended to the source line)', `<input type="text" data-k="note" value="${esc(o.note)}" placeholder="e.g. Seasonally adjusted.">`)}
       ${check('brand', 'Show "Made with civiccharts.com"')}
@@ -1008,7 +1066,7 @@
     const mime = PS.videoMime();
     const link = PS.shareLink(S.ds.id, o, S.state, DEFAULTS, autoOpts());
     const ds = S.comboDs || viewOf(S.ds);
-    const caps = PS.postCaptions(ds.combo ? { ...ds, topic: S.ds.topic } : { ...S.ds, topic: S.ds.topic }, S.analysis, { ...o, title: o.title || S.ds.title }, link);
+    const caps = aiNote(PS.postCaptions(ds.combo ? { ...ds, topic: S.ds.topic } : { ...S.ds, topic: S.ds.topic }, S.analysis, { ...o, title: o.title || S.ds.title }, link));
     // A tab picked by hand sticks for this size; otherwise the post text matches the size's network.
     const capTab = (S.capTabFor === o.platform && S.capTab) || PS.POST_FOR[o.platform] || 'linkedin';
     S.capTabShown = capTab;
@@ -1025,7 +1083,7 @@
       <h3>Download</h3>
       ${o.format === 'video' ? `<button class="btn primary block" data-act="video" ${mime && !blocked() ? '' : 'disabled'}>Export video${mime ? ` (${mime.startsWith('video/mp4') ? 'MP4' : 'WebM'})` : ''}</button>
         <div class="progress" id="exportProgress"><i></i></div><button class="btn block" id="cancelExport" data-act="cancel" hidden style="margin-top:6px">Cancel</button>
-        <p class="muted">Renders in real time (${o.duration}s). Keep this tab visible while it records.${S.audio ? ' Includes your voiceover.' : ''}</p>` : ''}
+        <p class="muted">Renders in real time (${o.duration}s). Keep this tab visible while it records.${[S.audio ? ' Includes your voiceover' : '', musicMood() !== 'none' ? `${S.audio ? ' and' : ' Includes'} ${PS.moodName(musicMood()).toLowerCase()} music` : ''].join('')}${S.audio || musicMood() !== 'none' ? '.' : ''}</p>` : ''}
       <button class="btn ${o.format === 'image' ? 'primary' : ''} block" data-act="png" style="margin-top:6px" ${dis}>Export PNG (final frame, with source details embedded)</button>
       ${adv ? '' : '<details class="mini-details more-formats"><summary>More formats: slides, PDF, data, embed</summary>'}
       <button class="btn block" data-act="carousel" style="margin-top:6px" ${dis}>LinkedIn carousel (4-page PDF)</button>
@@ -1224,5 +1282,6 @@
     }
     document.fonts.ready.then(() => { renderer.layout = null; update({ panels: false }); });
     if (window.speechSynthesis) speechSynthesis.onvoiceschanged = () => S.step === 'story' && renderStep();
+    if (!RENDER) PS.ttsStatus().then(st => { S.ttsOn = !!st.enabled; if (S.ttsOn && ['story', 'design'].includes(S.step)) renderStep(); });
   })();
 })(window.PS);

@@ -85,6 +85,44 @@
   PS.stopSpeaking = () => window.speechSynthesis?.cancel();
   PS.scriptSeconds = text => text.split(/\s+/).filter(Boolean).length / 2.6;
 
+  // ---------- AI voice (Google Cloud Text-to-Speech, through our Worker) ----------
+  // The Google key lives only in the Cloudflare Worker (worker/proxy.js) as a secret. The site
+  // asks the Worker whether voices are on, gets a Turnstile bot check if one is configured,
+  // then sends the script and gets MP3 audio back.
+  PS.TTS_VOICES = [
+    ['en-US-Chirp3-HD-Charon', 'Charon (calm, low)'],
+    ['en-US-Chirp3-HD-Kore', 'Kore (clear, warm)'],
+    ['en-US-Chirp3-HD-Puck', 'Puck (upbeat)'],
+    ['en-US-Chirp3-HD-Aoede', 'Aoede (bright)'],
+  ];
+  PS.TTS_MAX = 1000;
+  let ttsStatus;
+  PS.ttsStatus = () => (ttsStatus ||= fetch(`${PS.API_BASE}api/tts/status`).then(r => (r.ok ? r.json() : { enabled: false })).catch(() => ({ enabled: false })));
+  function loadScript(src) {
+    return new Promise((res, rej) => { if (document.querySelector(`script[src="${src}"]`)) return res(); const s = document.createElement('script'); s.src = src; s.async = true; s.onload = res; s.onerror = () => rej(new Error('Could not load the bot check.')); document.head.appendChild(s); });
+  }
+  async function turnstileToken(sitekey) {
+    await loadScript('https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit');
+    const el = document.createElement('div'); el.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:50'; document.body.appendChild(el);
+    try {
+      return await new Promise((res, rej) => {
+        const id = window.turnstile.render(el, { sitekey, appearance: 'interaction-only', callback: res, 'error-callback': () => rej(new Error('The bot check failed. Try again.')), 'timeout-callback': () => rej(new Error('The bot check timed out. Try again.')) });
+        setTimeout(() => { try { window.turnstile.remove(id); } catch { } rej(new Error('The bot check timed out. Try again.')); }, 60000);
+      });
+    } finally { setTimeout(() => el.remove(), 500); }
+  }
+  PS.aiVoice = async function (text, voice) {
+    const st = await PS.ttsStatus();
+    if (!st.enabled) throw new Error('AI voices aren\'t turned on for this site yet.');
+    const clean = String(text).replace(/\s+/g, ' ').trim();
+    if (!clean) throw new Error('Write a script first.');
+    if (clean.length > PS.TTS_MAX) throw new Error(`The script is ${clean.length} characters; AI voices take up to ${PS.TTS_MAX}. Shorten it.`);
+    const token = st.sitekey ? await turnstileToken(st.sitekey) : '';
+    const r = await fetch(`${PS.API_BASE}api/tts`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: clean, voice, token }) });
+    if (!r.ok) { let msg = ''; try { msg = (await r.json()).error; } catch { } throw new Error(msg || `The voice service answered ${r.status}. Try again later.`); }
+    return PS.decodeAudio(await r.blob());
+  };
+
   PS.decodeAudio = async blob => {
     const ctx = new AudioContext();
     try { return await ctx.decodeAudioData(await blob.arrayBuffer()); } finally { ctx.close(); }

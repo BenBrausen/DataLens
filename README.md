@@ -202,6 +202,12 @@ Context that can't be removed is stamped into the source line of every export: a
 
 Someone determined to mislead can still edit a file in another app. The goal is that Civic Charts is never the easy way to do it.
 
+## Music and AI voiceovers
+
+Videos can carry original background music (`public/js/music.js`): Laid back, Energetic or Building, composed in the browser with Web Audio for each chart. Nothing is sampled or licensed, so no Content ID system can claim it; each track fits the video length exactly, and Building swells to land on the chart's reveal. "Auto" leaves music off for TikTok and Reels (a trending sound added in the app helps reach there), picks Building when the story is a record and Laid back otherwise.
+
+AI voiceovers use Google Cloud Text-to-Speech (Chirp 3 HD voices) through the Cloudflare Worker, which holds the key as a secret and enforces a Turnstile bot check, a 1,000-character cap, 12 voiceovers per visitor per hour and a daily character budget. Setup: `worker/README-tts.md`. With a voiceover, music ducks to about a quarter of its level while words are spoken and comes back in the pauses; the video lengthens to fit the narration, and the longer post texts add "Narration: AI voice." Run `TTS_FAKE=1 node server.js` to test without a key.
+
 ## Sharing
 
 - **Sizes**

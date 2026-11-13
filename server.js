@@ -9,6 +9,26 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import worker from './worker/proxy.js';
+
+// The Worker code runs here too, for /api/tts. Node has no Cloudflare cache; stub it.
+globalThis.caches ??= { default: { match: async () => undefined, put: async () => {} } };
+// TTS_FAKE=1 answers with a synthetic "voice" (buzzy syllables and pauses) so the voiceover and
+// music-ducking path can be tested without a Google key.
+function fakeVoice(text) {
+  const sr = 24000, segs = [];
+  for (const w of text.split(/\s+/).filter(Boolean)) { segs.push([0.12 + Math.min(w.length, 10) * 0.035, 1]); segs.push([/[.!?]$/.test(w) ? 0.45 : 0.07, 0]); }
+  const n = Math.ceil(segs.reduce((a, s) => a + s[0], 0.3) * sr), pcm = new Int16Array(n);
+  let i = Math.floor(0.15 * sr);
+  for (const [dur, on] of segs) {
+    const m = Math.floor(dur * sr);
+    for (let k = 0; k < m && i < n; k++, i++) if (on) { const t = i / sr, env = Math.sin(Math.PI * k / m); pcm[i] = 9000 * env * (Math.sin(2 * Math.PI * 140 * t) * 0.6 + Math.sin(2 * Math.PI * 280 * t) * 0.3 + Math.sin(2 * Math.PI * 700 * t) * 0.15); }
+  }
+  const head = Buffer.alloc(44);
+  head.write('RIFF', 0); head.writeUInt32LE(36 + pcm.byteLength, 4); head.write('WAVEfmt ', 8); head.writeUInt32LE(16, 16); head.writeUInt16LE(1, 20); head.writeUInt16LE(1, 22);
+  head.writeUInt32LE(sr, 24); head.writeUInt32LE(sr * 2, 28); head.writeUInt16LE(2, 32); head.writeUInt16LE(16, 34); head.write('data', 36); head.writeUInt32LE(pcm.byteLength, 40);
+  return Buffer.concat([head, Buffer.from(pcm.buffer)]);
+}
 
 const ROOT = path.dirname(new URL(import.meta.url).pathname);
 const PUB = process.env.SITE_DIR ? path.resolve(process.env.SITE_DIR) : path.join(ROOT, 'public');
@@ -54,6 +74,20 @@ async function cachedFetch(url, accept) {
 const server = http.createServer(async (req, res) => {
   const u = new URL(req.url, 'http://x');
   try {
+    if (u.pathname === '/api/tts' || u.pathname === '/api/tts/status') {
+      const chunks = []; for await (const c of req) chunks.push(c);
+      const raw = Buffer.concat(chunks);
+      if (process.env.TTS_FAKE) {
+        if (u.pathname.endsWith('/status')) return send(res, 200, JSON.stringify({ enabled: true, sitekey: null, fake: true }), { 'Content-Type': 'application/json' });
+        const { text = '' } = JSON.parse(raw.toString() || '{}');
+        return send(res, 200, fakeVoice(String(text)), { 'Content-Type': 'audio/wav' });
+      }
+      // Same code as the live Worker, with the key from this machine's environment.
+      const origin = req.headers.origin || `http://localhost:${PORT}`;
+      const r = await worker.fetch(new Request(`http://localhost${u.pathname}`, { method: req.method, headers: { 'Content-Type': 'application/json', Origin: origin, 'CF-Connecting-IP': req.socket.remoteAddress || '' }, body: ['GET', 'HEAD', 'OPTIONS'].includes(req.method) ? undefined : raw }),
+        { GOOGLE_TTS_KEY: process.env.GOOGLE_TTS_KEY, TTS_ORIGINS: `${origin}` }, { waitUntil() {} });
+      return send(res, r.status, Buffer.from(await r.arrayBuffer()), { 'Content-Type': r.headers.get('content-type') || 'application/json' });
+    }
     if (u.pathname === '/api/search') {
       const q = new URL('https://catalog.data.gov/search');
       for (const [k, v] of u.searchParams) q.searchParams.set(k, v);
