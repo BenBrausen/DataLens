@@ -350,7 +350,8 @@
     for (let i = 1; i < pts.length; i++) if (pts[i].t >= t) { const a = pts[i - 1], b = pts[i]; return lerp(a.v, b.v, (t - a.t) / (b.t - a.t || 1)); }
     return pts[pts.length - 1].v;
   }
-  function tickFormat(st) { const u = st.ds.unit; return v => fmt(v, u, { short: true, decimals: u.format === 'pct' && Math.abs(v) >= 10 ? 0 : u.format === 'usdT' ? 0 : undefined }); }
+  // Whole-number percent ticks drop decimals ("5%", not "5.00%") so every tick on an axis matches.
+  function tickFormat(st) { const u = st.ds.unit; return v => fmt(v, u, { short: true, decimals: u.format === 'pct' && (Math.abs(v) >= 10 || Number.isInteger(v)) ? 0 : u.format === 'usdT' ? 0 : undefined }); }
 
   // ---------- chart types ----------
   const CHART_DRAW = {};
