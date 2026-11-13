@@ -241,8 +241,12 @@
         size: o.platform, width: PS.PLATFORMS[o.platform].w, height: PS.PLATFORMS[o.platform].h,
       },
       image: () => { renderer.draw(1); return renderer.canvas.toDataURL('image/png'); },
+      // &music=chill|energetic|build|none|auto (default none): original music for auto-posted videos.
+      music: () => (qs.get('music') ? (o.music = qs.get('music'), musicMood()) : 'none'),
       video: async () => {
-        const { blob, ext } = await PS.exportVideo({ renderer, duration: o.duration });
+        const mood = window.CC_RENDER.music();
+        const audioBuffer = mood !== 'none' ? await PS.soundtrack({ voice: null, mood, duration: o.duration, seed: S.ds.id, revealAt: o.duration * (o.takeaway ? 0.8 : 0.92) }) : null;
+        const { blob, ext } = await PS.exportVideo({ renderer, duration: o.duration, audioBuffer });
         const b64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(String(fr.result).split(',')[1]); fr.readAsDataURL(blob); });
         return { base64: b64, ext, type: blob.type };
       },

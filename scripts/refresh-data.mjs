@@ -1643,7 +1643,8 @@ for (const f of (await fs.readdir(OUT)).filter(f => f.endsWith('.json') && f !==
   const tag = DATASET_TAGS[meta.id] || {};
   const src = [...FEDERAL.map(f => ({ ...f, tier: 'federal' })), ...THIRD_PARTY].find(x => x.id === tag.source);
   const prev = prevById.get(meta.id);
-  const pk = periodKey(meta.lastObservation, meta.frequency), isNew = !!(prev && pk && periodKey(prev.lastObservation, meta.frequency) !== pk);
+  // Only a later period counts: a source revising its latest period away (an incomplete year dropped) is not a release.
+  const pk = periodKey(meta.lastObservation, meta.frequency), isNew = !!(prev && pk && periodKey(prev.lastObservation, meta.frequency) !== pk && String(meta.lastObservation) > String(prev.lastObservation));
   const released = isNew ? NOW : pk ? prev?.released ?? null : null;
   if (isNew) {
     releases.unshift({ id: meta.id, title: meta.title, released: NOW, lastObservation: meta.lastObservation, previousObservation: prev.lastObservation,
