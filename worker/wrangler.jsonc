@@ -1,0 +1,13 @@
+// Config for deploying the Worker from the command line:
+//   npx wrangler deploy --config worker/wrangler.jsonc
+// Secrets (GOOGLE_TTS_KEY, TURNSTILE_SECRET) live in Cloudflare, never here. keep_vars stops a
+// deploy from wiping text variables set in the dashboard (TURNSTILE_SITEKEY, TTS_DAILY_CHARS).
+{
+  "name": "plainsight-proxy",
+  "main": "proxy.js",
+  "compatibility_date": "2024-09-01",
+  "keep_vars": true,
+  "kv_namespaces": [
+    { "binding": "TTS_KV", "id": "6506f606e1184ab4bcb5959fe4ac88d1" }
+  ]
+}

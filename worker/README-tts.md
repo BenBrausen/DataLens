@@ -51,7 +51,7 @@ quota apply. Daily usage is visible in the KV namespace as `day:YYYY-MM-DD` (cha
 From a computer with Node, in the repo folder:
 
 ```bash
-npx wrangler deploy worker/proxy.js --name plainsight-proxy --compatibility-date 2024-09-01
+npx wrangler deploy --config worker/wrangler.jsonc
 ```
 
 Or paste `worker/proxy.js` into the Worker's online editor (Edit code → replace all → Deploy).
