@@ -65,6 +65,10 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 | Home electricity prices by state, and change over a year | EIA Form 861M sales and revenue (xlsx, keyless), residential, 12-month sales-weighted average | state map | monthly (~2.5-month lag) |
 | Median rent, rent as a share of income | Census ACS 5-year, Tables B25064 and B25071 | county + state maps | annual (5-year periods) |
 | Median home value; home price to income | Census ACS 5-year, Tables B25077 and B19013 | county map (value), county + state maps (ratio) | annual (5-year periods) |
+| Temperature vs. 1901–2000 average, by county and state | NOAA NCEI nClimDiv (keyless files; skipped when NOAA hasn't posted a new file) | county + state maps | annual, 1895 on |
+| Drought (share of land in D1 or worse) | U.S. Drought Monitor data services (keyless) | state map weekly since 2000; county map, last 2 years | weekly (Thursdays) |
+| Federal contracts and grants per resident, by state | USAspending.gov spending by geography, place of performance | state map | fiscal year, 2010 on |
+| Fair Market Rent (two-bedroom) by county | HUD User FMR API (free token, secret `HUD_API_TOKEN`; skipped without it, snapshot kept) | county map | fiscal year, FY2017 on |
 | Federal budget deficit: by fiscal year, % of GDP, rolling 12 months | OMB, Treasury Monthly Treasury Statement | time series | fiscal year / monthly |
 | Federal revenue vs. spending, % of GDP | OMB | time series (2 lines) | fiscal year |
 | Interest on the national debt: dollars, % of GDP | BEA, OMB | time series | quarterly / fiscal year |
@@ -100,7 +104,7 @@ official sources ─► scripts/refresh-data.mjs ─► public/data/*.json ─�
 
 To add a source, write one builder function in `scripts/refresh-data.mjs` that returns one of the three shapes. Charts, explanations and trust checks work automatically.
 
-Multi-item datasets (grocery prices, inflation by category) set `seriesTitle`/`chartTitle` and give each series a `noun`, so the headline and title name the item picked ("The average price of a dozen eggs..."). In Simple mode an Item/Category row picks one; `seriesBaseline` keeps "All items" alongside for comparison. Sources that publish late set `releaseLagDays` so the freshness check doesn't flag them as stale.
+Multi-item datasets (grocery prices, inflation by category) set `seriesTitle`/`chartTitle` and give each series a `noun`, so the headline and title name the item picked ("The average price of a dozen eggs..."). In Simple mode an Item/Category row picks one; `seriesBaseline` keeps "All items" alongside for comparison. Builders for big or slow sources (NOAA, Drought Monitor) keep the previous snapshot when nothing new is published and the builder code is unchanged (`buildHash`). A fiscal year that is less than 60% reported nationally is left off the USAspending maps so a reporting lag never reads as a cut. Sources that publish late set `releaseLagDays` so the freshness check doesn't flag them as stale.
 
 ## Sources: federal, state and vetted third parties
 
@@ -163,6 +167,7 @@ Pick **Your state** and county maps zoom to that state's counties, rankings and 
 | USDA (ERS county data, NASS) | ERS bulk files next; NASS Quick Stats needs its own free key |
 | USAID / foreign aid | USAID's programs moved to the State Department in 2025; ForeignAssistance.gov still publishes obligations by country and is the candidate source |
 | FCC broadband | Very large location-level files; needs pre-aggregation to county |
+| USAspending by county, and direct payments | Left out on purpose: USAspending books many payments where they are processed (Medicare contractors in Fargo, ND), so county and direct-payment maps would mislead |
 
 Every federal publisher on data.gov (62 agencies) is listed in Sources → Federal with a search button, so agency data without a ready-made dataset is still reachable.
 

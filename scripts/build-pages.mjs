@@ -60,7 +60,7 @@ await browser.close(); server.close();
 // 3. Write each dataset page.
 const pageTitle = info => {
   const [val, dateRaw] = String(info.latestText || '').split(' · '), date = (dateRaw || '').replace(/^through /, '');
-  const v = (val || '').replace(/^U\.S\.: /, 'U.S. '); // on map pages the value is the national figure; say so
+  const v = (val || '').replace(/^(Contiguous )?U\.S\.: /, 'U.S. '); // on map pages the value is the national figure; say so
   // A question title ("Are wages keeping up with prices?") reads badly with a bare value after it.
   let t = v && !info.title.endsWith('?') && !/\b(states|counties|countries|events)\b/.test(v) && date ? `${info.title}: ${v} (${date})` : date ? `${info.title} (${date})` : info.title;
   if (t.length > 62) t = date ? `${info.title} (${date})` : info.title;

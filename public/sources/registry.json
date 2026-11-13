@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-12T02:13:08.155Z",
+ "generated": "2026-11-13T03:45:03.512Z",
  "tiers": [
   {
    "id": "federal",
@@ -302,6 +302,18 @@
    "q": "How much has the planet warmed?"
   },
   {
+   "id": "county-temperature",
+   "q": "How much warmer is your county than it used to be?"
+  },
+  {
+   "id": "county-drought",
+   "q": "Is your county in a drought?"
+  },
+  {
+   "id": "state-federal-contracts",
+   "q": "Where do federal contract dollars go?"
+  },
+  {
    "id": "county-risk",
    "q": "What disasters threaten your county?"
   },
@@ -467,6 +479,42 @@
     "environment"
    ],
    "catalogSlug": "usda"
+  },
+  {
+   "id": "noaa",
+   "name": "NOAA National Centers for Environmental Information",
+   "url": "https://www.ncei.noaa.gov/",
+   "topics": [
+    "environment"
+   ],
+   "catalogSlug": "noaa-gov"
+  },
+  {
+   "id": "usdm",
+   "name": "U.S. Drought Monitor",
+   "url": "https://droughtmonitor.unl.edu/",
+   "topics": [
+    "environment"
+   ],
+   "note": "Produced jointly by the National Drought Mitigation Center at the University of Nebraska-Lincoln, USDA and NOAA."
+  },
+  {
+   "id": "usaspending",
+   "name": "USAspending.gov (U.S. Treasury)",
+   "url": "https://www.usaspending.gov/",
+   "topics": [
+    "government"
+   ],
+   "catalogSlug": "treasury"
+  },
+  {
+   "id": "hud",
+   "name": "U.S. Department of Housing and Urban Development",
+   "url": "https://www.huduser.gov/portal/datasets/fmr.html",
+   "topics": [
+    "housing"
+   ],
+   "catalogSlug": "hud-gov"
   },
   {
    "id": "fred",
@@ -686,6 +734,34 @@
   "state-price-to-income": {
    "topic": "housing",
    "source": "census"
+  },
+  "state-temperature": {
+   "topic": "environment",
+   "source": "noaa"
+  },
+  "county-temperature": {
+   "topic": "environment",
+   "source": "noaa"
+  },
+  "state-drought": {
+   "topic": "environment",
+   "source": "usdm"
+  },
+  "county-drought": {
+   "topic": "environment",
+   "source": "usdm"
+  },
+  "state-federal-contracts": {
+   "topic": "government",
+   "source": "usaspending"
+  },
+  "state-federal-grants": {
+   "topic": "government",
+   "source": "usaspending"
+  },
+  "county-fair-market-rent": {
+   "topic": "housing",
+   "source": "hud"
   },
   "federal-deficit": {
    "topic": "government",

@@ -35,7 +35,7 @@ export const STATES = [
 async function get(url, type = 'json', tries = 3) {
   for (let i = 0; i < tries; i++) {
     try {
-      const r = await fetch(url, { headers: { 'User-Agent': 'civiccharts-data-refresh/1.0' } });
+      const r = await fetch(url, { headers: { 'User-Agent': 'civiccharts-data-refresh/1.0', ...(type === 'json' ? { Accept: 'application/json' } : {}) } });
       if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
       if (type === 'latin1') return new TextDecoder('latin1').decode(await r.arrayBuffer());
       if (type === 'binary') return new Uint8Array(await r.arrayBuffer());
@@ -1375,6 +1375,216 @@ builders['acs-housing-costs'] = async () => {
   return out;
 };
 
+// ---------- local money and climate ----------
+// NOAA nClimDiv county and state temperature, keyless fixed-width files (~40 MB for counties).
+// State codes in these files are NOAA's own (alphabetical, AK and HI last), not FIPS.
+const NOAA_ST = ['AL','AZ','AR','CA','CO','CT','DE','FL','GA','ID','IL','IN','IA','KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT','VA','WA','WV','WI','WY','HI','AK'];
+async function climdiv(kind) {
+  const idx = await get('https://www.ncei.noaa.gov/pub/data/cirs/climdiv/', 'text');
+  const name = [...idx.matchAll(new RegExp(`climdiv-${kind}-v[\\d.]+-\\d{8}`, 'g'))].map(m => m[0]).sort().at(-1);
+  if (!name) throw new Error(`NOAA climdiv: no ${kind} file listed`);
+  return { name, text: await get(`https://www.ncei.noaa.gov/pub/data/cirs/climdiv/${name}`, 'text') };
+}
+// Parse rows into Map(key -> Map(year -> annual mean)), counting only complete years.
+function climdivAnnual(text, keyLen) {
+  const out = new Map();
+  for (const ln of text.split('\n')) {
+    if (ln.length < 20) continue;
+    // First field: place code, element code, year (10 characters for states, 11 for counties).
+    const [field, ...rest] = ln.trim().split(/\s+/), key = field.slice(0, keyLen), y = +field.slice(-4), vals = rest.map(Number);
+    if (vals.length !== 12 || vals.some(v => v <= -99)) continue; // incomplete year
+    if (!out.has(key)) out.set(key, new Map());
+    out.get(key).set(y, vals.reduce((a, b) => a + b, 0) / 12);
+  }
+  return out;
+}
+builders['temperature'] = async () => {
+  // NOAA posts new files monthly under a new name; skip the 40 MB download when the name hasn't changed.
+  const idx = await get('https://www.ncei.noaa.gov/pub/data/cirs/climdiv/', 'text');
+  const latest = [...idx.matchAll(/climdiv-tmpccy-v[\d.]+-\d{8}/g)].map(m => m[0]).sort().at(-1);
+  const kept = await unchanged(['state-temperature', 'county-temperature'], d => latest && d.sourceFile === latest, 'temperature');
+  if (kept) return kept;
+  const [cy, st] = [await climdiv('tmpccy'), await climdiv('tmpcst')];
+  const cty = climdivAnnual(cy.text, 5), sta = climdivAnnual(st.text, 3);
+  const years = [...new Set([...sta.get('110')?.keys() || []])].sort((a, b) => a - b);
+  if (years.length < 100) throw new Error('NOAA climdiv: national series too short');
+  // Departure from each place's own 1901-2000 average, the baseline NOAA uses in its climate reports.
+  const anom = m => {
+    const base = []; for (let y = 1901; y <= 2000; y++) if (m.has(y)) base.push(m.get(y));
+    if (base.length < 90) return years.map(() => null);
+    const b = base.reduce((a, x) => a + x, 0) / base.length;
+    return years.map(y => (m.has(y) ? round(m.get(y) - b, 1) : null));
+  };
+  const src = { publisher: 'NOAA National Centers for Environmental Information', short: 'NOAA', dataset: `nClimDiv county and statewide temperature (${cy.name.split('-').slice(2).join('-')})`, url: 'https://www.ncei.noaa.gov/access/monitoring/climate-at-a-glance/' };
+  const unit = { label: 'Temperature vs. 1901–2000 average', format: 'number', decimals: 1, suffix: '°F', signed: true };
+  const how = ['Each place is compared with its own 20th-century average, so a cold state and a hot one can be compared fairly.',
+    'Above zero means the year was warmer than that place used to be; below zero, cooler.'];
+  const cav = ['Values come from a grid built from thousands of weather stations, adjusted for station moves and instrument changes.', 'One year can swing a degree or more either way; look at decades for the trend.'];
+  const times = years.map(y => `${y}-12-31`);
+  const base = { category: 'Environment', frequency: 'annual', unit, source: src, isRate: true, zeroLine: true, divFlip: true, sourceFile: cy.name };
+  const national = { name: 'Contiguous U.S.', values: anom(sta.get('110')) };
+  const states = STATES.map(([ab, fips, name]) => {
+    const n = NOAA_ST.indexOf(ab);
+    const m = n >= 0 ? sta.get(String(n + 1).padStart(3, '0')) : null;
+    return { id: fips, code: ab, name, values: m ? anom(m) : years.map(() => null) };
+  });
+  const { vintage, recs } = await censusCountyFile();
+  const counties = recs.map(r => {
+    const n = NOAA_ST.indexOf(ABBR[r.STATE]);
+    const m = n >= 0 ? cty.get(String(n + 1).padStart(2, '0') + r.COUNTY) : null;
+    return { id: r.STATE + r.COUNTY, code: ABBR[r.STATE], name: `${r.CTYNAME}, ${ABBR[r.STATE]}`, short: r.CTYNAME, pop: +r[`POPESTIMATE${vintage}`], values: m ? anom(m) : years.map(() => null) };
+  });
+  return [
+    panel({ ...base, id: 'state-temperature', title: 'How much warmer each state has gotten', geo: 'us-states',
+      description: 'Each state\'s average temperature for the year compared with its 1901–2000 average.',
+      howToRead: how, caveats: [...cav, 'Alaska and Hawaii records start after 1901, so they have no 1901–2000 baseline and show as no data. D.C. is not reported separately. The national line covers the 48 contiguous states.'], national }, times, states),
+    panel({ ...base, id: 'county-temperature', title: 'How much warmer each county has gotten', geo: 'us-counties',
+      description: 'Each county\'s average temperature for the year compared with its 1901–2000 average.',
+      howToRead: how, caveats: [...cav, 'Alaska and Hawaii records start after 1901, so they have no 1901–2000 baseline and show as no data. ' + COUNTY_CAVEAT], national: { ...national } }, times, counties),
+  ];
+};
+
+// Previous snapshots of these datasets if every one passes `same`, refreshed timestamp; else null.
+// A snapshot only counts if the builder code that made it is unchanged (buildHash), so edits to
+// wording or methods always rebuild.
+const buildHash = key => { let h = 0; for (const c of builders[key].toString()) h = (h * 31 + c.charCodeAt(0)) | 0; return (h >>> 0).toString(36); };
+async function unchanged(ids, same, key) {
+  const out = [];
+  for (const id of ids) {
+    try { const d = JSON.parse(await fs.readFile(path.join(OUT, id + '.json'), 'utf8')); if (!same(d) || d.buildHash !== buildHash(key)) return null; out.push({ ...d, retrieved: NOW }); } catch { return null; }
+  }
+  console.log(`  ${ids.join(', ')}: no new release; kept snapshot`);
+  return out;
+}
+// U.S. Drought Monitor (National Drought Mitigation Center, USDA, NOAA): weekly maps every Thursday.
+// statisticsType=1 is cumulative, so d1 is the share of area in moderate drought or worse.
+const USDM = 'https://usdmdataservices.unl.edu/api';
+const mdy = d => `${d.getUTCMonth() + 1}/${d.getUTCDate()}/${d.getUTCFullYear()}`;
+builders['drought'] = async () => {
+  const end = new Date(), startC = new Date(Date.now() - 2 * 365 * DAY_MS);
+  const nat = await get(`${USDM}/USStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=us&startdate=1/1/2000&enddate=${mdy(end)}&statisticsType=1`);
+  const natBy = new Map(nat.map(r => [r.mapDate.slice(0, 10), +r.d1]));
+  const weeks = [...natBy.keys()].sort();
+  if (weeks.length < 500) throw new Error('Drought Monitor: national series too short');
+  // New maps come out weekly; between releases, keep the snapshot instead of re-downloading every county.
+  const kept = await unchanged(['state-drought', 'county-drought'], d => d.lastObservation === weeks.at(-1), 'drought');
+  if (kept) return kept;
+  const src = { publisher: 'U.S. Drought Monitor (National Drought Mitigation Center, USDA and NOAA)', short: 'U.S. Drought Monitor', dataset: 'Drought severity statistics by area, cumulative (D1 to D4)', url: 'https://droughtmonitor.unl.edu/' };
+  const unit = { label: 'Share of land area in drought (moderate or worse)', format: 'pct', decimals: 0, max: 100 };
+  const how = ['Counts land in moderate (D1), severe (D2), extreme (D3) or exceptional (D4) drought. Abnormally dry (D0) areas are not counted.',
+    'Maps are drawn weekly by climate scientists from rainfall, soil moisture, streamflow and on-the-ground reports, valid as of each Tuesday.'];
+  const cav = ['The Drought Monitor blends data with expert judgment, so it is an assessment, not a single measurement.', 'The national figure covers the 48 contiguous states.'];
+  const base = { category: 'Environment', frequency: 'weekly', unit, source: src, isRate: true, howToRead: how };
+  const stRows = [], ctRows = [];
+  for (const [ab, fips] of STATES) {
+    stRows.push(...(await get(`${USDM}/StateStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=${fips}&startdate=1/1/2000&enddate=${mdy(end)}&statisticsType=1`)).map(r => [fips, r.mapDate.slice(0, 10), +r.d1]));
+    ctRows.push(...(await get(`${USDM}/CountyStatistics/GetDroughtSeverityStatisticsByAreaPercent?aoi=${ab}&startdate=${mdy(startC)}&enddate=${mdy(end)}&statisticsType=1`)).map(r => [r.fips, r.mapDate.slice(0, 10), +r.d1]));
+  }
+  const grid = (rows, times) => { const m = new Map(); for (const [id, t, v] of rows) m.set(`${id}|${t}`, v); return id => times.map(t => m.get(`${id}|${t}`) ?? null); };
+  const sGet = grid(stRows, weeks);
+  const cWeeks = weeks.filter(t => t >= startC.toISOString().slice(0, 10));
+  const cGet = grid(ctRows, cWeeks);
+  const { vintage, recs } = await censusCountyFile();
+  return [
+    panel({ ...base, id: 'state-drought', title: 'Drought by state', caveats: cav, geo: 'us-states',
+      description: 'Share of each state\'s land area in moderate drought or worse, each week since 2000.',
+      national: { name: 'Contiguous U.S.', values: weeks.map(t => natBy.get(t)) } }, weeks, STATES.map(([ab, fips, name]) => ({ id: fips, code: ab, name, values: sGet(fips) }))),
+    panel({ ...base, id: 'county-drought', title: 'Drought by county', caveats: [...cav, 'County maps cover the last two years of weekly maps.', COUNTY_CAVEAT], geo: 'us-counties',
+      description: 'Share of each county\'s land area in moderate drought or worse, weekly over the last two years.',
+      national: { name: 'Contiguous U.S.', values: cWeeks.map(t => natBy.get(t)) } }, cWeeks,
+      recs.map(r => ({ id: r.STATE + r.COUNTY, code: ABBR[r.STATE], name: `${r.CTYNAME}, ${ABBR[r.STATE]}`, short: r.CTYNAME, pop: +r[`POPESTIMATE${vintage}`], values: cGet(r.STATE + r.COUNTY) }))),
+  ];
+};
+const DAY_MS = 864e5;
+
+// USAspending.gov: federal contracts and grants by state where the work happens (place of performance).
+// Direct payments are left out on purpose: USAspending books many of them where they are processed
+// (Medicare contractors in Fargo, ND), which would make North Dakota look like it gets $110,000 a resident.
+builders['federal-spending'] = async () => {
+  const now = new Date(), lastFy = now.getUTCMonth() >= 10 ? now.getUTCFullYear() : now.getUTCFullYear() - 1; // FY ends Sep 30; give it to November
+  const allFys = []; for (let y = 2010; y <= lastFy; y++) allFys.push(y);
+  const pop = await statePopulation(), popAt = (ab, y) => { const p = pop[ab + 'POP']; if (!p?.length) return null; const hit = p.find(x => +x[0].slice(0, 4) === y) || (y > +p.at(-1)[0].slice(0, 4) ? p.at(-1) : null); return hit ? hit[1] * 1000 : null; };
+  const GROUPS = [
+    ['contracts', ['A', 'B', 'C', 'D'], 'Federal contract spending per resident by state', 'Federal contract dollars per resident', 'Money federal agencies paid companies and organizations for goods and services, per resident of the state where the work was done.',
+      'Defense and federal offices dominate: Virginia, Maryland and D.C. lead because of the Pentagon, intelligence agencies and federal contractors nearby.'],
+    ['grants', ['02', '03', '04', '05'], 'Federal grants per resident by state', 'Federal grant dollars per resident', 'Grants from federal agencies to state and local governments, universities, nonprofits and others, per resident.',
+      'Medicaid is the largest grant by far, so states that expanded Medicaid or have more low-income residents receive more.'],
+  ];
+  const out = [];
+  for (const [slug, codes, title, label, description, why] of GROUPS) {
+    const byState = new Map(STATES.map(([ab]) => [ab, new Map()])), fys = allFys.slice();
+    for (const fy of fys) {
+      const r = await fetch('https://api.usaspending.gov/api/v2/search/spending_by_geography/', { method: 'POST', headers: { 'Content-Type': 'application/json', 'User-Agent': 'civiccharts-data-refresh/1.0' },
+        body: JSON.stringify({ scope: 'place_of_performance', geo_layer: 'state', filters: { time_period: [{ start_date: `${fy - 1}-10-01`, end_date: `${fy}-09-30` }], award_type_codes: codes } }) });
+      if (!r.ok) throw new Error(`USAspending HTTP ${r.status} (FY${fy})`);
+      for (const x of (await r.json()).results) if (byState.has(x.shape_code)) byState.get(x.shape_code).set(fy, x.aggregated_amount);
+    }
+    // A fiscal year that just ended can be far from fully reported (grants especially). Drop trailing
+    // years whose national total is under 60% of the year before, so a reporting lag never reads as a cut.
+    const total = fy => STATES.reduce((a, [ab]) => a + (byState.get(ab).get(fy) || 0), 0);
+    while (fys.length > 2 && total(fys.at(-1)) < 0.6 * total(fys.at(-2))) { console.log(`  ${slug}: FY${fys.at(-1)} looks incomplete (${Math.round(total(fys.at(-1)) / 1e9)}B vs ${Math.round(total(fys.at(-2)) / 1e9)}B); left out`); fys.pop(); }
+    const per = (ab, fy) => { const a = byState.get(ab).get(fy), p = popAt(ab, fy); return a != null && p ? round(a / p, 0) : null; };
+    const natVals = fys.map(fy => { let a = 0, p = 0; for (const [ab] of STATES) { const v = byState.get(ab).get(fy), q = popAt(ab, fy); if (v != null && q) { a += v; p += q; } } return p ? round(a / p, 0) : null; });
+    out.push(panel({ id: `state-federal-${slug}`, title, category: 'Government', frequency: 'fiscal', geo: 'us-states', lens: slug === 'contracts' ? 'Contracts' : 'Grants',
+      reframes: ['state-federal-contracts', 'state-federal-grants'], isRate: true,
+      unit: { label, format: 'usd', decimals: 0 }, description,
+      source: { publisher: 'U.S. Department of the Treasury, USAspending.gov', short: 'USAspending.gov', dataset: `Spending by geography, place of performance (${slug}); population from the U.S. Census Bureau`, url: 'https://www.usaspending.gov/search' },
+      howToRead: [why, 'Counts money obligated (committed) in each fiscal year, October to September, by where the work happens, not where the recipient is headquartered.'],
+      caveats: ['Direct payments such as Social Security and Medicare are not included: USAspending records many of them where they are processed, not where recipients live.',
+        'Agencies report on their own schedules, so the latest year can still be revised; obligations can also be reduced in later years.', 'Per-resident figures computed by Civic Charts with Census population estimates.'],
+      national: { name: 'United States', values: natVals } }, fys.map(fy => `${fy}-09-30`), STATES.map(([ab, fips, name]) => ({ id: fips, code: ab, name, values: fys.map(fy => per(ab, fy)) }))));
+  }
+  return out;
+};
+
+// HUD Fair Market Rents: the rent HUD sets for a modest unit each fiscal year (40th percentile of
+// recent movers' gross rent), used for housing vouchers. The API needs a free token (HUD_API_TOKEN).
+// Past years never change, so only years missing from the snapshot and the latest two are fetched.
+builders['fair-market-rent'] = async () => {
+  if (!process.env.HUD_API_TOKEN) { console.log('  (skipped fair-market-rent: needs the HUD_API_TOKEN secret)'); return []; }
+  const id = 'county-fair-market-rent';
+  let prev = null; try { prev = JSON.parse(await fs.readFile(path.join(OUT, id + '.json'), 'utf8')); } catch { }
+  const nowY = new Date().getUTCFullYear(), hdr = { Authorization: `Bearer ${process.env.HUD_API_TOKEN}`, 'User-Agent': 'civiccharts-data-refresh/1.0', Accept: 'application/json' };
+  const byYear = new Map(); // year -> Map(county fips -> [2-bedroom FMRs])
+  for (let y = 2017; y <= nowY + 1; y++) {
+    // Skip a past year only if the snapshot has it for nearly every county (a partial pull gets retried).
+    const pi = prev ? prev.times.findIndex(t => +t.slice(0, 4) === y) : -1;
+    if (pi >= 0 && y < nowY && prev.entities.filter(e => e.values[pi] != null).length > 3120) continue;
+    const m = new Map();
+    for (const [ab] of STATES) {
+      let j = null;
+      for (let i = 0; i < 5 && !j?.data; i++) {
+        if (i) await new Promise(res => setTimeout(res, 3000 * i));
+        try { const r = await fetch(`https://www.huduser.gov/hudapi/public/fmr/statedata/${ab}?year=${y}`, { headers: hdr }); j = await r.json(); } catch { j = null; }
+        if (j?.error && /invalid year/i.test(j.error)) break;
+      }
+      if (j?.error && /invalid year/i.test(j.error)) break; // not published yet
+      if (!j?.data) { console.warn(`  (HUD FMR: no data for ${ab} FY${y})`); continue; }
+      // New England lists towns: a county gets the median of its towns' rents.
+      for (const c of j.data.counties || []) { const k = String(c.fips_code).slice(0, 5), v = +c['Two-Bedroom']; if (v > 0) (m.get(k) || m.set(k, []).get(k)).push(v); }
+    }
+    if (m.size > 3000) { byYear.set(y, m); console.log(`  HUD FMR FY${y}: ${m.size} counties`); }
+  }
+  const years = [...new Set([...(prev?.times || []).map(t => +t.slice(0, 4)), ...byYear.keys()])].sort();
+  if (!years.length) throw new Error('HUD FMR: no years');
+  const med = a => { const s = [...a].sort((x, y) => x - y), n = s.length; return n % 2 ? s[n >> 1] : Math.round((s[n / 2 - 1] + s[n / 2]) / 2); };
+  const prevVal = (fips, y) => { const i = prev?.times.findIndex(t => +t.slice(0, 4) === y); return i >= 0 ? prev.entities.find(e => e.id === fips)?.values[i] ?? null : null; };
+  const val = (fips, y) => (byYear.has(y) ? (byYear.get(y).get(fips) ? med(byYear.get(y).get(fips)) : null) : prevVal(fips, y));
+  const { vintage, recs } = await censusCountyFile();
+  const entities = recs.map(r => { const f = r.STATE + r.COUNTY; return { id: f, code: ABBR[r.STATE], name: `${r.CTYNAME}, ${ABBR[r.STATE]}`, short: r.CTYNAME, pop: +r[`POPESTIMATE${vintage}`], values: years.map(y => val(f, y)) }; });
+  // National: population-weighted average across counties (HUD publishes no national FMR).
+  const natV = years.map((_, i) => { let a = 0, p = 0; for (const e of entities) if (e.values[i] != null && e.pop) { a += e.values[i] * e.pop; p += e.pop; } return p ? Math.round(a / p) : null; });
+  return panel({ id, title: 'Fair Market Rent by county', category: 'Housing', frequency: 'fiscal', geo: 'us-counties', isRate: true,
+    unit: { label: 'Two-bedroom Fair Market Rent per month', format: 'usd', decimals: 0 },
+    description: 'The monthly rent HUD sets for a modest two-bedroom unit in each county, including utilities, for the fiscal year starting each October.',
+    source: { publisher: 'U.S. Department of Housing and Urban Development', short: 'HUD', dataset: 'Fair Market Rents (HUD User API)', url: 'https://www.huduser.gov/portal/datasets/fmr.html' },
+    howToRead: ['Set near the 40th percentile of what recent movers pay, so it reflects current market rents more closely than survey averages of all renters.',
+      'Fiscal years start in October: FY2027 rents took effect October 1, 2026. HUD uses them to set housing voucher payments.'],
+    caveats: ['Counties inside one metro area usually share the metro\'s rent, so neighboring counties can show the same number.',
+      'In New England, HUD sets rents by town; a county shows the median of its towns.', 'National figure is a population-weighted average of counties computed by Civic Charts.', COUNTY_CAVEAT],
+    national: { name: 'United States (population-weighted)', values: natV } }, years.map(y => `${y}-09-30`), entities);
+};
+
 // ---------- run ----------
 await fs.mkdir(OUT, { recursive: true });
 const only = process.argv.slice(2);
@@ -1387,6 +1597,7 @@ for (const [key, build] of Object.entries(builders)) {
     for (const ds of result) {
       const n = ds.kind === 'panel' ? ds.entities.filter(e => e.values.some(v => v != null)).length : ds.kind === 'events' ? ds.events.length : ds.series.reduce((a, x) => a + x.points.length, 0);
       if (!n) { console.error(`FAIL ${ds.id}: built with no data (keeping previous snapshot)`); continue; }
+      ds.buildHash = buildHash(key);
       await fs.writeFile(path.join(OUT, ds.id + '.json'), JSON.stringify(ds));
       console.log(`ok   ${ds.id.padEnd(22)} ${ds.kind.padEnd(10)} last=${ds.lastObservation} ${Date.now() - t0}ms`);
     }

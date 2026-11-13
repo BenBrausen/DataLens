@@ -300,13 +300,14 @@
   // ---------- ready-made dataset search (instant, local) ----------
   const SYN = { jobs: ['unemploy', 'employ', 'job'], job: ['unemploy', 'employ'], work: ['unemploy', 'employ', 'job'], prices: ['inflation', 'price'], cpi: ['inflation'], cost: ['price', 'inflation'],
     spending: ['outlay', 'spending'], taxes: ['revenue', 'receipt'], tax: ['revenue', 'receipt'], borrowing: ['debt', 'deficit'], budget: ['deficit', 'budget', 'debt'],
-    homes: ['home', 'housing'], housing: ['home', 'house', 'mortgage', 'permit'], rent: ['rent', 'renter'], climate: ['temperature', 'co2', 'warming', 'heat'], warming: ['temperature'],
+    homes: ['home', 'housing'], housing: ['home', 'house', 'mortgage', 'permit'], rent: ['rent', 'renter'], fmr: ['fair market rent'], voucher: ['fair market rent'], section8: ['fair market rent'], climate: ['temperature', 'co2', 'warming', 'heat', 'drought'], warming: ['temperature'],
     crime: ['crime', 'homicide'], murder: ['homicide'], vote: ['president', 'election'], voting: ['president', 'election'], election: ['president', 'election'], elections: ['president', 'election'],
     drugs: ['overdose', 'drug'], opioid: ['overdose'], money: ['income'], wages: ['income', 'wage', 'pay'], pay: ['income', 'wage', 'pay'], salary: ['income', 'wage', 'pay'], moving: ['migration'], movers: ['migration'],
     disaster: ['disaster', 'risk', 'fema'], weather: ['disaster', 'heat', 'hurricane', 'flood'], storms: ['hurricane', 'disaster'], fire: ['wildfire'], gdp: ['gdp'], interest: ['interest', 'mortgage'],
     old: ['65', 'age'], elderly: ['65', 'age'], seniors: ['65'], poor: ['poverty'], insurance: ['uninsured'], pollution: ['air', 'co2'], quake: ['earthquake'], internet: ['broadband', 'internet'], wifi: ['broadband', 'internet'], online: ['broadband', 'internet'], connectivity: ['broadband'],
     groceries: ['grocer', 'food'], grocery: ['grocer', 'food'], food: ['grocer', 'food'], egg: ['egg'], electricity: ['electric'], power: ['electric'], utilities: ['electric', 'utility'], utility: ['electric', 'utility'],
-    affordable: ['income', 'rent', 'afford'], affordability: ['income', 'rent', 'afford'], afford: ['income', 'rent', 'afford'], earnings: ['pay', 'wage'], raises: ['wage', 'pay'], paycheck: ['wage', 'pay'], landlord: ['rent'] };
+    affordable: ['income', 'rent', 'afford'], affordability: ['income', 'rent', 'afford'], afford: ['income', 'rent', 'afford'], earnings: ['pay', 'wage'], raises: ['wage', 'pay'], paycheck: ['wage', 'pay'], landlord: ['rent'],
+    dry: ['drought'], rain: ['drought'], hot: ['temperature', 'warm'], heat: ['temperature', 'warm', 'heat'], warmer: ['temperature', 'warm'], hotter: ['temperature', 'warm'], warmest: ['temperature', 'warm'], hottest: ['temperature', 'warm'], contracts: ['contract'], grants: ['grant'], federal: ['federal'], defense: ['contract'], pentagon: ['contract'], medicaid: ['grant'] };
   const GEO_WORDS = { 'us-states': 'state states by-state', 'us-counties': 'county counties local', world: 'world country countries global international' };
   function hay(c) {
     if (c._hay) return c._hay;

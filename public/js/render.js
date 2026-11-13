@@ -188,7 +188,7 @@
       // kicker
       ctx.globalAlpha = aHead;
       ctx.textBaseline = 'top'; ctx.textAlign = 'left';
-      const kick = (o.kicker || `${s.ds.category} · ${s.ds.source.publisher}`).toUpperCase();
+      const kick = (o.kicker || `${s.ds.category} · ${s.ds.source.short || s.ds.source.publisher}`).toUpperCase();
       ctx.font = font(st, 700, L.kickerSize); spaced(ctx, 2.2 * S);
       ctx.fillStyle = st.accent;
       roundRect(ctx, L.R.x, L.kickerY + L.kickerSize * 0.12, 10 * S, L.kickerSize * 0.78, 2 * S); ctx.fill();
@@ -368,7 +368,8 @@
     let lo = d3.min(all, p => p.v), hi = d3.max(all, p => p.v);
     if (o.zeroBase) { lo = Math.min(0, lo); hi = Math.max(0, hi); }
     const pad = (hi - lo) * 0.06 || 1;
-    const y = d3.scaleLinear().domain([o.zeroBase && lo >= 0 ? 0 : lo - pad, hi + pad]).nice(5);
+    // unit.max caps the axis for shares that can't exceed it (drought: 100% of land area).
+    const y = d3.scaleLinear().domain([o.zeroBase && lo >= 0 ? 0 : lo - pad, Math.min(hi + pad, ds.unit.max ?? Infinity)]).nice(5);
     const tf = tickFormat(st);
     ctx.font = font(st, 400, 22 * S * st.ts);
     const ticks = y.ticks(5);
@@ -651,7 +652,9 @@
     const diverging = ds.zeroLine && lo < 0 && hi > 0;
     if (diverging) { const m = Math.max(-lo, hi); lo = -m; hi = m; }
     const norm = v => (v - lo) / (hi - lo || 1);
-    const colorOf = v => (diverging ? st.div(v / hi) : st.ramp(norm(v)));
+    // divFlip: warmer than normal reads red, not blue (temperature anomalies).
+    const flip = ds.divFlip ? -1 : 1;
+    const colorOf = v => (diverging ? st.div(flip * v / hi) : st.ramp(norm(v)));
     // Rankings beside the map when the map, sized to the available height, leaves a column
     // wide enough for readable names (340px at 1080 wide); otherwise two columns under it.
     const legendH = 74 * S, avail = C.h - 70 * S - legendH;
@@ -691,7 +694,7 @@
     // legend
     const lgY = mapBox.y + mapBox.h + 18 * S, lgW = Math.min(mapBox.w * 0.7, 640 * S), lgX = C.x;
     const g = ctx.createLinearGradient(lgX, 0, lgX + lgW, 0);
-    for (let i = 0; i <= 10; i++) g.addColorStop(i / 10, diverging ? st.div(i / 5 - 1) : st.ramp(i / 10));
+    for (let i = 0; i <= 10; i++) g.addColorStop(i / 10, diverging ? st.div(flip * (i / 5 - 1)) : st.ramp(i / 10));
     ctx.fillStyle = g; roundRect(ctx, lgX, lgY, lgW, 18 * S, Math.min(st.r, 9 * S)); ctx.fill();
     ctx.font = font(st, 400, 21 * S * st.ts); ctx.fillStyle = T.faint; ctx.textBaseline = 'top';
     // Five scale labels only if they fit side by side; otherwise low, middle, high.

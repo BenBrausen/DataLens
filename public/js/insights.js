@@ -166,7 +166,8 @@
       const ord = k => k + (['th', 'st', 'nd', 'rd'][(k % 100 > 10 && k % 100 < 14) ? 0 : Math.min(k % 10, 4) % 4] || 'th');
       const pos = rank === 1 ? `the highest of ${n}` : rank === n ? `the lowest of ${n}` : rank <= n / 2 ? `${ord(rank)} highest of ${n}` : `${ord(n - rank + 1)} lowest of ${n}`;
       const cmp = us != null ? `${val > us ? 'above' : val < us ? 'below' : 'equal to'} the U.S. (${v(us)})` : `compared with a typical ${ds.geo === 'world' ? 'country' : 'state'} at ${v(vals0(now))}`;
-      headline = `${fe.name}'s ${lbl} was ${v(val)} in ${d(li)}, ${cmp}. It ranks ${pos}.`;
+      const on = ['weekly', 'daily', 'real-time'].includes(ds.frequency) ? 'on' : 'in'; // "on November 10, 2026", "in 2025"
+      headline = `${fe.name}'s ${lbl} was ${v(val)} ${on} ${d(li)}, ${cmp}. It ranks ${pos}.`;
       const fa = fe.values[fi];
       if (fi !== li && fa != null) facts.push({ k: 'focus', text: `${fe.name} since ${PS.fmtDate(ds._tms[fi], f)}: ${PS.fmtChange(fa, val, u)}${us != null && ds.national.values[fi] != null ? ` (U.S.: ${PS.fmtChange(ds.national.values[fi], us, u)})` : ''}.` });
     }

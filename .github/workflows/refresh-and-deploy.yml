@@ -28,6 +28,7 @@ jobs:
           # Optional free keys raise rate limits / unlock sources. Add as repo secrets.
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
           API_DATA_GOV_KEY: ${{ secrets.API_DATA_GOV_KEY }}
+          HUD_API_TOKEN: ${{ secrets.HUD_API_TOKEN }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
       - name: Re-verify state portals (platform, dataset counts, moved domains)
         if: github.event_name != 'schedule' || github.event.schedule == '17 6 * * 1'
